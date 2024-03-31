@@ -1,0 +1,82 @@
+{% load static %}
+<!-- 
+  NOTE: This navigation bar is set to "expand at md" screen size. For more info, see: https://getbootstrap.com/docs/5.0/examples/navbars/.
+  Don't know how to use those examples? Right-click on that page and select "View page source" then copy the block of code you feel like using.
+ -->
+{% include 'nav/_css.html' %}
+ <nav class="navbar navbar-expand-md navbar-dark fixed-top p-0" aria-label="Main Navbar">
+  
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/"><img class="navLogo rounded-circle" src="/media/defaults/gso-logo.png" title="Home">
+      GSO   
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse text-center" id="mainNavbar">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-comments m-2"></i>Link1</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-comments m-2"></i>Link2</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'about' %}"><i class="fa fa-info-circle m-2"></i>About</a>
+        </li>
+      </ul>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Help
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <!-- <a class="dropdown-item" data-widget="control-sidebar" href="#">
+            Toggle Control Sidebar
+          </a> -->
+          <a class="dropdown-item" href="https://support.google.com/docs/answer/181110?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Cpc-shortcuts" target="_blank">
+            Google Sheets Shortcut keys
+          </a>
+          <a class="dropdown-item" href="https://adminlte.io/docs/3.0/components/main-header.html" target="_blank">AdminLTE3 widgets</a>
+          <a class="dropdown-item" href="#">Support</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Contact</a>
+        </div>
+      </li>
+
+    </div>
+  </div>
+  <div class="col col-sm-2">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if user.is_authenticated %}
+  <div class="btn-group">
+    <img title="{{request.user.username}}" class="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{request.user.image.url}}" alt="profilePic" width="45" height="45">
+    <!-- <h1 class="widget-user-username text-right text-white" style="position: absolute; left: 60%">{{ request.user.username }}</h1> -->
+    <div class="dropdown-menu" aria-labelledby="id_profile_links">
+      <a class="dropdown-item " href="{% url 'profile' request.user.username %}">Profile</a>
+      <a class="dropdown-item " href="{% url 'password-change' %}">Change password</a>
+      <hr class="dropdown-divider">
+      {% include 'auth/logout.html' %}
+      <!-- <a class="dropdown-item " href="/logout">Logout</a> -->
+    </div>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- NOT BEING USED ATM -->
+  <!-- Control Sidebar -->
+  <!-- <aside class="control-sidebar control-sidebar-light"> -->
+    <!-- Control sidebar content goes here -->
+    <!-- <div class="p-3"> -->
+      <!-- Content of the sidebar goes here -->
+    <!-- </div> -->
+  <!-- </aside> -->
+  <!-- /.control-sidebar -->

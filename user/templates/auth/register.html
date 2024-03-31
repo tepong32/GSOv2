@@ -1,0 +1,56 @@
+{% extends 'auth/base.html' %}
+
+
+{% block form %}
+<style type="text/css">
+  .card{
+  height: 800px;
+  margin-top: 3em;
+  margin-bottom: auto;
+  width: 450px;
+  background-color: rgba(0,0,0,0.2) !important;
+  }
+</style>
+  <div class="col-lg-6 col-md-5 col-sm-12">
+    <div class="position-relative" style="min-height: 300px;">
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Join us!</small></h3>
+        </div>
+        
+        <!-- /.card-header -->
+        <!-- form start -->
+        <form method="POST">
+          <div class="card-body">
+            {% csrf_token %}
+            <fieldset class="form-group">
+              {{ form }}
+            </fieldset>
+            <button type="submit" class="btn btn-primary">Sign up</button>
+            <div class="border-top pt-3">
+              <small class="text-muted">
+                Already have an account? <a class="ml-2" href="{% url 'login' %}">Log in here</a>
+              </small>
+              <div class="social-auth-links text-center">
+                <p>OR</p>
+                <a href="/accounts/google/login/?process=login" class="btn btn-block btn-danger socialaccount_provider google">
+                  <i class="fab fa-google-plus mr-2"></i>
+                  Sign up using Google
+                </a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock form %}
+
+
+
+
+
+
+
+
+

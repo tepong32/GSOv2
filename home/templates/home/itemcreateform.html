@@ -1,0 +1,18 @@
+{% extends 'home/index.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<form action="{% url 'add-item' %}" method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+    {% if form.errors %}
+      <p>Please check entries for the following fields:</p>
+      {{ form.errors }}
+    {% endif %}
+
+    {% bootstrap_button button_type="submit" content="OK" %}
+    {% bootstrap_button button_type="reset" content="Cancel" %}
+</form>
+
+{% endblock content %}

@@ -1,0 +1,77 @@
+{% load static %}
+{% load model_fields %} <!-- custom filter from templatetags folder -->
+
+<!-- Table from adminlte3 -->
+
+
+<div class="row">
+	<div class="col-sm-12 col-md-6"><div class="dt-buttons btn-group flex-wrap">
+		<button class="btn btn-secondary buttons-copy buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Copy</span></button> <button class="btn btn-secondary buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>CSV</span>
+		</button>
+		<button class="btn btn-secondary buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Excel</span>
+		</button>
+		<button class="btn btn-secondary buttons-pdf buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>PDF</span>
+		</button>
+		<button class="btn btn-secondary buttons-print" tabindex="0" aria-controls="example1" type="button"><span>Print</span>
+		</button>
+		<div class="btn-group">
+			<button class="btn btn-secondary buttons-collection dropdown-toggle buttons-colvis" tabindex="0" aria-controls="example1" type="button" aria-haspopup="true" aria-expanded="false"><span>Column visibility</span><span class="dt-down-arrow"></span>
+			</button>
+		</div>
+	</div></div>
+	<div class="col-sm-12 col-md-6"><div id="example1_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="" aria-controls="example1"></label></div>
+</div>
+</div>
+
+
+<!-- display the data on the table -->
+<div class="pagination">
+    {% if items.has_previous %}
+        <a href="?page={{ items.previous_page_number }}">previous</a>
+    {% endif %}
+    <span class="current-page">{{ items.number }}</span>
+    {% if items.has_next %}
+        <a href="?page={{ items.next_page_number }}">next</a>
+    {% endif %}
+</div>
+
+<div class="table-responsive" style="min-height: 100vh">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <!-- Generate table headers -->
+                {% for field in items.0|model_fields %}
+                	{% if field.name != "id" and field.name != "modified_on" %} <!-- skipping the id field -->
+                    	<th class="text-center">{{ field.verbose_name }}</th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody class="text-sm">
+            <!-- Generate table rows -->
+            {% for item in items %}
+                <tr>
+                    {% for field in item|model_fields %}
+                        {% if field.name != "id" and field.name != "modified_on" %} <!-- skipping the id field -->
+	                        <td>
+	                            <!-- adding conditional stringformat for obrNum field // 6 digits with leading zeros-->
+	                            {% if field.name == "OBR #" %}
+	                                {{ item|get_attr:field.name|stringformat:"06" }}
+	                            {% else %}
+	                                {{ item|get_attr:field.name }}
+	                            {% endif %}
+	                        </td>
+                       {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+</div>
+
+<iframe width="100%" height="800px" src="https://docs.google.com/spreadsheets/d/0B-THzOwfTWWSMEdXdkhQUTJZSlE/edit?usp=sharing&ouid=116138760479964019416&resourcekey=0--UXocsxSH1EyU5dWuGdF1g&rtpof=true&sd=true?widget=true&amp;headers=false"></iframe>

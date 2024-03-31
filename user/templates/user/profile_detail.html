@@ -1,0 +1,94 @@
+{% extends 'user/users_base.html' %}
+
+<!-- Users' Profile page -->
+<!-- Self-explanatory page...I guess. LOL -->
+
+{% block profile %}
+
+
+      <div class="container">
+        <div class="row">
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline col-md-4">
+              <div class="card-body box-profile">
+                {% if messages %}
+                  {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                  {% endfor %}
+                {% endif %}
+                <div class="text-center">
+                  <img class="profile-user-img img-fluid img-circle elevation-5"
+                       src="{{user.profile.image.url}}"
+                       alt="User profile picture" style="width: 150px; height: 150px">
+                </div>
+                
+                <h2 class="profile-username text-center">{{user.username}}
+
+                {% if user.username == request.user.username %}
+                  <small>
+                    <a title="Edit profile" class="fa fa-edit text-success" href="{% url 'profile-edit' user.username %}"></a>
+                  </small>
+                {% endif %}
+                </h2>
+                <p class="text-sm text-muted text-center"><i>"{{user.profile.quote}}"</i></p>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>Posts:</b> <a class="float-right"><b>{{posts}}</b></a>
+                  </li>
+                  <!-- <li class="list-group-item">
+                    <b>Following</b> <a class="float-right">543</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Friends</b> <a class="float-right">13,287</a>
+                  </li> -->
+                </ul>
+
+                <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <!-- About Me Box -->
+            <div class="card card-primary col ml-1">
+              <div class="card-header">
+                <h3 class="card-title">About Me</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <p>{{user.profile.about_me}}</p>
+
+                <hr>
+
+                <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+
+                <p class="text-muted">{{user.profile.location}}</p>
+
+                <hr>
+
+                <!-- Pro'ly, you need to add the Skills attribute to the Profile model. For now, remove this div or just leave this here. -->
+                <strong><i class="fas fa-pencil-alt mr-1"></i> Skills</strong>
+
+                <p class="text-muted">
+                  <span class="tag tag-danger">Add "skills" attribute to model</span><br>
+                  <span class="tag tag-danger">Then use a For-Loop here</span><br>
+                  <span class="tag tag-danger">To display them</span>
+
+                </p>
+
+                <hr>
+
+                <strong><i class="mr-1"></i>Member since {{ user.date_joined|date:"F Y" }}</strong>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    {% endblock profile %}
+
+

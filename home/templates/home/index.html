@@ -1,0 +1,86 @@
+{% load adminlte_helpers i18n %} {% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- this head part is default for AdminLTE -->
+    {% block title_outer %}
+    <title>{% block title %}{{ site.name }}{% endblock %}</title>
+    {% endblock %} {% block meta %}
+    <!-- OWN HEAD ICON -->
+    <link rel="icon" sizes="192x192" href="media/defaults/round.png">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+      name="viewport"
+    />
+    {% endblock %} {% block stylesheets %} {% include 'adminlte/lib/_styles.html' %}
+    <!-- Bootstrap Modal Forms -->
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+    <!-- Bootstrap 4 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="../../plugins/fontawesome-free/css/all.min.css"
+    />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css" />
+    <!-- Google Font: Source Sans Pro -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+      rel="stylesheet"
+    />
+    {% endblock %}
+    
+  </head>
+  <!-- The actual viewing page -->
+  <body class="hold-transition sidebar-mini layout-navbar-fixed">
+
+    <!-- JAVASCRIPTS after body-tag -->
+    <!-- FB likes plugin -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0" nonce="smTllhV8"></script>
+    <!-- FB comments plugin -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0" nonce="nguTQ8Lu"></script>
+    <!-- FB share plugin -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0" nonce="IO6K7q2y"></script>
+
+    {% include 'home/_css.html' %}
+  	<!-- Site Navigation -->
+  	{% include 'nav/navbar.html' %}
+
+
+	<!-- This block will contain the dynamic area of the site -->
+	<div class="container" style="padding-top: 4.8em; min-height: 100vh">
+	{% block content %}
+		<!-- Landing page (Home): -->
+      {% include 'home/home_authed.html' %}
+	{% endblock content %}
+
+  </div>
+
+    <!-- JAVASCRIPTS before /body-tag -->
+
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+    <!-- Fontawesome -->
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.js"
+      integrity="sha256-BTlTdQO9/fascB1drekrDVkaKd9PkwBymMlHOiG+qLI="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://use.fontawesome.com/2363b49f19.js"></script>
+  
+
+    {% include 'adminlte/lib/_scripts.html' %}
+  </body>
+  {% block footer %}
+    {% include 'nav/footer.html' %}
+  {% endblock footer %}
+</html>

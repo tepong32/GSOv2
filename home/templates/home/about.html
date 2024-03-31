@@ -1,0 +1,39 @@
+{% extends 'home/index.html' %}
+
+{% block content %}
+<style type="text/css">
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+  div {
+    font-family: 'Poppins', sans-serif;
+  }
+</style>
+<div class="row">
+  <!-- 1st col -->
+  <div class="container col-md-8 text-sm bg-transparent">
+    <!-- about col -->
+    <div class="col">
+      <div class="card elevation-3" style="margin: 0;">
+        <div class="card-header">
+          <h3 class="card-title">About <u><a href="/">teppy.rocks</a></u></h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body text-muted text-sm text-justify">
+          <small><i><p>
+            Here's the part specifically intended for curious individuals. ;)
+          </p></i></small>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </div>
+    <!-- /.about col -->
+  </div>
+  <!-- /1st col -->
+
+
+
+  <!-- 2nd col -->
+  <!-- dev profile -->
+  {% include 'home/teppyinfocard.html' %}
+</div> <!-- outermost row -->
+{% endblock %}

@@ -1,0 +1,6 @@
+Install GDrive for Desktop
+
+Choose whether to do online edits to the file or continue working on the tkinter app you made and just sync the file to Gdrive. The latter option works best as users can go ahead and encode using excel for the meantime and have the file automatically updated as displayed on the web page as well.
+
+The users app on the django project must be re-worked and only admins can register new users for displaying the gsheet privacy concerns (only authed users should be able to view it).
+Remove google login/register links, as well or set the is_active status of users to False by default so they can just register but cannot login until the admin approves their permissions.

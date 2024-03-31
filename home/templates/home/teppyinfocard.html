@@ -1,0 +1,49 @@
+<style type="text/css">
+  .devCard:hover {
+    height: 200px;
+    transition-delay: .7s; /*idk why this is not working*/
+  }
+</style>
+
+
+<div class="card col text-sm text-justify p-2 border elevation-3 ml-2" style="max-height: 450px" >
+
+    <!-- Dev Profile + Cover -->
+    <div class="card card-widget widget-user devCard" style="min-height: 150px;">
+      <div>
+          <video autoplay="" muted="" loop="" style="object-fit: cover;position: absolute;width: 100%; height: 100%; border-radius:  15px;">
+            <source src="/media/defaults/smile.mp4" type="video/mp4">
+          </video>
+          <br>
+        <h1 class="widget-user-username text-right text-white" style="position: absolute; left: 60%">Teppy</h1>
+        <br>
+        <br>
+        <small class="widget-user-desc text-right text-white" style="position: absolute; left: 55%">Website Creator</small>
+        <!-- like&share the site button -->
+          <div class="fb-like float-right mr-2" data-href="http://localhost:8000/" data-width="" data-layout="box_count" data-action="like" data-size="small" data-share="false" >
+          </div>
+      </div>
+      <div class="widget-user-image">
+        <img class="img-circle" src="/media/defaults/teppy-hd.png" alt="User Avatar">
+      </div>
+    </div>
+
+    <!-- About ME -->
+    <div class="card-title quoteText text-danger">
+      <h6>About ME section:</h6>
+    </div>
+    <div class="p-2" style="min-height: 150px;max-height: 400px; border-radius: 15px;">
+      <p class="p-2">
+        I am an aspiring web-developer/blogger writing about things I think are worth sharing. <br>
+        Still trying to learn a lot of new things related to the internet. <br>
+        I specifically learned and used the Django web framework because I want <small>(almost)</small> everything on my website to be <i>"custom-coded".</i> <br>
+      </p>
+      <hr>
+      <div class="col-sm-4 d-sm-block float-right" style="height: 75px">
+        <a class="fab fa-github dev_social_link m-1" href="https://github.com/tepong32" target="_blank"></a>
+        <a class="fab fa-facebook dev_social_link m-1" href="https://facebook.com/tepong32" target="_blank"></a>
+        <a class="fab fa-twitter dev_social_link m-1" href="https://twitter.com/tepongdgreat" target="_blank"></a>
+        <a class="fab fa-linkedin-square dev_social_link m-1" href="https://linkedin.com/in/cristinoagapitojr" target="_blank"></a>
+      </div>
+    </div>
+  </div> <!-- 2nd col -->

@@ -1,0 +1,48 @@
+<div class="card col text-sm text-justify p-2 border elevation-3 ml-2 mt-3" style="max-height: 450px" >
+
+    <!-- Dev Profile + Cover -->
+    <div class="card card-widget widget-user" style="min-height: 100px;">
+      <div>
+          <video autoplay="" muted="" loop="" style="object-fit: cover;position: absolute;width: 100%; height: 100%; border-radius:  15px;">
+            <source src="/media/defaults/smile.mp4" type="video/mp4">
+          </video>
+          <br>
+        
+      </div>
+
+
+      <div class="btn-group">
+        <img title="{{request.user.username}}" class="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{request.user.profile.image.url}}" alt="profilePic" width="60" height="60">
+        <h1 class="widget-user-username text-right text-white" style="position: absolute; left: 60%">{{ request.user.username }}</h1>
+        <div class="dropdown-menu" aria-labelledby="id_profile_links">
+          <a class="dropdown-item " href="{% url 'profile' request.user.username %}">Profile</a>
+          <a class="dropdown-item " href="{% url 'password-change' %}">Change password</a>
+          <hr class="dropdown-divider">
+          <a class="dropdown-item " href="/logout">Logout</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Panel -->
+    <div class="card-title quoteText text-danger text-center">
+      <h6>Your Panel</h6>
+      <hr>
+      <a class="btn btn-sm btn-primary mr-2" title="Yes. YOUR article." href="#">
+        Create YOUR article</i>
+      </a>
+
+      
+      {% if request.user.is_staff %}
+      <!-- This button is for staffs/admins to be able to share freebies. -->
+      <a class="btn btn-sm btn-primary mr-2" title="Give them something." href="#">
+        Add Freebie </i>
+      </a>
+      {% endif %}
+      <a class="btn btn-sm btn-primary mr-2" title="This is a test button. Don't mind this." href="#">
+        Share </i>
+      </a>
+    </div>
+    
+      
+    </div>
+  </div> <!-- 2nd col -->

@@ -1,0 +1,20 @@
+{% extends 'home/index.html' %}
+{% load static %}
+
+<!-- NOTE: This page "extends", home_authed is "included" -->
+<!-- Change back the "return line" in views.home to home_authed.html if needed -->
+
+{% block content %}
+Will probably separate the sheets here (if multiple files will be displayed) by tabs. <br>
+Sign-in with a Google account that has permissions to edit sheet. <br>
+
+<div class="container container-fluid">
+<!-- GSheet: add: "?widget=true&amp;headers=false" to share link -->
+<!-- add dimensions as needed -->
+<iframe width="100%" height="800px" src="{{gso_inv_link}}"></iframe>
+
+<!-- GDocs: add: "/pub?embedded=true" to share link -->
+<!-- add dimensions as needed -->
+<iframe class="col col-4" height="500px" src="https://docs.google.com/document/d/1pYh6MA5wlq6Uqo8lk8iVun0Hf2HO8ZxV3HPS0y3izNI/edit?usp=sharing/pub?embedded=true"></iframe>
+</div>
+{% endblock content %}

@@ -1,0 +1,13 @@
+{% extends 'home/index.html' %}
+
+<!-- 
+	NOTE: This is just the base html file for the users app. All other htmls inside the ''user' app will extend from this file which, in turn, also extends from another html file: 'home/index.html'.
+	IDK. I just feel like having this so, if ever you want to show something like ads on your users' profile screens, you can have it formatted here and not on 'home/index.html'.
+ -->
+
+{% block content %}
+
+<!-- the actual content for the users app -->
+{% block profile %} {% endblock profile %}
+
+{% endblock content %}
