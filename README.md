@@ -1,0 +1,38 @@
+Central Online Database/File Server for LGU Departments
+
+Mock Server for GSO:
+
+Problems:
+	Main:
+	Relic PCs breaking down and files have neither backups nor central server.
+	Not-so-organized way of creating references for the assets.
+	
+	Sub:
+	Stakeholders wanting to view/confirm information need to physically go to accounting department (where duplicate copies of the files are kept) to manually get the information they need. Hence, causing delays to the workflow of people supposed to be doing their specific tasks for the day. (...and yes, there's a bit of complaining happening here. (>.<))
+	No accountability yet having full control for whoever handles updating the records.
+	No properly-trained / well-knowledgeable employee handling the record-keeping tasks.
+
+
+
+Solutions:
+	Main:
+	Online file storage/server for records
+
+	Sub:
+	An admin-managed Google account keeping the records on Google Drive. This account decides who can edit and who has view-only access to the files by indicating email addresses, hence, passing accountability to the editors.
+		Pros:
+		Ever experienced needing to edit an Excel file and then a prompt saying "___ is open on another computer and the file is in Read-only mode" or something? Taking-advantage of the features provided by Google Apps, working on the same file simultaneously is not a problem. Changes made by all editors working on the file are saved real-time with indicators of who-made-what changes.
+		Google Sheets (counterpart of MS Excel) has a "version history" feature which can be very convenient if users made errors otherwise not "undo-able" using Excel (e.g.: tab deletion).
+		
+		
+		Cons:
+		A personal Google account can only store up to 15gb of files for free. Over the limit, a monthly/yearly subscription is needed to keep the files. (A typical excel file can be up to a few MB, at most so, a 15gb file storage can suffice for at least a few years, provided that one account will be used for only one department's files.)
+		
+		
+		GREATEST CON:
+		You will need a capable programmer/system admin (or, at least, someone with acceptable familiarity on how the internet works) to handle future tasks - delegating who can edit which files, removing accesses, creating/updating templates, "un-doing" major errors made on files.
+		Heads-up! A little process training will suffice for someone to be able to manage the account storing the files and provide/revoke accesses to them. However, there's also the risk of the account being taken-over or sabotaged by the admin (worst-case scenario: files being deleted which typically is equivalent to a relic PC breaking down ---the very problem we are trying to solve here). In the end, full trust by the LGU and/or a binding/liability contract may be needed before someone takes-over the account.
+
+	A popped-out problem arising from the Main problem's solution:
+	DATA PRIVACY
+	Storing and Sharing the files online may lead to Information Security (InfoSec) and Data Privacy concerns. This is where the web application (website) comes in. To be able to have access (view-only) to the file, users will need to login to the web app first. Credentials will then be managed by the web admin. So, unless someone who can login to the site or has direct access to the file shares it outside, data-leak will not be much of a problem. We will have a narrowed-down list of who may have leaked info.
