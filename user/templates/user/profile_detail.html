@@ -16,33 +16,44 @@
                     <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                   {% endfor %}
                 {% endif %}
-                <div class="text-center">
+                <div>
+                  <h2 class="profile-username text-right" style="position: absolute; left: 60%">{{user.username}}
+                  </h2>
+                  <p class="text-sm text-muted" style="position: absolute; left: 50%; bottom: 50%"><i>{{user.department}}</i></p>
                   <img class="profile-user-img img-fluid img-circle elevation-5"
-                       src="{{user.profile.image.url}}"
+                       src="{{user.image.url}}"
                        alt="User profile picture" style="width: 150px; height: 150px">
+
+
                 </div>
                 
-                <h2 class="profile-username text-center">{{user.username}}
+                
 
-                {% if user.username == request.user.username %}
-                  <small>
-                    <a title="Edit profile" class="fa fa-edit text-success" href="{% url 'profile-edit' user.username %}"></a>
-                  </small>
-                {% endif %}
+                
                 </h2>
-                <p class="text-sm text-muted text-center"><i>"{{user.profile.quote}}"</i></p>
-
+                
+                {% if user.username == request.user.username or user.is_admin %}
                 <ul class="list-group list-group-unbordered mb-3">
                   <li class="list-group-item">
-                    <b>Posts:</b> <a class="float-right"><b>{{posts}}</b></a>
-                  </li>
-                  <!-- <li class="list-group-item">
-                    <b>Following</b> <a class="float-right">543</a>
+                      <span><small>Only you (and admin/s) can see and/or modify these information.</small></span>
+                      <a title="Edit profile" class="fa fa-edit text-success" href="{% url 'profile-edit' user.username %}"></a>
                   </li>
                   <li class="list-group-item">
-                    <b>Friends</b> <a class="float-right">13,287</a>
-                  </li> -->
+                    <b>TIN</b> <a class="float-right">xxx</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>PAGIBIG</b> <a class="float-right">xxx</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>GSIS</b> <a class="float-right">xxx</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>PhilHealth</b> <a class="float-right">xxx</a>
+                  </li>
                 </ul>
+                {% else %}
+                <h3>### Personally Identifiable Information ###</h3>
+                {% endif %}
 
                 <a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>
               </div>
