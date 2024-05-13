@@ -117,7 +117,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     ### personal info
     first_name          = models.CharField(max_length=50)
-    middle_name         = models.CharField(max_length=50, blank=True)
+    middle_name         = models.CharField(max_length=50, blank=True, null=True)
     last_name           = models.CharField(max_length=50)
     ext_name            = models.CharField(max_length=3, blank=True, null=True, verbose_name="Extension")
     department          = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=False)
@@ -138,7 +138,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return str(self.username)
 
     def get_short_name(self):
-        return str(self.username)
+        return str(self.first_name)
 
     def dp_directory_path(instance, filename):
         # file will be uploaded to MEDIA_ROOT/DP/<username>/<filename> ---check settings.py. MEDIA_ROOT=media for the exact folder/location
