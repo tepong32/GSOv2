@@ -26,6 +26,6 @@ class UserUpdateForm(forms.ModelForm):
 
 	class Meta:
 		model = User 	# the model that is going to be affected is the User model, 
-		fields = ["email", "first_name", "middle_name", "last_name", "ext_name", "department", "image"]	# "username" field not changeable
+		fields = ["email", "first_name", "middle_name", "last_name", "ext_name", "image"]	# "username" & "department" field should not be user-changeable
 
 
