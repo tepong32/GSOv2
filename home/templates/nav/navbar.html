@@ -46,12 +46,14 @@
             <a class="dropdown-item" href="#">
               Support
             </a>
+            {% if user.is_authenticated %}
             <div class="dropdown-divider"></div>
             <a class="dropdown-item " href="{% url 'profile' request.user.username %}">Profile</a>
               <a class="dropdown-item " href="{% url 'password-change' %}">Change password</a>
               <hr class="dropdown-divider">
               {% include 'auth/logout.html' %}
           </div>
+          {% endif %}
         </li>
       </ul>
       

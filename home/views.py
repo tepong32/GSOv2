@@ -12,7 +12,7 @@ def home(request):
 	# external links as variables
 	# <!-- GSheet: add: "?widget=true&amp;headers=false" to share link -->
 	# see home.html
-	gso_inv_link = "https://docs.google.com/spreadsheets/d/1bQj8XPMQYlP-5xJPTWdf3yyxLehXU_kq/edit?usp=sharing&ouid=101213569485981432969&rtpof=true&sd=true?widget=true&amp;headers=false"
+	gso_inv_link = "https://docs.google.com/spreadsheets/d/1aYRgmCa6urHjWlVTBWLQmyLYPXtnnM78/edit?usp=drive_link&ouid=101213569485981432969&rtpof=true&sd=true"
 	
 
 	items = Item.objects.all().order_by("-date")
