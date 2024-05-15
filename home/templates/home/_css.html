@@ -19,11 +19,13 @@
 	a {
         text-decoration: none;
     }
-
+    /* modified bootstrap's bg-color schemes a little so they won't have just solid colors */
+	.bg-black .bg-dark{
+		background-color: #3c3744;
+	}
     .card {
     	border-radius: 20px;
     }
-
     .card-fullscreen {
 	    position: fixed;
 	    top: 0;
@@ -35,9 +37,9 @@
 	    z-index: 9999;
 	    overflow: auto;
 	}
-
-	/* modified bootstrap's bg-color schemes a little so they won't have just solid colors */
-	.bg-black .bg-dark{
-		background-color: #3c3744;
+	.recordsTab {
+		width: 100%;
+		height: 100vh;
 	}
+
 </style>

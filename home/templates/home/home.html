@@ -10,15 +10,15 @@
 <hr>
 
 
-<div class="card card-body">
+
 	{% for i in departments %}
 		{% if request.user.department == i %}
-			{{request.user}} <br>
 			<div class="col-12">
 				<div class="card card-primary card-tabs">
 				<div class="card-header p-0 pt-1">
 				<ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
 				<li class="pt-2 px-3"><h3 class="card-title"><i>{{request.user.department}}</i></h3></li>
+				<!-- fullscreen/restore toggle -->
 				<a class="nav-link" data-widget="fullscreen" href="#" role="button">
 					<i class="fas fa-expand-arrows-alt"></i>
 				</a>
@@ -50,7 +50,7 @@
 				</div>
 				<div class="tab-pane fade" id="custom-tabs-two-profile" role="tabpanel" aria-labelledby="custom-tabs-two-profile-tab">
 					<!-- gsheet for inventory record -->
-					<iframe width="100%" height="1000px" src="{{gso_inventory_link}}"></iframe>
+					<iframe class="recordsTab" src="{{gso_inventory_link}}"></iframe>
 				</div>
 				<div class="tab-pane fade" id="custom-tabs-two-messages" role="tabpanel" aria-labelledby="custom-tabs-two-messages-tab">
 					3
@@ -77,15 +77,14 @@
 
 
 		{% else %}
-			<b>generic view</b>
+			<b>{{i}}</b>
 		{% endif %}
 	{% endfor %}
-</div>
 
 
 <!-- GDocs: add: "/pub?embedded=true" to share link -->
 <!-- add dimensions as needed -->
-<iframe class="col" height="500px" src="https://docs.google.com/document/d/1pYh6MA5wlq6Uqo8lk8iVun0Hf2HO8ZxV3HPS0y3izNI/edit?usp=sharing/pub?embedded=true"></iframe>
+<iframe class="col" height="800px" src="https://docs.google.com/document/d/1pYh6MA5wlq6Uqo8lk8iVun0Hf2HO8ZxV3HPS0y3izNI/edit?usp=sharing/pub?embedded=true"></iframe>
 
 
 
