@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 
 # for needing user to be logged-in first before accessing the page requested
 from django.contrib.auth.decorators import login_required
+from user.models import User, Department
 
 
 @login_required
@@ -12,8 +13,8 @@ def home(request):
 	# external links as variables
 	# <!-- GSheet: add: "?widget=true&amp;headers=false" to share link -->
 	# see home.html
-	gso_inv_link = "https://docs.google.com/spreadsheets/d/1aYRgmCa6urHjWlVTBWLQmyLYPXtnnM78/edit?usp=drive_link&ouid=101213569485981432969&rtpof=true&sd=true"
-	
+	gso_inventory_link = "https://docs.google.com/spreadsheets/d/1aYRgmCa6urHjWlVTBWLQmyLYPXtnnM78/edit?usp=drive_link&ouid=101213569485981432969&rtpof=true&sd=true"
+	departments = Department.objects.all()
 
 	items = Item.objects.all().order_by("-date")
 	paginator = Paginator(items, 10)  # Show 10 items per page
@@ -22,7 +23,8 @@ def home(request):
 
 	context = {
 		'items': items_list,
-		'gso_inv_link': gso_inv_link
+		'gso_inventory_link': gso_inventory_link,
+		'departments': departments,
 	}
 
 	# return render(request, 'home/index.html', context)

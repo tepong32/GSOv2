@@ -5,23 +5,110 @@
 <!-- Change back the "return line" in views.home to home_authed.html if needed -->
 
 {% block content %}
-This area will display information on a "Need-to-Know" basis. <br>
-Meaning, only files related to your respective departments will be displayed to you. <br>
-How was that made possible? Filter. The pages displayed will be filtered depending on the department you were tagged against. <br>
-You cannot change your specified departments. Only admins can. So, don't bother. <br>
 
-Will probably separate the sheets here (if multiple files will be displayed) by tabs. <br>
-Sign-in with a Google account that has permissions to edit sheet. <br>
 
-<div class="container container-fluid">
-<!-- GSheet: add: "?widget=true&amp;headers=false" to share link -->
-<!-- add dimensions as needed -->
-<iframe width="100%" height="1200px" src="{{gso_inv_link}}"></iframe>
 <hr>
+
+
+<div class="card card-body">
+	{% for i in departments %}
+		{% if request.user.department == i %}
+			{{request.user}} <br>
+			<div class="col-12">
+				<div class="card card-primary card-tabs">
+				<div class="card-header p-0 pt-1">
+				<ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+				<li class="pt-2 px-3"><h3 class="card-title"><i>{{request.user.department}}</i></h3></li>
+				<a class="nav-link" data-widget="fullscreen" href="#" role="button">
+					<i class="fas fa-expand-arrows-alt"></i>
+				</a>
+				<li class="nav-item">
+				<a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#custom-tabs-two-home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">Home</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link" id="custom-tabs-two-profile-tab" data-toggle="pill" href="#custom-tabs-two-profile" role="tab" aria-controls="custom-tabs-two-profile" aria-selected="false">Inventory Record</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link" id="custom-tabs-two-messages-tab" data-toggle="pill" href="#custom-tabs-two-messages" role="tab" aria-controls="custom-tabs-two-messages" aria-selected="false">Voucher <small>(Receiving)</small></a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link" id="custom-tabs-two-settings-tab" data-toggle="pill" href="#custom-tabs-two-settings" role="tab" aria-controls="custom-tabs-two-settings" aria-selected="false">Voucher <small>(Transmittal)</small></a>
+				</li>
+				</ul>
+				</div>
+				<div class="card-body">
+				<div class="tab-content" id="custom-tabs-two-tabContent">
+				<div class="tab-pane fade show active" id="custom-tabs-two-home" role="tabpanel" aria-labelledby="custom-tabs-two-home-tab">
+					<!-- reminders -->
+					This area will display information on a "Need-to-Know" basis. <br>
+					Meaning, only files related to your respective departments will be displayed to you. <br>
+					How was that made possible? Filter. The pages displayed will be filtered depending on the department you were tagged against. <br>
+					You cannot change your specified departments. Only admins can. So, don't bother. <br>
+
+					Will probably separate the sheets here (if multiple files will be displayed) by tabs. <br>
+					Sign-in with a Google account that has permissions to edit sheet. <br>
+				</div>
+				<div class="tab-pane fade" id="custom-tabs-two-profile" role="tabpanel" aria-labelledby="custom-tabs-two-profile-tab">
+					<!-- gsheet for inventory record -->
+					<iframe width="100%" height="1000px" src="{{gso_inventory_link}}"></iframe>
+				</div>
+				<div class="tab-pane fade" id="custom-tabs-two-messages" role="tabpanel" aria-labelledby="custom-tabs-two-messages-tab">
+					3
+				</div>
+				<div class="tab-pane fade" id="custom-tabs-two-settings" role="tabpanel" aria-labelledby="custom-tabs-two-settings-tab">
+					4
+				</div>
+				</div>
+				</div>
+
+				</div>
+				</div>
+			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+		{% else %}
+			<b>generic view</b>
+		{% endif %}
+	{% endfor %}
+</div>
+
+
 <!-- GDocs: add: "/pub?embedded=true" to share link -->
 <!-- add dimensions as needed -->
-<iframe class="col col-8" height="500px" src="https://docs.google.com/document/d/1pYh6MA5wlq6Uqo8lk8iVun0Hf2HO8ZxV3HPS0y3izNI/edit?usp=sharing/pub?embedded=true"></iframe>
-<!-- <iframe class="col col-6" height="500px" src="https://docs.google.com/document/d/1pYh6MA5wlq6Uqo8lk8iVun0Hf2HO8ZxV3HPS0y3izNI/edit?usp=sharing/pub?embedded=true"></iframe> -->
+<iframe class="col" height="500px" src="https://docs.google.com/document/d/1pYh6MA5wlq6Uqo8lk8iVun0Hf2HO8ZxV3HPS0y3izNI/edit?usp=sharing/pub?embedded=true"></iframe>
 
-</div>
+
+
+
+
+
+
+<script>
+$(document).ready(function() {
+    $('.nav-link[data-widget="fullscreen"]').on('click', function(e) {
+        e.preventDefault();
+        var card = $(this).closest('.card');
+        var icon = $(this).children('i');
+        if (card.hasClass('card-fullscreen')) {
+            card.removeClass('card-fullscreen');
+            icon.removeClass('fas fa-compress-arrows-alt');
+            icon.addClass('fas fa-expand-arrows-alt');
+        } else {
+            card.addClass('card-fullscreen');
+            icon.removeClass('fas fa-expand-arrows-alt');
+            icon.addClass('fas fa-compress-arrows-alt');
+        }
+    });
+});
+</script>
 {% endblock content %}
