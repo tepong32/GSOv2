@@ -91,7 +91,7 @@ class Department(models.Model):
         verbose_name_plural = "Departments"
 
     def __str__(self):
-        return f"{self.name} - {self.dept_head}".strip()
+        return f"{self.name}".title()
 
 
 class User(AbstractBaseUser, PermissionsMixin):
