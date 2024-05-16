@@ -13,7 +13,9 @@ def home(request):
 	# external links as variables
 	# <!-- GSheet: add: "?widget=true&amp;headers=false" to share link -->
 	# see home.html
-	gso_inventory_link = "https://docs.google.com/spreadsheets/d/1aYRgmCa6urHjWlVTBWLQmyLYPXtnnM78/edit?usp=drive_link&ouid=101213569485981432969&rtpof=true&sd=true"
+
+	# nasa GSO folder tong isa na to
+	gso_inventory_link = "https://docs.google.com/spreadsheets/d/19nnnuiKAZMwFscjJBdqXQzjIjZ5OPBxk/edit?usp=sharing&ouid=101213569485981432969&rtpof=true&sd=true"
 	departments = Department.objects.all()
 
 	items = Item.objects.all().order_by("-date")

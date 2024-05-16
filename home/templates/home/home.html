@@ -6,11 +6,6 @@
 
 {% block content %}
 
-
-<hr>
-
-
-
 	{% for i in departments %}
 		{% if request.user.department == i %}
 			<div class="col-12">
@@ -43,7 +38,7 @@
 					This area will display information on a "Need-to-Know" basis. <br>
 					Meaning, only files related to your respective departments will be displayed to you. <br>
 					How was that made possible? Filter. The pages displayed will be filtered depending on the department you were tagged against. <br>
-					You cannot change your specified departments. Only admins can. So, don't bother. <br>
+					
 
 					Will probably separate the sheets here (if multiple files will be displayed) by tabs. <br>
 					Sign-in with a Google account that has permissions to edit sheet. <br>
