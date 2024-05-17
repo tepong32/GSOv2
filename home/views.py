@@ -28,9 +28,7 @@ def home(request):
 		'gso_inventory_link': gso_inventory_link,
 		'departments': departments,
 	}
-
-	# return render(request, 'home/index.html', context)
-	return render(request, 'home/home.html', context)
+	return render(request, 'home/departments/acctg.html', context)
 
 
 def about(request):
