@@ -27,6 +27,7 @@ def home(request):
 		'items': items_list,
 		'gso_inventory_link': gso_inventory_link,
 		'departments': departments,
+		'user': User
 	}
 	return render(request, 'home/departments/acctg.html', context)
 
