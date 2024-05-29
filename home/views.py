@@ -16,7 +16,8 @@ def home(request):
 
 	# nasa GSO folder tong isa na to
 	gso_inventory_link = "https://docs.google.com/spreadsheets/d/19nnnuiKAZMwFscjJBdqXQzjIjZ5OPBxk/edit?usp=sharing&ouid=101213569485981432969&rtpof=true&sd=true"
-	department = request.user.department
+	### excluding the ---select-one--- option from the list of Departments that will be contained on the departments variable
+	departments = [choice[0] for choice in Department.choices if choice[0] != Department.select]
 
 	items = Item.objects.all().order_by("-date")
 	paginator = Paginator(items, 10)  # Show 10 items per page
@@ -26,7 +27,7 @@ def home(request):
 	context = {
 		'items': items_list,
 		'gso_inventory_link': gso_inventory_link,
-		'department': department,
+		'departments': departments,
 		'user': User
 	}
 	return render(request, 'home/home.html', context)
