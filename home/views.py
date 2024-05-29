@@ -16,7 +16,7 @@ def home(request):
 
 	# nasa GSO folder tong isa na to
 	gso_inventory_link = "https://docs.google.com/spreadsheets/d/19nnnuiKAZMwFscjJBdqXQzjIjZ5OPBxk/edit?usp=sharing&ouid=101213569485981432969&rtpof=true&sd=true"
-	departments = Department.objects.all()
+	department = request.user.department
 
 	items = Item.objects.all().order_by("-date")
 	paginator = Paginator(items, 10)  # Show 10 items per page
@@ -26,10 +26,10 @@ def home(request):
 	context = {
 		'items': items_list,
 		'gso_inventory_link': gso_inventory_link,
-		'departments': departments,
+		'department': department,
 		'user': User
 	}
-	return render(request, 'home/departments/acctg.html', context)
+	return render(request, 'home/home.html', context)
 
 
 def about(request):

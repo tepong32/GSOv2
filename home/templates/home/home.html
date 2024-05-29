@@ -8,7 +8,14 @@
 	{% endcomment %}
 
 	{% if request.user.department in departments %}
-		{% include 'home/departments/{{user.department}}.html' %}
+		{% comment %}
+		with tag is used to concatenate the strings and create the path for the department template. The add filter is used to concatenate the strings. Then, the include tag is used with the variable department_template which holds the path of the template to be included.
+		{% endcomment %}
+
+		{% with "home/departments/"|add:request.user.department|add:".html" as department_template %}
+			{% include department_template %}
+		{% endwith %}
+		
 	{% else %}
 		{% include 'home/departments/other.html' %}
 	{% endif %}
