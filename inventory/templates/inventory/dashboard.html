@@ -14,6 +14,7 @@
   {% if can_view_stock %}<a href="{% url 'inventory:consumable-list' %}">Open consumables</a>{% endif %}
   {% if can_view_transfers %}<a href="{% url 'inventory:asset-transfer-list' %}">Asset handoffs{% if pending_transfer_count %} ({{ pending_transfer_count }} pending){% endif %}</a>{% endif %}
   {% if can_view_disposals %}<a href="{% url 'inventory:asset-disposal-list' %}">Disposal requests{% if open_disposal_count %} ({{ open_disposal_count }} open){% endif %}</a>{% endif %}
+  {% if can_view_verifications %}<a href="{% url 'inventory:asset-verification-list' %}">Physical verification{% if open_verification_count %} ({{ open_verification_count }} open){% endif %}</a>{% endif %}
   {% if can_add %}<a class="button primary" href="{% url 'inventory:asset-create' %}">Add an asset</a>{% endif %}
 </nav>
 <section class="metrics" aria-label="Asset overview">
@@ -28,6 +29,7 @@
   {% if can_view_stock %}<article class="module"><span class="pill available">Available</span><h3>Consumable supplies</h3><p>Record stock received and issued by department. FIFO lot tracking is optional per item.</p><a class="button primary" href="{% url 'inventory:consumable-list' %}">Open consumables</a></article>{% endif %}
   {% if can_view_transfers %}<article class="module"><span class="pill available">Available</span><h3>Asset handoffs</h3><p>Send an asset to another department and record its receipt.</p><a class="button primary" href="{% url 'inventory:asset-transfer-list' %}">Review handoffs{% if pending_transfer_count %} ({{ pending_transfer_count }} pending){% endif %}</a></article>{% endif %}
   {% if can_view_disposals %}<article class="module"><span class="pill available">Available</span><h3>Disposal requests</h3><p>Send asset condition photos and a signed form to GSO for review.</p><a class="button primary" href="{% url 'inventory:asset-disposal-list' %}">Open requests{% if open_disposal_count %} ({{ open_disposal_count }} open){% endif %}</a></article>{% endif %}
+  {% if can_view_verifications %}<article class="module"><span class="pill available">Available</span><h3>Physical verification</h3><p>Check assets against the register and record location, condition, and discrepancies.</p><a class="button primary" href="{% url 'inventory:asset-verification-list' %}">Open verification{% if open_verification_count %} ({{ open_verification_count }} open){% endif %}</a></article>{% endif %}
   <article class="module"><span class="pill">Planned</span><h3>Procurement and suppliers</h3><p>Follow purchase references, delivery details, and supplier information.</p><span class="muted">Planned workspace · not connected yet</span></article>
   <article class="module"><span class="pill">Planned</span><h3>Maintenance requests</h3><p>Coordinate equipment concerns and retain repair history against an asset.</p><span class="muted">Planned workspace · not connected yet</span></article>
 </section>

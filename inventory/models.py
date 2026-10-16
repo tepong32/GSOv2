@@ -133,6 +133,9 @@ class Asset(models.Model):
             ("acknowledge_asset_transfer", "Can acknowledge asset handoffs to the assigned department"),
             ("request_asset_disposal", "Can request assessment for disposal of an assigned asset"),
             ("review_asset_disposal", "Can review and record GSO asset disposal cases"),
+            ("start_asset_verification", "Can start GSO physical asset verification rounds"),
+            ("record_asset_verification", "Can record physical asset verification results"),
+            ("close_asset_verification", "Can close completed physical asset verification rounds"),
         )
         indexes = (
             models.Index(fields=("department_id", "status"), name="gso_asset_dept_status"),
@@ -230,6 +233,94 @@ class AssetTransfer(models.Model):
 
     def __str__(self):
         return f"{self.asset.asset_name}: {self.source_department_label or 'Unassigned'} to {self.destination_department_label}"
+
+
+class AssetVerificationRound(models.Model):
+    """A dated GSO exercise that snapshots the assets to be physically checked."""
+
+    title = models.CharField(max_length=160)
+    department_id = models.PositiveBigIntegerField(db_index=True)
+    department_label = models.CharField(max_length=160)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_verification_rounds_created",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    closed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_verification_rounds_closed",
+    )
+    closed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+
+    @property
+    def is_closed(self):
+        return self.closed_at is not None
+
+    def __str__(self):
+        return self.title
+
+
+class AssetVerificationRecord(models.Model):
+    NOT_CHECKED = "not_checked"
+    MATCHED = "matched"
+    DISCREPANCY = "discrepancy"
+    NOT_FOUND = "not_found"
+    RESULT_CHOICES = (
+        (NOT_CHECKED, "Not checked"),
+        (MATCHED, "Found and matched"),
+        (DISCREPANCY, "Found with a discrepancy"),
+        (NOT_FOUND, "Not found during visit"),
+    )
+    CONDITION_CHOICES = (("serviceable", "Serviceable"), ("damaged", "Damaged / needs attention"), ("unknown", "Not assessed"))
+
+    verification_round = models.ForeignKey(AssetVerificationRound, on_delete=models.PROTECT, related_name="records")
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="verification_records")
+    asset_name_snapshot = models.CharField(max_length=180)
+    property_tag_snapshot = models.CharField(max_length=100, blank=True)
+    serial_number_snapshot = models.CharField(max_length=120, blank=True)
+    assigned_department_snapshot = models.CharField(max_length=160, blank=True)
+    assigned_office_snapshot = models.CharField(max_length=160, blank=True)
+    result = models.CharField(max_length=20, choices=RESULT_CHOICES, default=NOT_CHECKED, db_index=True)
+    observed_department = models.CharField(max_length=160, blank=True)
+    observed_office = models.CharField(max_length=160, blank=True)
+    condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, blank=True)
+    notes = models.TextField(blank=True)
+    verified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_verifications_recorded",
+    )
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("result", "asset_name_snapshot", "pk")
+        constraints = (models.UniqueConstraint(fields=("verification_round", "asset"), name="gso_asset_once_per_verification"),)
+
+    def __str__(self):
+        return f"{self.asset_name_snapshot} — {self.get_result_display()}"
+
+
+class AssetVerificationEvent(models.Model):
+    record = models.ForeignKey(AssetVerificationRecord, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_verification_events",
+    )
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Verification history is immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Verification history is retained and cannot be deleted.")
 
 
 class AssetDisposalCase(models.Model):

@@ -13,19 +13,25 @@ from .access import (
     _is_gso_department, asset_access_required, asset_in_scope, can,
     can_acknowledge_asset_transfer, can_request_asset_disposal,
     can_review_asset_disposal, can_stock, can_transfer_asset, can_view_audit,
+    can_manage_asset_verification,
     department_for_user, department_model, gso_department_for_user,
 )
 from .forms import (
     AssetDisposalRequestForm, AssetDisposalResponseForm, AssetDisposalReviewForm,
     AssetForm, AssetTransferForm, ConsumableItemForm, StockAdjustmentForm,
     StockIssueForm, StockReceiptForm, TransferCancellationForm,
+    AssetVerificationRoundForm, AssetVerificationRecordForm,
 )
-from .models import Asset, AssetDisposalAttachment, AssetDisposalCase, AssetTransfer, ConsumableItem, StockMovement
+from .models import (
+    Asset, AssetDisposalAttachment, AssetDisposalCase, AssetTransfer,
+    AssetVerificationRecord, AssetVerificationRound, ConsumableItem, StockMovement,
+)
 from .services import (
     acknowledge_asset_transfer, cancel_asset_transfer, create_asset,
     create_asset_transfer, create_consumable, record_stock_movement,
     respond_to_disposal_case, review_asset_disposal_case,
     submit_asset_disposal_request, update_asset, update_consumable,
+    start_asset_verification_round, record_asset_verification, close_asset_verification_round,
 )
 
 
@@ -66,6 +72,9 @@ def dashboard(request):
             AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
             AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
         )).count() if can_review_asset_disposal(request.user) or can_request_asset_disposal(request.user) else 0,
+        "can_view_verifications": any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")),
+        "open_verification_count": _verification_round_queryset(request.user).filter(closed_at__isnull=True).count()
+        if any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")) else 0,
     })
 
 
@@ -275,6 +284,87 @@ def asset_transfer_cancel(request, pk):
     else:
         messages.error(request, "Enter a reason before cancelling the handoff.")
     return redirect("inventory:asset-transfer-list")
+
+
+def _verification_round_queryset(user):
+    rounds = AssetVerificationRound.objects.select_related("created_by", "closed_by")
+    if user.is_superuser:
+        return rounds
+    department = gso_department_for_user(user)
+    return rounds.filter(department_id=department.pk) if department else rounds.none()
+
+
+@asset_access_required("view")
+def asset_verification_list(request):
+    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")):
+        raise PermissionDenied
+    form = AssetVerificationRoundForm(request.POST or None) if can_manage_asset_verification(request.user, "start") else None
+    if request.method == "POST":
+        if not form or not form.is_valid():
+            return render(request, "inventory/asset_verification_list.html", {"rounds": _verification_round_queryset(request.user), "form": form, "can_start": bool(form)})
+        try:
+            verification_round = start_asset_verification_round(actor=request.user, title=form.cleaned_data["title"])
+        except (PermissionDenied, ValidationError) as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Verification round created with a snapshot of all active GSO assets.")
+            return redirect("inventory:asset-verification-detail", pk=verification_round.pk)
+    return render(request, "inventory/asset_verification_list.html", {
+        "rounds": _verification_round_queryset(request.user), "form": form,
+        "can_start": can_manage_asset_verification(request.user, "start"),
+    })
+
+
+@asset_access_required("view")
+def asset_verification_detail(request, pk):
+    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")):
+        raise PermissionDenied
+    verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
+    records = verification_round.records.select_related("verified_by")
+    counts = {key: records.filter(result=key).count() for key, _ in AssetVerificationRecord.RESULT_CHOICES}
+    if request.method == "POST":
+        if not can_manage_asset_verification(request.user, "close"):
+            raise PermissionDenied
+        try:
+            close_asset_verification_round(actor=request.user, verification_round=verification_round)
+        except (PermissionDenied, ValidationError) as error:
+            messages.error(request, str(error))
+        else:
+            messages.success(request, "Verification round closed. Its recorded results remain available for review.")
+        return redirect("inventory:asset-verification-detail", pk=verification_round.pk)
+    return render(request, "inventory/asset_verification_detail.html", {
+        "verification_round": verification_round, "records": records,
+        "counts": counts, "can_record": can_manage_asset_verification(request.user, "record"),
+        "can_close": can_manage_asset_verification(request.user, "close"),
+    })
+
+
+@asset_access_required("view")
+def asset_verification_record(request, pk):
+    if not can_manage_asset_verification(request.user, "record"):
+        raise PermissionDenied
+    record = get_object_or_404(
+        AssetVerificationRecord.objects.select_related("verification_round"),
+        pk=pk, verification_round__in=_verification_round_queryset(request.user),
+    )
+    form = None if record.verification_round.closed_at else AssetVerificationRecordForm(request.POST or None, initial={
+        "result": record.result if record.result != AssetVerificationRecord.NOT_CHECKED else "",
+        "observed_department": record.observed_department,
+        "observed_office": record.observed_office,
+        "condition": record.condition,
+        "notes": record.notes,
+    })
+    if request.method == "POST" and form and form.is_valid():
+        try:
+            record_asset_verification(actor=request.user, record=record, data=form.cleaned_data)
+        except (PermissionDenied, ValidationError) as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Physical check recorded in the verification history.")
+            return redirect("inventory:asset-verification-detail", pk=record.verification_round_id)
+    return render(request, "inventory/asset_verification_record.html", {
+        "record": record, "form": form, "events": record.events.select_related("actor").all(),
+    })
 
 
 def _disposal_queryset(user):

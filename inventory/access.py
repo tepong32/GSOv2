@@ -110,6 +110,15 @@ def can_review_asset_disposal(user):
     return bool(in_gso_scope(user) and user.has_perm("inventory.review_asset_disposal"))
 
 
+def can_manage_asset_verification(user, action="view"):
+    permission = {
+        "start": "start_asset_verification",
+        "record": "record_asset_verification",
+        "close": "close_asset_verification",
+    }.get(action)
+    return bool(permission and in_gso_scope(user) and user.has_perm(f"inventory.{permission}"))
+
+
 def can_stock(user, action):
     """GSO controls stock; department users may see only their own issue history."""
     if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):

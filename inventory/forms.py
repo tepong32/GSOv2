@@ -4,7 +4,7 @@ from django.utils import timezone
 from PIL import Image, UnidentifiedImageError
 from pathlib import Path
 from .access import department_model
-from .models import Asset, AssetDisposalCase, ConsumableItem, StockMovement
+from .models import Asset, AssetDisposalCase, AssetVerificationRecord, ConsumableItem, StockMovement
 
 
 MAX_DISPOSAL_FILE_BYTES = 15 * 1024 * 1024
@@ -155,6 +155,27 @@ class AssetTransferForm(forms.Form):
 
 class TransferCancellationForm(forms.Form):
     reason = forms.CharField(max_length=240, label="Why is this handoff being cancelled?")
+
+
+class AssetVerificationRoundForm(forms.Form):
+    title = forms.CharField(
+        max_length=160, label="Verification round name",
+        help_text="Example: 2026 annual physical inventory check.",
+    )
+
+
+class AssetVerificationRecordForm(forms.Form):
+    result = forms.ChoiceField(choices=tuple(choice for choice in AssetVerificationRecord.RESULT_CHOICES if choice[0] != AssetVerificationRecord.NOT_CHECKED))
+    observed_department = forms.CharField(required=False, max_length=160, label="Department where found")
+    observed_office = forms.CharField(required=False, max_length=160, label="Room / office / current custodian")
+    condition = forms.ChoiceField(choices=(("", "Select if assessed"),) + AssetVerificationRecord.CONDITION_CHOICES, required=False)
+    notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 3}), label="Discrepancy or follow-up notes")
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("result") in (AssetVerificationRecord.DISCREPANCY, AssetVerificationRecord.NOT_FOUND) and not cleaned.get("notes", "").strip():
+            self.add_error("notes", "Add a brief note so GSO knows what needs follow-up.")
+        return cleaned
 
 
 class AssetDisposalRequestForm(forms.Form):

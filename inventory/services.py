@@ -7,12 +7,13 @@ from django.utils import timezone
 
 from .access import (
     asset_in_scope, can, can_acknowledge_asset_transfer, can_request_asset_disposal,
-    can_review_asset_disposal, can_transfer_asset,
+    can_review_asset_disposal, can_transfer_asset, can_manage_asset_verification,
     department_model, department_for_user, gso_department_for_user,
 )
 from .models import (
     Asset, AssetAuditEvent, AssetDisposalAttachment, AssetDisposalCase,
-    AssetDisposalEvent, AssetTransfer, ConsumableAuditEvent, ConsumableItem,
+    AssetDisposalEvent, AssetTransfer, AssetVerificationEvent, AssetVerificationRecord,
+    AssetVerificationRound, ConsumableAuditEvent, ConsumableItem,
     StockLot, StockLotAllocation, StockMovement,
 )
 
@@ -184,6 +185,94 @@ def cancel_asset_transfer(*, actor, transfer, reason):
     transfer.cancellation_reason = reason.strip()
     transfer.save(update_fields=("status", "cancelled_by", "cancelled_at", "cancellation_reason"))
     return transfer
+
+
+@transaction.atomic
+def start_asset_verification_round(*, actor, title):
+    if not can_manage_asset_verification(actor, "start"):
+        raise PermissionDenied
+    department = gso_department_for_user(actor)
+    if department is None:
+        raise PermissionDenied
+    title = title.strip()
+    if not title:
+        raise ValidationError("Enter a name for this verification round.")
+    verification_round = AssetVerificationRound.objects.create(
+        title=title, department_id=department.pk, department_label=department.name, created_by=actor,
+    )
+    assets = Asset.objects.filter(department_id=department.pk).exclude(status=Asset.RETIRED).order_by("pk")
+    AssetVerificationRecord.objects.bulk_create([
+        AssetVerificationRecord(
+            verification_round=verification_round, asset=asset,
+            asset_name_snapshot=asset.asset_name, property_tag_snapshot=asset.property_tag,
+            serial_number_snapshot=asset.serial_number,
+            assigned_department_snapshot=asset.assigned_department_label,
+            assigned_office_snapshot=asset.assigned_office,
+        )
+        for asset in assets
+    ])
+    return verification_round
+
+
+@transaction.atomic
+def record_asset_verification(*, actor, record, data):
+    if not can_manage_asset_verification(actor, "record"):
+        raise PermissionDenied
+    record = AssetVerificationRecord.objects.select_for_update().select_related("verification_round").get(pk=record.pk)
+    verification_round = AssetVerificationRound.objects.select_for_update().get(pk=record.verification_round_id)
+    if verification_round.closed_at:
+        raise ValidationError("This verification round is closed.")
+    if not actor.is_superuser:
+        department = gso_department_for_user(actor)
+        if not department or verification_round.department_id != department.pk:
+            raise PermissionDenied
+    if data.get("result") not in {AssetVerificationRecord.MATCHED, AssetVerificationRecord.DISCREPANCY, AssetVerificationRecord.NOT_FOUND}:
+        raise ValidationError("Choose a physical verification result.")
+    if data["result"] in (AssetVerificationRecord.DISCREPANCY, AssetVerificationRecord.NOT_FOUND) and not data.get("notes", "").strip():
+        raise ValidationError("Add a brief note for a discrepancy or missing asset.")
+    record.result = data["result"]
+    record.observed_department = data.get("observed_department", "").strip()
+    record.observed_office = data.get("observed_office", "").strip()
+    record.condition = data.get("condition", "")
+    record.notes = data.get("notes", "").strip()
+    record.verified_by = actor
+    record.verified_at = timezone.now()
+    record.save(update_fields=("result", "observed_department", "observed_office", "condition", "notes", "verified_by", "verified_at"))
+    AssetVerificationEvent.objects.create(
+        record=record, actor=actor,
+        snapshot={
+            "asset_name": record.asset_name_snapshot,
+            "property_tag": record.property_tag_snapshot,
+            "serial_number": record.serial_number_snapshot,
+            "recorded_department": record.assigned_department_snapshot,
+            "recorded_office": record.assigned_office_snapshot,
+            "result": record.result,
+            "observed_department": record.observed_department,
+            "observed_office": record.observed_office,
+            "condition": record.condition,
+            "notes": record.notes,
+        },
+    )
+    return record
+
+
+@transaction.atomic
+def close_asset_verification_round(*, actor, verification_round):
+    if not can_manage_asset_verification(actor, "close"):
+        raise PermissionDenied
+    verification_round = AssetVerificationRound.objects.select_for_update().get(pk=verification_round.pk)
+    if not actor.is_superuser:
+        department = gso_department_for_user(actor)
+        if not department or verification_round.department_id != department.pk:
+            raise PermissionDenied
+    if verification_round.closed_at:
+        raise ValidationError("This verification round is already closed.")
+    if verification_round.records.filter(result=AssetVerificationRecord.NOT_CHECKED).exists():
+        raise ValidationError("Record a result for every listed asset before closing this round.")
+    verification_round.closed_by = actor
+    verification_round.closed_at = timezone.now()
+    verification_round.save(update_fields=("closed_by", "closed_at"))
+    return verification_round
 
 
 def _disposal_snapshot(case, note=""):
