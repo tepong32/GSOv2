@@ -84,6 +84,8 @@ skips. Maintenance tests use real profiles, explicit grants including superuser/
 denial, and prove no Finance-store queries. Browser login/open/work/upload/complete
 was exercised at1440x1000 and390x844; completed mobile has no horizontal overflow or
 duplicate IDs. Screenshots: `output/playwright/maintenance-*.png`.
+Final actual-GRAND MySQL integration passes29/29 in8.430s. Its23 pre-existing W036
+conditional-uniqueness warnings remain; none belong to inventory/inventory_finance.
 
 Stopped synthetic SQLite plus private-file recovery reconciled all37 tables and the
 one retained document, recovered deliberately corrupted/missing restored-copy

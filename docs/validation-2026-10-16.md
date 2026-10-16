@@ -369,7 +369,7 @@ operator-data restoration claim. Synthetic source retained in
 PASS: full shell `manage.py test --noinput`:65 discovered/56 executed/nine native
 skips,7.048s; `.tmp/maintenance-release-shell.log`. Migration drift, `pip check`
 and whitespace checks pass. GitHub API shows no rulesets or master protection.
-External Version Manager README reviewed, inspect/preview proposes minor0.6.0
+External Version Manager README reviewed, inspect/preview proposes minor0.6.1
 updating only VERSION/CHANGELOG.
 
 PASS: final actual-GRAND native command `scripts/run_grand_source_tests.py --grand-root
@@ -379,3 +379,15 @@ W036 warnings remain, none in inventory/inventory_finance. Both disposable schem
 removed; no `gso_test_` or `gso_grand_test_` schema remains. Owned MySQL stopped
 normally. Canonical master remains28da3f1 and operator DB hash matches preservation
 checkpoint before release. External vm-commit and branch/primary CI are next.
+
+Release completed: actual external Version Manager minor commit3905a74 (tag recorded
+in CONTINUE and the changelog),
+feature branch `codex/asset-maintenance` pushed. BranchCI38941638939 PASS (29s),
+including dependency audit, model/drift checks and full regression. Canonical clean
+master fast-forwarded and pushed; remote master/tag match
+`3905a74f7a0c566334145e063474cb49fe71cf53`. PrimaryCI38941747339 PASS (27s).
+Operator database SHA-256 remains
+`5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
+No deployment or operator migration. Parallel Finance note updated without changing
+its source/migrations/shared handoff. Release-result documentation uses separate
+`codex/maintenance-release-notes`, created after fresh fetch0/0 with clean worktree.

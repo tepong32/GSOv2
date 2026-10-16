@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.1] - 2026-10-17
+### Documentation
+- Record verified maintenance release and recovery results
+
 ## [0.6.0] - 2026-10-17
 ### Added
 - Add auditable asset maintenance and protected repair evidence

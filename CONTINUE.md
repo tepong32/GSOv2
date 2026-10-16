@@ -5,7 +5,7 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Maintenance release candidate
+## Published maintenance milestone
 
 See [maintenance workflow](docs/maintenance.md). Migration0016, services, staff
 screens, private evidence, asset/dashboard links and recovery checker are implemented.
@@ -22,15 +22,20 @@ Browser and preview port8019 stopped. Synthetic source remains at
 `.tmp/maintenance-preview-_g03g7vp`. Stopped DB+private-file recovery reconciled
 37 tables and one file, detected/restored corrupted and missing evidence, and left
 source unchanged; backup `C:/Users/Administrator/.codex/backups/gsov2-maintenance-recovery-20261017-nzu80ff7`.
-Not online MySQL/operator recovery. Prepared external Version Manager minor release;
-verify branch/primary CI and remote state before the next feature. No operator
-migration, permissions grant or deployment. Finance coordination note updated only.
+Not online MySQL/operator recovery. Actual external Version Manager release3905a74,
+tagv0.6.0, was pushed on `codex/asset-maintenance`. BranchCI38941638939 passed before
+canonical master fast-forward/push; primaryCI38941747339 passed at the same commit.
+Remote master/tag verified and operator DB hash unchanged. No operator migration,
+permissions grant or deployment. Finance coordination note updated only.
+
+Current documentation branch `codex/maintenance-release-notes` in
+`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`; based on3905a74 after
+fresh fetch0/0. Publish this release-result update through the documentation-only
+Version Manager workflow, then fetch again and create a separate next-feature branch.
 
 ## Published reviewed claim support
 
-Branch `codex/asset-maintenance`, worktree
-`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on published
-`28da3f1`. Fresh fetch showed 0/0 before new-branch work. Optional `inventory_finance` includes
+Published claim support at`28da3f1`. Optional `inventory_finance` includes
 same-store protected receipt/case/owner/actor relationships, source snapshots,
 proposal/independent approval/rejection/withdrawal, immutable event saves and
 scoped GRAND-base screens. Signed previews bind actor/case/content and expire.
@@ -106,10 +111,10 @@ parallel work; fetch and inspect its current source before adapter work.
 
 1. Check live primary/documentation CI and fetch sync before the next feature;
    preserve operator data and use a separate feature branch.
-2. Complete maintenance release gates, then select the next roadmap workflow on a
-   separate branch. Claim support is published; accepted-receipt cost correction
+2. Select the next roadmap workflow on a separate branch. Claim support and basic
+   maintenance are published; accepted-receipt cost correction
    and recognized-JEV linkage still need explicit design against current GRAND.
 3. All 21 pages of the retained 2024-006 copy are visually reviewed. Establish
    publication/amendments and review relevant 2002-003/2023-004 text before official outputs.
-4. Continue maintenance, stock counts, custody/clearance, general-office records,
+4. Continue maintenance corrections, stock counts, custody/clearance, general-office records,
    accepted outputs, GRAND import/router and coordinated recovery work per roadmap.
