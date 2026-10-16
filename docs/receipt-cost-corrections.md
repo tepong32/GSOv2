@@ -13,6 +13,16 @@ for a later invoice correction: stock may have been issued and asset custody may
 already have changed. A separate reviewed documentary amendment now records corrected source cost;
 no financial revaluation workflow is claimed.
 
+The ordinary asset editor now protects receipt-origin unit cost, quantity,
+supplier and purchase-order reference in both the form and the locked service.
+Previously an authorized register editor could overwrite those materialized facts
+without the receipt amendment process. Identical values and descriptive/tagging
+updates remain allowed. Unknown cost cannot be changed to zero through this path.
+No historical rows are rewritten: any existing divergence needs explicit review.
+Unlinked legacy entries keep their existing audit-backed editing workflow.
+The guard reads the receipt link after locking the asset without taking a receipt
+lock, preserving the established receipt-to-asset order used during acceptance.
+
 Claim support previously retained the Finance claim source but used the receipt's
 live quantity and cost. Its signed preview also omitted receipt facts, and the
 review page displayed the current delivery description as historical evidence.

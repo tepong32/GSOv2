@@ -65,6 +65,7 @@ def _editable_data(data, allowed):
 
 
 ASSET_INPUT_FIELDS = (set(SNAPSHOT_FIELDS) - {"assigned_department_id", "assigned_department_label"}) | {"assigned_department"}
+RECEIVED_ASSET_FACTS = ("unit_cost", "quantity", "supplier", "purchase_order_reference")
 CONSUMABLE_INPUT_FIELDS = {"name", "category", "unit", "use_fifo", "minimum_stock", "is_active", "notes"}
 
 
@@ -126,6 +127,15 @@ def update_asset(*, actor, asset, data):
     if asset.status == Asset.RETIRED:
         raise PermissionDenied("Retired asset records are read-only.")
     data = _editable_data(data, ASSET_INPUT_FIELDS)
+    # Acceptance creates the asset and its receipt link in one transaction. Read
+    # the link after locking the asset; do not invert receipt -> asset lock order.
+    from .models import ReceivingLine
+    if ReceivingLine.objects.filter(registered_asset_id=asset.pk).exists():
+        changed = [field for field in RECEIVED_ASSET_FACTS
+                   if field in data and data[field] != getattr(asset, field)]
+        if changed:
+            raise ValidationError("Retain the accepted receipt's cost, quantity, supplier and purchase order. "
+                                  "Use the receipt cost amendment workflow for documentary cost corrections.")
     validate_asset_identifiers(asset.department_id, data, existing=asset)
     has_department = "assigned_department" in data
     assigned_department = _resolve_assigned_department(data.pop("assigned_department", None)) if has_department else None

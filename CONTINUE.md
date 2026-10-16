@@ -5,6 +5,32 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Receipt-origin asset edit protection — locally validated
+
+Fresh fetch: canonical master clean and synchronized at4a81990 (prior publication
+CI38973934215 PASS). Branch `codex/received-asset-source-protection` protects
+materialized unit cost, quantity, supplier and PO from ordinary asset edits.
+Source inspection found the ordinary edit path could bypass the documented cost
+amendment boundary. The service rechecks the receipt link under the existing asset
+lock; the form disables these fields. Identical values, descriptions and tags remain
+editable; unlinked legacy records retain existing behavior. No migration/backfill,
+Finance write or automatic repair of historical divergence.
+
+Focused receiving21/21 PASS; shell117 discovered/100 executed/17 native skips
+PASS34.412s; system and migration drift checks PASS. Native shell117/117
+PASS109.011s; actual GRAND114/114 PASS38.756s, both exit0. Disposable schemas
+removed and owned33317 shutdown requested normally. Remote CI gates publication.
+See validation for exact commands and initial test-fixture corrections.
+
+The property assessment confirms inventory_class is a reporting group, not a
+reviewed PPE/semi-expendable treatment. Asset lacks useful-life/expiration facts;
+free-text fund/account fields are not authoritative Finance dimension links.
+Do not derive treatment from cost alone or duplicate Accounting's SPLC. Next:
+complete the physical property-record design using the retained COA2024-006 annex
+and current Finance ownership, alongside the unresolved receipt allocation gap.
+Finance's latest handoff records an executed existing filtered JEV working output,
+not new official form acceptance; its unpublished application files remain intact.
+
 ## Original-issue supply returns — published
 
 Feature e78c404 is integrated/pushed. BranchCI38973327525 and primaryCI38973485610

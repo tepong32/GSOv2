@@ -114,6 +114,11 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   Approval bumps receipt version and makes older claim support stale. New support
   uses the reviewed documentary ceiling, not an Accounting valuation. Include
   `inventory/receipt-amendments` in paired recovery and run its evidence checker.
+- Ordinary edits of receipt-linked assets retain unit cost, quantity, supplier and
+  purchase-order reference. Check the link after the asset lock without acquiring
+  the receipt lock in reverse order. Legacy unlinked entries remain editable;
+  never silently repair historical divergence. Documentary cost amendments do not
+  revalue the materialized asset or authorize Accounting classification.
 
 ## Validation
 

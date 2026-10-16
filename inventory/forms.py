@@ -57,6 +57,13 @@ class AssetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance.pk and hasattr(self.instance, "receiving_line"):
+            from .services import RECEIVED_ASSET_FACTS
+            for name in RECEIVED_ASSET_FACTS:
+                self.fields[name].disabled = True
+                self.fields[name].help_text = (
+                    "Retained from accepted receiving. Documentary cost corrections use receipt amendments."
+                )
         self.fields["status"].choices = [
             (value, label) for value, label in Asset.STATUS_CHOICES if value != Asset.RETIRED
         ]

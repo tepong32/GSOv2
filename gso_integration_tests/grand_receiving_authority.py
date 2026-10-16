@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connections
@@ -26,7 +26,7 @@ class GrandReceivingAuthorityTests(TestCase):
         grand_maintenance.GrandMaintenanceTests.setUpTestData.__func__(cls)
         permissions = Permission.objects.filter(content_type__app_label="inventory", codename__in=(
             "view_receivingreceipt", "add_receivingreceipt", "change_receivingreceipt",
-            "submit_receivingreceipt", "review_receivingreceipt", "add_asset"))
+            "submit_receivingreceipt", "review_receivingreceipt", "add_asset", "change_asset", "view_asset"))
         for actor in (cls.clerk, cls.outsider, cls.viewer, cls.no_grant):
             actor.user_permissions.add(*permissions)
         cls.reviewer = cls.no_grant
@@ -96,6 +96,24 @@ class GrandReceivingAuthorityTests(TestCase):
                 accept_receipt(actor=self.clerk, receipt=receipt, expected_version=receipt.state_version, note="Self review")
             receipt = accept_receipt(actor=self.reviewer, receipt=receipt, expected_version=receipt.state_version,
                                      note="Independently checked source documents")
+            from inventory.services import update_asset
+            from inventory.forms import AssetForm
+            asset = receipt.lines.get().registered_asset
+            with self.assertRaisesMessage(ValidationError, "Retain the accepted receipt"):
+                update_asset(actor=self.clerk, asset=asset, data={"unit_cost": 1})
+            self.client.force_login(self.clerk)
+            edit_url = reverse("inventory:asset-edit", args=[asset.pk])
+            page = self.client.get(edit_url)
+            self.assertEqual(page.status_code, 200)
+            self.assertTrue(page.context["form"].fields["unit_cost"].disabled)
+            form = AssetForm(instance=asset)
+            payload = {key: value for key, value in form.initial.items() if value is not None}
+            payload.update(unit_cost="1.00", supplier="Forged", notes="Legitimate description update")
+            self.assertEqual(self.client.post(edit_url, payload).status_code, 302)
+            asset.refresh_from_db()
+            self.assertEqual(asset.unit_cost, 100)
+            self.assertEqual(asset.supplier, "Synthetic supplier")
+            self.assertEqual(asset.notes, "Legitimate description update")
         self.assertEqual(len(finance), 0)
         self.assertEqual(receipt.status, receipt.ACCEPTED)
         self.assertEqual(Asset.objects.filter(property_tag="AUTH-PRINTER").count(), 1)

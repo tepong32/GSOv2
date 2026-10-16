@@ -1213,3 +1213,45 @@ proposed enhancements follow later. No application changes. Native suites are
 NOT RUN - OUT OF SCOPE for this documentation-only follow-up; the unchanged code
 retains the completed native/browser/recovery evidence above. Diff/UTF-8/VM preview
 checks apply; remote CI still gates integration under the normal workflow.
+
+## Receipt-origin asset edit protection — 2026-10-17
+
+Fresh fetch and file status: canonical master clean/synchronized at4a81990;
+feature branch codex/received-asset-source-protection. Prior goal turn completed
+publication (progress). Finance fetched at32ab046 with its unpublished changes
+preserved. Its latest filtered-JEV output probe is recorded in its own handoff.
+
+Source inspection found update_asset accepted changes to original receiving cost,
+quantity, supplier and PO. Added a locked service guard and disabled form fields;
+no schema, Finance data, evidence storage or historical row changes. Tests cover
+rejection without audit writes, same-value/description/tag updates, forged form
+inputs, original NULL cost, legacy unlinked edits, and GRAND HTTP behavior with
+zero Finance queries. No new Accounting classification rule is asserted.
+
+- PASS: `python manage.py test inventory.test_receiving --verbosity 1`:21/21,
+  0.891s. Initial two runs FAIL - CAUSED BY CURRENT WORK in the new test fixture:
+  omitted required property tag, then two existing rollback assertions accidentally
+  placed under the new test. Restored them to their original test and supplied the
+  required tag; no production assertion weakened.
+- PASS: `python manage.py test --verbosity 1`:117 discovered,100 executed,
+  17 native skips,34.412s; `.tmp/received-asset-shell.log`, exit0.
+- PASS: `python manage.py check`; `python manage.py makemigrations --check --dry-run`;
+  `git diff --check`.
+- PASS native commands: `python scripts/run_mysql_tests.py` (117/117,109.011s) and
+  `python scripts/run_grand_source_tests.py --grand-root
+  C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`
+  (114/114,38.756s). Both exit0, no skips, disposable schemas removed.
+  Logs `.tmp/received-asset-shell-native.log` and `.tmp/received-asset-grand-native.log`.
+  Owned33317 normal shutdown requested after checking no test schemas remain.
+- NOT RUN - OUT OF SCOPE: new populated migration/recovery rehearsal, since this
+  patch introduces no schema, stored-field, file or backup-path change. Earlier
+  paired recovery evidence is retained; it is not presented as a new rehearsal.
+- NOT RUN - OUT OF SCOPE: new visual browser pass; existing form layout is unchanged,
+  with disabled fields/help text and rendered HTTP/form behavior covered by tests.
+
+Property assessment: Asset.inventory_class is an operational reporting group, not
+PPE/semi-expendable recognition; no useful-life/expiration fields exist. Existing
+fund/account strings do not resolve Finance dimensions. Current receipt claim and
+journal mappings allocate monetary support, not physical cost components. Follow
+verified COA2024-006 annexes and Finance ownership for the next design; do not infer
+classification from threshold alone or introduce a second Accounting SPLC.

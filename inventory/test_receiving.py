@@ -212,8 +212,59 @@ class ReceivingPreparationTests(TestCase):
         receipt.refresh_from_db()
         self.assertEqual(receipt.status, "submitted")
         self.assertEqual(StockMovement.objects.count(), 0)
+
         self.assertFalse(receipt.lines.exclude(stock_movement=None).exists())
         self.assertFalse(receipt.events.filter(action="accepted").exists())
+
+    def test_received_asset_edits_retain_source_facts_and_allow_tagging(self):
+        from .services import update_asset, create_asset
+        from .forms import AssetForm
+        self.reviewer.user_permissions.add(Permission.objects.get(
+            content_type__app_label="inventory", codename="change_asset"))
+        self.reviewer = User.objects.get(pk=self.reviewer.pk)
+        receipt = self.receipt()
+        receipt.refresh_from_db()
+        line = save_receipt_line(actor=self.clerk, receipt=receipt,
+            expected_version=receipt.state_version, data=dict(kind="asset",
+                description="Laptop", unit="piece", delivered_quantity=1,
+                accepted_quantity=1, rejected_quantity=0, property_tag="TAG-INITIAL", unit_cost=Decimal("25000.00")))
+        receipt = self.submit(receipt)
+        accept_receipt(actor=self.reviewer, receipt=receipt,
+            expected_version=receipt.state_version, note="Checked source")
+        line.refresh_from_db()
+        asset = line.registered_asset
+        events = asset.audit_events.count()
+        for field, value in (("unit_cost", Decimal("1.00")), ("quantity", 2),
+                             ("supplier", "Different vendor"), ("purchase_order_reference", "PO-other")):
+            with self.subTest(field=field), self.assertRaisesMessage(ValidationError, "Retain the accepted receipt"):
+                update_asset(actor=self.reviewer, asset=asset, data={field: value, "notes": "Must roll back"})
+        asset.refresh_from_db()
+        self.assertEqual(asset.audit_events.count(), events)
+        self.assertEqual(asset.notes, "")
+        self.assertEqual(asset.unit_cost, Decimal("25000.00"))
+        update_asset(actor=self.reviewer, asset=asset, data={"unit_cost": Decimal("25000.00"),
+            "quantity": 1, "supplier": asset.supplier, "purchase_order_reference": "",
+            "property_tag": "TAG-RECEIVED", "notes": "Tagged after acceptance"})
+        asset.refresh_from_db()
+        self.assertEqual(asset.property_tag, "TAG-RECEIVED")
+        self.assertEqual(asset.audit_events.count(), events + 1)
+        form = AssetForm(instance=asset)
+        for field in ("unit_cost", "quantity", "supplier", "purchase_order_reference"):
+            self.assertTrue(form.fields[field].disabled)
+        payload = {key: value for key, value in form.initial.items() if value is not None}
+        payload.update(unit_cost="1.00", quantity="2", supplier="Tampered", purchase_order_reference="Forged")
+        bound = AssetForm(payload, instance=asset)
+        self.assertTrue(bound.is_valid(), bound.errors)
+        self.assertEqual(bound.cleaned_data["unit_cost"], Decimal("25000.00"))
+        self.assertEqual(bound.cleaned_data["supplier"], "Synthetic vendor")
+        update_asset(actor=self.reviewer, asset=asset, data=bound.cleaned_data)
+        line.refresh_from_db()
+        self.assertEqual(line.unit_cost, Decimal("25000.00"))
+        legacy = create_asset(actor=self.reviewer, data={"asset_name": "Legacy entry", "quantity": 1})
+        update_asset(actor=self.reviewer, asset=legacy, data={"unit_cost": Decimal("12.00")})
+        legacy.refresh_from_db()
+        self.assertEqual(legacy.unit_cost, Decimal("12.00"))
+        self.assertFalse(AssetForm(instance=legacy).fields["unit_cost"].disabled)
 
     def test_asset_acceptance_keeps_physical_origin_without_inventing_accounting(self):
         receipt = self.receipt()
@@ -232,6 +283,12 @@ class ReceivingPreparationTests(TestCase):
         self.assertIsNone(asset.purchase_date)
         self.assertIsNone(asset.unit_cost)
         self.assertEqual(asset.audit_events.count(), 1)
+        from .services import update_asset
+        self.reviewer.user_permissions.add(Permission.objects.get(
+            content_type__app_label="inventory", codename="change_asset"))
+        reviewer = User.objects.get(pk=self.reviewer.pk)
+        with self.assertRaises(ValidationError):
+            update_asset(actor=reviewer, asset=asset, data={"unit_cost": Decimal("0.00")})
 
     def test_receiving_screens_and_private_download_scope(self):
         receipt = self.receipt()

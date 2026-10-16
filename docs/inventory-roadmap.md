@@ -58,6 +58,9 @@ correcting evidence and independent decisions without rewriting accepted invento
 or Finance values. Original/effective cost and stale support remain visible.
 Quantity reversal, valuation/allocation and official outputs remain future work.
 Finance integration has not been installed.
+Ordinary receipt-linked asset edits now retain accepted cost, quantity, supplier
+and purchase-order facts; documentary corrections use the existing amendment
+workflow. Historical divergence is not automatically repaired.
 
 Add a guided GSO intake for newly delivered equipment and vehicles. Capture delivery/inspection date, quantity accepted, supplier and purchase references, the receiving/inspection reference, and the person or office taking custody. Assign or record a property tag and check for possible duplicates by tag, serial, or chassis number before the asset becomes part of the active register. Keep Accounting's official classification and account mapping reviewable; the intake flow must not invent those values.
 

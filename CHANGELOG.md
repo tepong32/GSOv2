@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.17.2] - 2026-10-17
+### Fixed
+- Protect receipt-origin facts from ordinary asset edits
+
 ## [0.17.1] - 2026-10-17
 ### Documentation
 - Record verified supply return publication and clarify source reference
