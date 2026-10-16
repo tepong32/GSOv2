@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.1] - 2026-10-17
+### Documentation
+- Record receiving release and validation evidence
+
 ## [0.4.0] - 2026-10-17
 ### Added
 - Add independently reviewed receiving and portable lifecycle integrity

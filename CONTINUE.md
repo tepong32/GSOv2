@@ -5,14 +5,17 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [COA sources](docs/coa-requirements.md), [receiving](docs/receiving.md) and
 [validation](docs/validation-2026-10-16.md).
 
-## Receiving release candidate
+## Published receiving milestone
 
 Branch `codex/receiving-inspection`, worktree
 `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on `405f360`.
 Fresh fetch: HEAD/master 0/0; all listed local changes belong to this feature.
-Version Manager inspect and minor preview completed: only VERSION/CHANGELOG updated
-by the tool. Release/integration/push pending. Recheck live Git/CI before resuming.
-No required PR/protection/ruleset found in the release check.
+Version Manager released `7d3547fcc86e570e79db4bfc67f742335c38cf2d`; branch/tag pushed.
+Feature CI38932007629 passed before fast-forward integration/push to master. Remote
+master/tag verified at that commit, canonical status clean and operator hash unchanged.
+Primary GSO checks CI38932087704 passed at that commit. Check live state before work.
+No required PR/protection/ruleset found. Documentation follow-up uses branch
+`codex/receiving-release-notes` in the same worktree; it changes release evidence only.
 
 Implemented migrations 0013/0014: receipt/line/evidence/history, draft corrections,
 retained voids, protected uploads/downloads, submission and independent review.
@@ -58,8 +61,8 @@ parallel work; fetch and inspect its current source before adapter work.
 
 ## Next work
 
-1. Complete final release checks and actual VM release/integrate/push; verify remote
-   tag/primary and CI, and preserve operator hash. Update this checkpoint.
+1. Check live primary/documentation CI and fetch sync before the next feature;
+   preserve operator data and use a separate feature branch.
 2. On a new feature branch after fresh sync, implement concrete reviewed Finance
    attribution using existing parties/claims/posting identities, without duplicating
    authority. Recheck actual GRAND state first.

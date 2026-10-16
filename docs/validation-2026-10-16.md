@@ -176,3 +176,18 @@ pending transfers and open disposal cases, with duplicate preflight before DDL.
 This resolves the prior W036 finding for current models. The separate server is owned
 by this task; normal test runs removed their random schemas. No Finance schema or
 production configuration was changed.
+
+## Receiving publication evidence - 2026-10-17
+
+Version Manager README/inspect/preview preceded the actual minor release, commit
+`7d3547fcc86e570e79db4bfc67f742335c38cf2d`. Preview touched only VERSION/CHANGELOG;
+historical evidence was preserved. Explicit intended files were staged. No runtime
+DB/uploads, browser artifacts or parallel Finance work were published.
+
+PASS: optional-native/runtime dependency audit (no known vulnerabilities), pip check,
+system check and diff whitespace check. Feature CI38932007629 passed before canonical
+master was fast-forwarded and pushed. Remote master/tag matched the release commit;
+canonical status was clean and operator DB hash matched the preservation manifest.
+No operator migration or deployment occurred. Primary GSO checks CI38932087704 passed
+at the release commit. This follow-up changes documentation only. The broader integration,
+Finance attribution and remaining roadmap remain incomplete.
