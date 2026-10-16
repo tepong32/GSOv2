@@ -96,8 +96,8 @@ Let GSO record a dated physical count for consumables, compare counted quantity 
 
 Receiving now shares GRAND explicit action grants and read-only UAT restrictions,
 with service/HTTP/control parity and no caching. This prerequisite precedes reviewed
-cost amendments. Audit remaining legacy asset, transfer, disposal and verification
-checks before claiming uniform GRAND authorization across the module. See CONTINUE
+cost amendments. Legacy asset, transfer, disposal and verification checks are now aligned with
+explicit GRAND grants and UAT write denial; read-only history remains scoped. See CONTINUE
 for current validation and publication status.
 
 ## Deliberate boundaries

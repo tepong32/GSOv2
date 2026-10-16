@@ -117,3 +117,20 @@ and [validation](validation-2026-10-16.md); online/operator recovery remains ope
   application controls and do not make data immune to direct administrator SQL.
 - Official-form acceptance, audit retention policy, lost-item accountability and
   safe historical correction workflows remain in the roadmap.
+
+## GRAND legacy inventory authority
+
+Asset register, legacy handoff, disposal and physical-verification actions use
+GRAND explicit user/group grants. A superuser flag alone does not grant an action.
+Finance UAT membership denies all mutation checks even when action grants exist.
+Scoped reads retain explicit grants: history pages may use the existing workflow
+action permission in read-only mode, while forms/services use the mutation check.
+This preserves review access without granting edit, acknowledgment, disposal or
+count authority. No grants are installed automatically. Standalone permissions
+remain compatible. Navigation resolves real scoped read helpers. Maintenance and
+stock audit reads also require explicit grants in GRAND.
+
+The internal read_only argument is only for read routes/navigation; it must never
+be derived from request input or passed by mutation services. Department/owner,
+independent review and lifecycle checks still apply separately. No data migration,
+public service, authentication backend or Finance posting path is introduced.

@@ -764,3 +764,41 @@ No extra SQLite integration rerun: native full suite covers changed integration
 and shared dependencies; standalone SQLite checks shell portability. Actual VM
 README/inspect/patch preview reviewed; intended changes only. Remote rulesets empty,
 master unprotected. Publication gated on branch CI, then primary CI verification.
+
+## Legacy asset authority alignment — 2026-10-17
+
+Fresh fetch clean0/0 atb232924; separate `codex/asset-authority`. GRAND fetched0/0
+at32ab046; active Form1 working tree/handoff inspected and preserved. Copied
+actual-GRAND fixture before probe allowed seven mutations for each of ungranted
+superuser and explicitly granted GSO UAT: create/edit, transfer/acknowledge,
+disposal request/review and verification record. After correction all14 deny.
+Logs`.tmp/asset-authority-{before,after}.log`. No mocked authority or operator data.
+
+New actual-GRAND tests cover explicit-superuser denial, UAT override, unchanged
+asset/custody/case/count state and zero Finance queries on denied operations;
+scoped history reads/direct POST denials; authorized create/edit/legacy handoff;
+and UAT acknowledgment/cancellation denial for a handoff into its own office.
+The last own-office test was added after SQLite discovery and is covered by the
+final native run. No database schema/storage change.
+
+PASS: standalone SQLite91 discovered/79 executed/12 native skips,23.725s;
+standalone MySQL91/91,80.414s. Actual GRAND SQLite79 discovered/68 executed/11
+native skips,13.933s. Logs`.tmp/asset-authority-{shell-sqlite,shell-native,grand-sqlite}.log`.
+PASS: `manage.py makemigrations --check --dry-run` no changes; `python -m pip check`
+no broken requirements. Native GRAND outcome recorded below when complete.
+
+PASS: actual GRAND browser UAT dashboard/history navigation; disposal detail shows
+no review form, verification list no start form, count detail no action buttons.
+Desktop disposal screenshot and mobile390 count screenshot visually inspected:
+`output/playwright/asset-authority-uat-{disposal,count-mobile}.png`. Mobile client
+and scroll width375, table scroll stays inside its container. Browser closed;
+preview8026 stopped. NOT RUN - OUT OF SCOPE: new recovery drill (unchanged schema
+and storage format), operator migration/grants, deployment, official-form acceptance.
+Prior coordinated recovery evidence remains applicable.
+
+Final actual GRAND MySQL80/80 PASS25.996s, zero skips, log
+`.tmp/asset-authority-grand-native.log`. Existing23 non-GSO W036 warnings remain.
+Both aliases destroyed; owned MySQL33317 stopped normally after confirming no
+remaining GSO test schemas. Finance33308 untouched. Operator DB hash unchanged:
+5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+VM README, inspect and patch preview checked; release contains intended changes.

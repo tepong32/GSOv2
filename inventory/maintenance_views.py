@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 
-from .access import in_gso_scope, gso_department_for_user
+from .access import in_gso_scope, gso_department_for_user, has_inventory_permission
 from .models import Asset, AssetMaintenanceCase, AssetMaintenanceEvidence
 from .maintenance import (can_manage_maintenance, open_maintenance, update_maintenance,
                           attach_maintenance_evidence, close_maintenance)
@@ -15,7 +15,7 @@ from .maintenance_forms import (MaintenanceOpenForm, MaintenanceWorkForm, Mainte
 
 
 def can_view_maintenance(actor):
-    return bool(in_gso_scope(actor) and (actor.has_perm("inventory.view_assetmaintenancecase") or
+    return bool(in_gso_scope(actor) and (has_inventory_permission(actor, "view_assetmaintenancecase") or
                                         can_manage_maintenance(actor)))
 
 

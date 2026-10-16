@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.3] - 2026-10-17
+### Fixed
+- Align legacy inventory authority with GRAND explicit grants
+
 ## [0.11.2] - 2026-10-17
 ### Fixed
 - Enforce GRAND receiving grants and read-only UAT access

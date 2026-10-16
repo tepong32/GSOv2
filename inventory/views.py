@@ -16,7 +16,7 @@ from .access import (
     _is_gso_department, asset_access_required, asset_in_scope, can,
     can_acknowledge_asset_transfer, can_request_asset_disposal,
     can_review_asset_disposal, can_stock, can_transfer_asset, can_view_audit,
-    can_manage_asset_verification,
+    can_manage_asset_verification, has_inventory_permission,
     department_for_user, department_model, gso_department_for_user,
 )
 from .forms import (
@@ -80,17 +80,17 @@ def dashboard(request):
         "retired_count": assets.filter(status=Asset.RETIRED).count(),
         "can_add": can(request.user, "add"),
         "can_view_stock": can_stock(request.user, "view"),
-        "can_view_transfers": can_transfer_asset(request.user) or can_acknowledge_asset_transfer(request.user),
+        "can_view_transfers": can_transfer_asset(request.user, read_only=True) or can_acknowledge_asset_transfer(request.user, read_only=True),
         "pending_transfer_count": _transfer_queryset(request.user).filter(status=AssetTransfer.PENDING).count()
-        if can_transfer_asset(request.user) or can_acknowledge_asset_transfer(request.user) else 0,
-        "can_view_disposals": can_review_asset_disposal(request.user) or can_request_asset_disposal(request.user),
+        if can_transfer_asset(request.user, read_only=True) or can_acknowledge_asset_transfer(request.user, read_only=True) else 0,
+        "can_view_disposals": can_review_asset_disposal(request.user, read_only=True) or can_request_asset_disposal(request.user, read_only=True),
         "open_disposal_count": _disposal_queryset(request.user).filter(status__in=(
             AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
             AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
-        )).count() if can_review_asset_disposal(request.user) or can_request_asset_disposal(request.user) else 0,
-        "can_view_verifications": any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")),
+        )).count() if can_review_asset_disposal(request.user, read_only=True) or can_request_asset_disposal(request.user, read_only=True) else 0,
+        "can_view_verifications": any(can_manage_asset_verification(request.user, action, read_only=True) for action in ("start", "record", "close", "import")),
         "open_verification_count": _verification_round_queryset(request.user).filter(closed_at__isnull=True).count()
-        if any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")) else 0,
+        if any(can_manage_asset_verification(request.user, action, read_only=True) for action in ("start", "record", "close", "import")) else 0,
     })
 
 
@@ -262,7 +262,7 @@ def _transfer_queryset(user):
 
 @asset_access_required("view")
 def asset_transfer_list(request):
-    if not (can_transfer_asset(request.user) or can_acknowledge_asset_transfer(request.user)):
+    if not (can_transfer_asset(request.user, read_only=True) or can_acknowledge_asset_transfer(request.user, read_only=True)):
         raise PermissionDenied
     rows = list(_transfer_queryset(request.user))
     for transfer in rows:
@@ -342,10 +342,12 @@ def _verification_round_queryset(user):
 
 @asset_access_required("view")
 def asset_verification_list(request):
-    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")):
+    if not any(can_manage_asset_verification(request.user, action, read_only=True) for action in ("start", "record", "close")):
         raise PermissionDenied
     form = AssetVerificationRoundForm(request.POST or None) if can_manage_asset_verification(request.user, "start") else None
     if request.method == "POST":
+        if not can_manage_asset_verification(request.user, "start"):
+            raise PermissionDenied
         if not form or not form.is_valid():
             return render(request, "inventory/asset_verification_list.html", {"rounds": _verification_round_queryset(request.user), "form": form, "can_start": bool(form)})
         try:
@@ -365,7 +367,7 @@ def asset_verification_list(request):
 
 @asset_access_required("view")
 def asset_verification_detail(request, pk):
-    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")):
+    if not any(can_manage_asset_verification(request.user, action, read_only=True) for action in ("start", "record", "close")):
         raise PermissionDenied
     verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
     records = verification_round.records.select_related("verified_by")
@@ -537,7 +539,7 @@ def _verification_reconciliation_data(verification_round, accounting_import):
 
 @asset_access_required("view")
 def asset_verification_reconcile(request, pk):
-    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")):
+    if not any(can_manage_asset_verification(request.user, action, read_only=True) for action in ("start", "record", "close", "import")):
         raise PermissionDenied
     verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
     can_import = can_manage_asset_verification(request.user, "import")
@@ -568,7 +570,7 @@ def asset_verification_reconcile(request, pk):
 
 @asset_access_required("view")
 def asset_accounting_template(request):
-    if not can_manage_asset_verification(request.user, "import"):
+    if not can_manage_asset_verification(request.user, "import", read_only=True):
         raise PermissionDenied
     response = HttpResponse(content_type="text/csv; charset=utf-8")
     response["Content-Disposition"] = 'attachment; filename="gso-accounting-asset-snapshot-template.csv"'
@@ -580,7 +582,7 @@ def asset_accounting_template(request):
 
 @asset_access_required("view")
 def asset_accounting_source_download(request, pk):
-    if not can_manage_asset_verification(request.user, "import"):
+    if not can_manage_asset_verification(request.user, "import", read_only=True):
         raise PermissionDenied
     snapshot = get_object_or_404(
         AssetAccountingImport.objects.select_related("verification_round").exclude(source_file=""), pk=pk,
@@ -598,7 +600,7 @@ def asset_accounting_source_download(request, pk):
 
 @asset_access_required("view")
 def asset_verification_reconciliation_export(request, pk):
-    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")):
+    if not any(can_manage_asset_verification(request.user, action, read_only=True) for action in ("start", "record", "close", "import")):
         raise PermissionDenied
     verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
     accounting_import = verification_round.accounting_imports.first()
@@ -652,7 +654,7 @@ def asset_verification_reconciliation_export(request, pk):
 
 def _disposal_queryset(user):
     cases = AssetDisposalCase.objects.select_related("asset", "submitted_by", "reviewed_by", "completed_by")
-    if can_review_asset_disposal(user):
+    if can_review_asset_disposal(user, read_only=True):
         if user.is_superuser:
             return cases
         gso = gso_department_for_user(user)
@@ -665,7 +667,7 @@ def _disposal_queryset(user):
 
 @asset_access_required("view")
 def asset_disposal_list(request):
-    if not (can_review_asset_disposal(request.user) or can_request_asset_disposal(request.user)):
+    if not (can_review_asset_disposal(request.user, read_only=True) or can_request_asset_disposal(request.user, read_only=True)):
         raise PermissionDenied
     return render(request, "inventory/asset_disposal_list.html", {
         "cases": _disposal_queryset(request.user),
@@ -738,7 +740,7 @@ def disposal_attachment_download(request, pk):
     )
     case = attachment.disposal_case
     if not (asset_in_scope(request.user, case.asset)
-            or (case.submitted_by_id == request.user.pk and request.user.has_perm("inventory.request_asset_disposal"))):
+            or (case.submitted_by_id == request.user.pk and has_inventory_permission(request.user, "request_asset_disposal"))):
         raise PermissionDenied
     response = FileResponse(
         attachment.file.open("rb"), as_attachment=True,
@@ -851,7 +853,7 @@ def consumable_detail(request, pk):
     if not is_gso:
         movements = movements.filter(department_id=department.pk)
     page = Paginator(movements.select_related("actor"), 50).get_page(request.GET.get("page"))
-    audit_events = item.audit_events.all() if is_gso and request.user.has_perm("inventory.view_stock_audit") else ()
+    audit_events = item.audit_events.all() if is_gso and has_inventory_permission(request.user, "view_stock_audit") else ()
     return render(request, "inventory/consumable_detail.html", {
         "item": item, "page": page, "is_gso": is_gso, "audit_events": audit_events,
         "can_record_count": can_manage_count(request.user, "record", item) and item.is_active,

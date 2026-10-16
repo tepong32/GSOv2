@@ -5,6 +5,30 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Legacy asset authority alignment
+
+Fresh GSO fetch clean0/0 atb232924, branch `codex/asset-authority`. Prior receiving
+releasev0.11.2 is integrated/pushed: branchCI38959271074 PASS43s, primary
+CI38959384805 PASS; master/tag verified. GRAND fetched0/0 at32ab046 with parallel
+unpublished Form1 changes preserved; its handoff still reports full regression.
+
+Actual copied-GRAND probe reproduced seven legacy mutations allowed to both
+ungranted superusers and GSO UAT users. All fourteen now deny. Asset create/edit,
+legacy transfer/acknowledgment, disposal, verification and audit reads share the
+existing GRAND explicit grant policy; no new roles, schema or account authority.
+Read-only history uses scoped existing grants; mutation helpers default to denial
+for UAT. Navigation uses actual read helpers, including receiving/stock.
+
+Standalone SQLite91/79 executed/12 skips PASS23.725s; native91/91 PASS80.414s.
+Actual GRAND SQLite79/68 executed/11 skips PASS13.933s; final native80/80
+PASS25.996s including added same-office UAT handoff denial. Existing23 non-GSO
+W036 warnings remain. Browser scoped UAT disposal/count history verified without
+write controls; mobile count no page overflow. No schema/storage changes.
+Preview8026/browser stopped, both native test schemas removed, owned MySQL33317
+shut down normally. Operator DB unchanged. VM patch preview inspected; publication
+follows branch CI. Next: reviewed documentary cost amendments and Finance
+quantity/cost/JEV relationships. HR-reference clearance and official outputs remain incomplete.
+
 ## Receiving authority correction
 
 Started `codex/receiving-authority` from cbdd0d1 after clean fetch0/0. Previous
@@ -21,7 +45,7 @@ warnings remain. Initial failures were test assertions (expanded cache header,
 prose matched instead of create link), corrected without weakening protection.
 Browser UAT scoped reads/control absence visually verified; preview8025 stopped.
 No schema/storage change, so prior recovery evidence remains applicable.
-VM patch preview inspected for this correction; publication follows passing checks.
+Actual VM releaseb232924/v0.11.2 published; branch and primary CI passed.
 
 Next: audit legacy asset/transfer/disposal/verification authority before claiming
 consistent GRAND policy across GSO. Documentary cost amendments remain planned;

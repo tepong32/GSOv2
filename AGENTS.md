@@ -73,6 +73,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   retaining zero-variance decisions without fake movements or invented surplus costs.
   Include count evidence in coordinated recovery; historical counts and official
   supplies forms need separate reconciliation/acceptance, not backdated adjustments.
+- Legacy asset, handoff, disposal and verification actions use explicit GRAND
+  grants and deny UAT mutations. Read-only history checks may reuse existing action
+  grants without enabling writes; never pass read_only=True from mutation services.
+  Navigation must use the same scoped view helpers, not implicit superuser perms.
 - Receiving in GRAND requires explicit action grants, including for superusers;
   Finance UAT viewers may only read scoped receipts/private evidence. Enforce the
   same policy in services, POST entry points and rendered controls; never cache

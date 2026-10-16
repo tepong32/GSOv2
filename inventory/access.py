@@ -68,7 +68,21 @@ def in_gso_scope(user):
     )
 
 
+def has_inventory_permission(user, codename, *, mutation=False):
+    """Use GRAND's explicit grants; its UAT role never authorizes writes."""
+    from django.apps import apps
+    permission = f"inventory.{codename}"
+    if apps.is_installed("vouchers"):
+        from vouchers.access import has_explicit_permission
+        from vouchers.roles import is_finance_uat_viewer
+        return bool(not (mutation and is_finance_uat_viewer(user))
+                    and has_explicit_permission(user, permission))
+    return bool(user.has_perm(permission))
+
+
 def can(user, action):
+    if action not in ("view", "add", "change", "delete", "export"):
+        return False
     codename = "export_asset_register" if action == "export" else f"{action}_asset"
     if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):
         return False
@@ -80,21 +94,21 @@ def can(user, action):
     )
     if action == "view" and not (getattr(user, "is_superuser", False) or valid_department):
         return False
-    return bool(user.has_perm(f"inventory.{codename}"))
+    return has_inventory_permission(user, codename, mutation=action not in ("view", "export"))
 
 
 def can_view_audit(user):
-    return bool(in_gso_scope(user) and user.has_perm("inventory.view_asset_audit"))
+    return bool(in_gso_scope(user) and has_inventory_permission(user, "view_asset_audit"))
 
 
-def can_transfer_asset(user):
-    return bool(in_gso_scope(user) and user.has_perm("inventory.transfer_asset"))
+def can_transfer_asset(user, *, read_only=False):
+    return bool(in_gso_scope(user) and has_inventory_permission(user, "transfer_asset", mutation=not read_only))
 
 
-def can_acknowledge_asset_transfer(user, transfer=None):
+def can_acknowledge_asset_transfer(user, transfer=None, *, read_only=False):
     if transfer is not None and transfer.kind == transfer.RETURN:
         return False
-    if not can(user, "view") or not user.has_perm("inventory.acknowledge_asset_transfer"):
+    if not can(user, "view") or not has_inventory_permission(user, "acknowledge_asset_transfer", mutation=not read_only):
         return False
     department = department_for_user(user)
     if transfer is not None and transfer.destination_custodian_user_id:
@@ -110,26 +124,27 @@ def can_acknowledge_asset_transfer(user, transfer=None):
     return bool(department and (transfer is None or transfer.destination_department_id == department.pk))
 
 
-def can_request_asset_disposal(user, asset=None):
+def can_request_asset_disposal(user, asset=None, *, read_only=False):
     return bool(
         can(user, "view")
-        and (user.has_perm("inventory.request_asset_disposal") or can_review_asset_disposal(user))
+        and (has_inventory_permission(user, "request_asset_disposal", mutation=not read_only)
+             or can_review_asset_disposal(user, read_only=read_only))
         and (asset is None or asset_in_scope(user, asset))
     )
 
 
-def can_review_asset_disposal(user):
-    return bool(in_gso_scope(user) and user.has_perm("inventory.review_asset_disposal"))
+def can_review_asset_disposal(user, *, read_only=False):
+    return bool(in_gso_scope(user) and has_inventory_permission(user, "review_asset_disposal", mutation=not read_only))
 
 
-def can_manage_asset_verification(user, action="view"):
+def can_manage_asset_verification(user, action="view", *, read_only=False):
     permission = {
         "start": "start_asset_verification",
         "record": "record_asset_verification",
         "close": "close_asset_verification",
         "import": "import_asset_accounting_snapshot",
     }.get(action)
-    return bool(permission and in_gso_scope(user) and user.has_perm(f"inventory.{permission}"))
+    return bool(permission and in_gso_scope(user) and has_inventory_permission(user, permission, mutation=not read_only))
 
 
 def can_stock(user, action):

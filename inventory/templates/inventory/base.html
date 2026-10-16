@@ -1,3 +1,4 @@
+{% load inventory_access %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -83,9 +84,10 @@
       <a class="brand" href="{% url 'inventory:dashboard' %}">GRAND · GSO</a>
       <nav class="nav" aria-label="Main navigation">
         <a href="{% url 'inventory:dashboard' %}">Workspace</a>
-        {% if perms.inventory.view_asset %}<a href="{% url 'inventory:asset-list' %}">Asset register</a>{% endif %}
-        {% if perms.inventory.view_consumableitem %}<a href="{% url 'inventory:consumable-list' %}">Consumables</a>{% endif %}
-        {% if perms.inventory.view_receivingreceipt %}<a href="{% url 'inventory:receiving-list' %}">Receiving</a>{% endif %}
+        {% inventory_navigation request.user as inventory_nav %}
+        {% if inventory_nav.assets %}<a href="{% url 'inventory:asset-list' %}">Asset register</a>{% endif %}
+        {% if inventory_nav.stock %}<a href="{% url 'inventory:consumable-list' %}">Consumables</a>{% endif %}
+        {% if inventory_nav.receiving %}<a href="{% url 'inventory:receiving-list' %}">Receiving</a>{% endif %}
         {% if request.user.is_authenticated %}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="nav-button" type="submit">Sign out</button></form>{% endif %}
       </nav>
     </div>
