@@ -1,0 +1,30 @@
+{% extends "inventory/base.html" %}
+{% block title %}GSO workspace{% endblock %}
+{% block content %}
+<header class="hero">
+  <div>
+    <p class="eyebrow">Your office · GRAND concept</p>
+    <h1>{{ department.name|default:"General Services Office" }}</h1>
+    {% if is_gso %}<p>Find an asset, review its current status, or update the office register.</p>{% else %}<p>Review the assets assigned to your office. GSO maintains the central asset records.</p>{% endif %}
+  </div>
+  <div class="person"><span>Welcome back</span><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>Employee workspace</span></div>
+</header>
+<nav class="quick-links" aria-label="Everyday tasks">
+  <a href="{% url 'inventory:asset-list' %}">Open asset register</a>
+  {% if can_add %}<a class="button primary" href="{% url 'inventory:asset-create' %}">Add an asset</a>{% endif %}
+</nav>
+<section class="metrics" aria-label="Asset overview">
+  <div class="metric"><strong>{{ total_assets }}</strong><span>Register entries</span></div>
+  <div class="metric"><strong>{{ in_service_count }}</strong><span>In service</span></div>
+  <div class="metric"><strong>{{ maintenance_count }}</strong><span>Under maintenance</span></div>
+  <div class="metric"><strong>{{ retired_count }}</strong><span>Retired · history kept</span></div>
+</section>
+<div class="section-head"><div><h2>Office workspace</h2><span class="muted">GSO records and day-to-day work</span></div></div>
+<section class="workspace-grid" aria-label="GSO workspaces">
+  <article class="module"><span class="pill available">Available</span><h3>Inventory register</h3><p>Search assets, review assigned office and custodian, and check acquisition and status details.</p><a class="button primary" href="{% url 'inventory:asset-list' %}">Open register</a></article>
+  <article class="module"><span class="pill">Planned</span><h3>Property issuance and transfers</h3><p>Track custody handoffs, receiving acknowledgements, and return records.</p><span class="muted">Planned workspace · not connected yet</span></article>
+  <article class="module"><span class="pill">Planned</span><h3>Procurement and suppliers</h3><p>Follow purchase references, delivery details, and supplier information.</p><span class="muted">Planned workspace · not connected yet</span></article>
+  <article class="module"><span class="pill">Planned</span><h3>Maintenance requests</h3><p>Coordinate equipment concerns and retain repair history against an asset.</p><span class="muted">Planned workspace · not connected yet</span></article>
+</section>
+<section class="panel"><h2>Access and records</h2><p class="muted">Your assigned department sets the office scope. Separate view, add, change, and delete permissions control available actions. Retiring an asset retains the record and its change history.</p></section>
+{% endblock %}

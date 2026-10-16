@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.utils import timezone
 from PIL import Image
-from django.urls import reverse
+from django.utils.text import slugify
 
 ### Documentation: ###
 # See: https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
@@ -84,7 +84,8 @@ class Department(models.Model):
         ]
 
     name = models.CharField(blank=True, null=False, max_length=80, choices=choices, default=select, verbose_name="Department: ")
-    dept_head = models.ForeignKey(DepartmentHead, on_delete=models.SET_NULL, null=True, blank=False)
+    slug = models.SlugField(max_length=120, unique=True, blank=True, null=True)
+    dept_head = models.ForeignKey(DepartmentHead, on_delete=models.SET_NULL, null=True, blank=True)
     ### setting max_allowable leaves per "cluster"/OM
     
     class Meta:
@@ -92,6 +93,11 @@ class Department(models.Model):
 
     def __str__(self):
         return f"{self.name}".title()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -125,34 +131,38 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager() # set the CustomUserManager() above instead of default UserManager() from django.contrib.auth
 
     USERNAME_FIELD = "username" # the key identifier of accounts. This was also set on the CustomUserManager() class code
-    REQUIRED_FIELDS = [] # ["email", "username", "first_name", "last_name"]
+    REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
     class Meta:
         verbose_name = "User"
         verbose_name_plural = 'Users'
         
     def __str__(self):
-        if {self.last_name} and {self.first_name}:
-            return f"{self.last_name}, {self.first_name}".strip().title()
-        else:
-            return str(self.username)
+        full_name = ", ".join(part for part in (self.last_name, self.first_name) if part)
+        return full_name or str(self.username)
 
     def get_short_name(self):
         return str(self.first_name)
+
+    def get_full_name(self):
+        return " ".join(part for part in (self.first_name, self.middle_name, self.last_name, self.ext_name) if part).strip()
 
     def dp_directory_path(instance, filename):
         # file will be uploaded to MEDIA_ROOT/DP/<username>/<filename> ---check settings.py. MEDIA_ROOT=media for the exact folder/location
         return 'users/{}/DP/{}'.format(instance.username, filename)
     image = models.ImageField(default='defaults/default_user_dp.png', blank=True, upload_to=dp_directory_path, verbose_name="Photo")
 
-    def get_absolute_url(self):
-        return reverse('user', kwargs={'pk': self.username})
-
     def save(self, *args, **kwargs):        # for automatically down-sizing images
         super(User, self).save(*args, **kwargs)
 
-        img = Image.open(self.image.path)   # open the image of the current instance
-        if img.height > 600 or img.width > 600: # for sizing-down the images to conserve memory in the server
+        if not self.image:
+            return
+        try:
+            image_path = self.image.path
+            img = Image.open(image_path)
+        except (FileNotFoundError, ValueError, OSError):
+            return
+        if img.height > 600 or img.width > 600:
             output_size = (600, 600)
             img.thumbnail(output_size)
-            img.save(self.image.path)
+            img.save(image_path)
