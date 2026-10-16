@@ -22,7 +22,9 @@ workflow are implemented; operator installation remains pending.
 Receiving/inspection is now implemented as described in [receiving operations](receiving.md).
 An optional GRAND claim-support workflow now provides reviewed amount attribution;
 see [claim support and limits](claim-attribution.md). Accepted-receipt cost correction,
-quantity/cost allocation and recognized-JEV links remain incomplete. Continue the
+quantity/cost allocation and recognized-JEV links remain incomplete. The
+[receipt-cost correction design](receipt-cost-corrections.md) first pins both sides
+of reviewed claim support; this prerequisite does not implement cost amendments. Continue the
 maintenance/clearance/stock-count sequence alongside these financial integration gaps.
 Later general-office records should use
 GRAND's records/custody/HR capabilities where available instead of duplicating them.

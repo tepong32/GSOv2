@@ -5,6 +5,44 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Current development: receipt-side claim review basis
+
+Previous turn published counts3ec09d6 and notes217a4d3/v0.10.1. Final notes primary
+CI38955602714 PASS50s; feature primary CI38955372028 passed. Fresh fetch and clean
+0/0 preceded `codex/receipt-support-basis`. GRAND remains32ab046, fetched0/0;
+its active handoff reports full Finance tests running and all Form1 work unpublished.
+No GRAND application/test sources or owned Finance33308 server are changed here.
+
+Source review found claim support pins claim facts but uses live receipt facts and
+omits them from signed previews. Implementing retained receipt snapshots before
+accepted-cost amendments: optional adapter migration0002 leaves old rows NULL;
+new confirmation/review reject changed bases, history shows retained values, and
+stale/missing approved receipt bases block further support until explicit withdrawal.
+Read receipt lines after acquiring their parent lock. See
+[cost correction design](docs/receipt-cost-corrections.md); amendment UI itself is
+not implemented and no accepted receipt/asset/FIFO is rewritten.
+
+Standalone91 discovered/79 executed/12 native skips PASS30.089s; adapter migration
+drift and dependency consistency PASS. Initial GRAND SQLite71/native72 runs each
+failed one invalid test fixture (accepted quantity exceeded delivery); corrected
+fixture, kept DB constraint. Final actual GRAND SQLite72/61 executed/11 native skips
+PASS12.432s and native72/72 PASS30.325s. Logs`.tmp/receipt-basis-{sqlite,native}-final.log`.
+Existing23 GRAND W036 warnings remain outside GSO. Both test schema pairs removed;
+owned MySQL33317/session27946 shut down normally. Finance33308 untouched.
+
+Actual GRAND browser preview/confirmation/independent approval passes; simulated
+fixture-only cost change100→200 leaves original100 visible with a stale warning.
+Mobile390/desktop1440 inspected, no page overflow or duplicate IDs; warning contrast
+corrected and verified in restarted preview. All preview8024/browser sessions stopped.
+Final paired stopped recovery preserves201 default/83 finance tables, both source
+snapshots and original approval; deliberate approval-event loss detected/restored.
+Backup`.codex/backups/gsov2-receipt-basis-recovery-20261017-8y_nfx_8`; no attachments
+in this fixture. Source unchanged during recovery. Operator DB hash unchanged.
+External VM release/CI/integration remain pending. Overall goal stays active.
+Next: reviewed documentary cost amendments, after checking receiving authorization
+against actual GRAND explicit grants/UAT controls; then financial quantity/cost/JEV
+relationships. HR-reference clearance and official outputs remain unfinished.
+
 ## Published reviewed physical counts
 
 Started `codex/reviewed-stock-counts` after fresh fetch and clean 0/0 at

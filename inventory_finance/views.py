@@ -19,6 +19,7 @@ from .access import visible_attributions
 from .forms import ProposalForm, ConfirmProposalForm, ReviewForm
 from .models import ReceiptClaimAttribution
 from .services import propose_attribution, approve_attribution, close_attribution
+from .receipt_basis import receipt_basis, receipt_basis_current
 
 TOKEN_SALT = "gso-receipt-claim-proposal-v1"
 
@@ -72,7 +73,7 @@ def propose(request, case_id):
                 row = propose_attribution(actor=request.user, receipt_line_id=payload["receipt_line_id"],
                     case_public_id=case.public_id, source_line_id=payload["source_line_id"],
                     source_checksum=payload["source_checksum"], amount=payload["amount"], basis=payload["basis"],
-                    request_id=payload["request_id"])
+                    request_id=payload["request_id"], expected_receipt_basis=payload.get("receipt_basis"))
                 return redirect("inventory_finance:detail", attribution_id=row.public_id)
             except signing.BadSignature:
                 form.add_error(None, "This preview expired or changed. Preview the proposal again.")
@@ -88,7 +89,8 @@ def propose(request, case_id):
             payload = {"actor_id": request.user.pk, "case_id": str(case.public_id),
                 "receipt_line_id": data["receipt_line"].pk, "source_line_id": data["source_line"].pk,
                 "source_checksum": source["sha256"], "amount": str(data["amount"]),
-                "basis": data["basis"], "request_id": str(uuid4())}
+                "basis": data["basis"], "request_id": str(uuid4()),
+                "receipt_basis": receipt_basis(data["receipt_line"])}
             confirmation = ConfirmProposalForm(initial={"proposal_token": signing.dumps(payload, salt=TOKEN_SALT)})
             preview = {"source": source["source"], "amount": data["amount"], "basis": data["basis"],
                        "receipt_line": data["receipt_line"]}
@@ -113,11 +115,12 @@ def detail(request, attribution_id):
             line_id=row.source_line_id)["sha256"] == row.source_checksum
     except ValidationError:
         pass
+    receipt_current = receipt_basis_current(row)
     form = ReviewForm(request.POST or None, initial={"expected_version": row.state_version})
     actions = []
     if row.status == row.PROPOSED:
         if row.proposed_by_id != request.user.pk:
-            if source_current:
+            if source_current and receipt_current:
                 actions.append(("approve", "Approve support"))
             actions.append(("reject", "Reject proposal"))
         actions.append(("withdraw", "Withdraw link"))
@@ -142,4 +145,5 @@ def detail(request, attribution_id):
                 form.add_error(None, exc)
     return render(request, "inventory_finance/detail.html", {
         "row": row, "form": form, "can_review": can_review, "source_current": source_current,
+        "receipt_current": receipt_current,
         "events": row.events.select_related("actor").all()})

@@ -73,6 +73,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   retaining zero-variance decisions without fake movements or invented surplus costs.
   Include count evidence in coordinated recovery; historical counts and official
   supplies forms need separate reconciliation/acceptance, not backdated adjustments.
+- Claim support pins both claim and receipt facts. Preserve NULL historical receipt
+  bases; never backfill approval evidence from today's values. Re-read lines after
+  taking receipt locks, keep case → receipt → attribution order, and retain original
+  approvals when stale links are withdrawn. See [cost correction design](docs/receipt-cost-corrections.md).
 
 ## Validation
 

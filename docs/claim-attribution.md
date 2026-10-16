@@ -13,6 +13,11 @@ receipt line from their own office, an amount and its documentary basis. Preview
 the actual receipt/claim content. Confirmation is signed, bound to the actor and case,
 expires after 30 minutes and rechecks source freshness and permissions on submission.
 Retrying the same request retains one proposal and event.
+New proposals also retain the receipt basis: delivery/inspection facts, accepted
+quantity, documented unit cost, materialized UUIDs and evidence metadata. Preview
+confirmation and approval reject changes on either side of the relationship.
+The review screen displays recorded receipt facts rather than today's live values.
+See [receipt correction prerequisites](receipt-cost-corrections.md).
 
 A different officer in the case's Finance-owning department reviews the proposal.
 Approval checks the source snapshot, receipt status and both amount limits under
@@ -50,6 +55,10 @@ published GRAND `32ab046`; the parallel Form1 working tree was not modified.
    window. Initial attribution migration depends on inventory0015, departments0005,
    vouchers0038 and the actual swappable user model. All attribution rows remain in
    `default`; do not create cross-store FKs or alter the Finance router.
+   Migration0002 adds nullable receipt review snapshots. Historical NULL values are
+   deliberately not backfilled from current facts. Such links remain readable and
+   withdrawable; they cannot be approved or treated as a verified basis for new
+   support on the same receipt until reviewed/withdrawn and reproposed.
 5. Assign the following explicit grants only to reviewed roles. This package assigns
    none automatically. Preserve existing Finance workbench/case access independently.
 

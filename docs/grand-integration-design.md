@@ -119,6 +119,15 @@ UAT viewers must be rejected on writes, and independent Finance review must resp
 the pinned owner even when GSO custody belongs to a different office. No default
 role grants or permission-copying from the prototype are allowed.
 
+## Receipt-side review evidence — current prerequisite
+
+The [cost-correction design](receipt-cost-corrections.md) records actual materialized
+cost copies and the selected amendment boundary. Before any correction is enabled,
+claim support now pins receipt facts as well as the Finance claim source. The optional
+adapter's migration0002 adds nullable receipt snapshots without inventing old review
+evidence or altering approved amounts. Current development/release evidence belongs
+in CONTINUE; cost amendments and recognized-JEV relationships remain unfinished.
+
 ## Financial relationships (adapter after physical receiving)
 
 Implemented initial workflow on `codex/reviewed-receipt-claims`: optional

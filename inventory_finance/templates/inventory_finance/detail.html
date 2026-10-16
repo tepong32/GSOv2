@@ -4,9 +4,12 @@
 <div class="container-fluid pb-4">
   <a href="{% url 'inventory_finance:workbench' %}">Receipt claim support</a>
   <h1 class="h3 mt-2">{{ row.case.reference_code }} · {{ row.get_status_display }}</h1>
-  {% if not source_current %}<div class="alert alert-warning" role="status">The claim source has changed or its line was replaced. This historical link needs review; it cannot be approved as current support.</div>{% endif %}
+  {% if not source_current %}<div class="alert alert-warning text-dark" role="status">The claim source has changed or its line was replaced. This historical link needs review; it cannot be approved as current support.</div>{% endif %}
+  {% if not receipt_current %}<div class="alert alert-warning text-dark" role="status">The receipt basis changed or was not retained with this historical link. Review and withdraw or reject it before proposing current support.</div>{% endif %}
   <div class="card"><div class="card-body"><dl>
-    <dt>Delivery</dt><dd>{{ row.receipt_line.receipt.delivery_reference }} · line {{ row.receipt_line.sequence }}: {{ row.receipt_line.description }}</dd>
+    {% if row.receipt_snapshot %}<dt>Recorded delivery</dt><dd>{{ row.receipt_snapshot.header.delivery_reference }} · line {{ row.receipt_snapshot.line.sequence }}: {{ row.receipt_snapshot.line.description }}</dd>
+    <dt>Recorded accepted quantity and unit cost</dt><dd>{{ row.receipt_snapshot.line.accepted_quantity }} {{ row.receipt_snapshot.line.unit }} · unit cost {{ row.receipt_snapshot.line.unit_cost|default_if_none:'Unknown' }}</dd>
+    {% else %}<dt>Original receipt basis</dt><dd>Not retained by this historical link. Current receipt values are not evidence of its original review.</dd>{% endif %}
     <dt>Recorded claim line</dt><dd>{{ row.source_snapshot.voucher_number }} · {{ row.source_snapshot.line_description }} · {{ row.source_snapshot.line_amount }}</dd>
     <dt>Supported amount</dt><dd>{{ row.amount }}</dd><dt>Basis</dt><dd>{{ row.basis|linebreaksbr }}</dd>
     <dt>Proposed by</dt><dd>{{ row.proposed_by }} · {{ row.proposed_at }}</dd>

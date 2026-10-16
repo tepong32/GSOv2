@@ -20,6 +20,7 @@ from inventory.finance_sources import resolve_claim_line
 from inventory_finance.access import visible_attributions
 from inventory_finance.models import ReceiptClaimAttribution
 from inventory_finance.services import propose_attribution, approve_attribution, close_attribution
+from inventory_finance.receipt_basis import receipt_basis
 from . import grand_claim_sources
 
 
@@ -52,7 +53,8 @@ class AttributionTests(TestCase):
         source = resolve_claim_line(actor=self.clerk, case_public_id=self.case.public_id, line_id=self.line.pk)
         args = dict(actor=self.clerk, receipt_line_id=self.receipt_line.pk, case_public_id=self.case.public_id,
                     source_line_id=self.line.pk, source_checksum=source["sha256"], amount=amount,
-                    basis="Documented invoice support", request_id=uuid4())
+                    basis="Documented invoice support", request_id=uuid4(),
+                    expected_receipt_basis=receipt_basis(ReceivingLine.objects.select_related("receipt").get(pk=self.receipt_line.pk)))
         args.update(overrides)
         return propose_attribution(**args)
 
@@ -230,7 +232,8 @@ class AttributionConcurrencyTests(TransactionTestCase):
         source = resolve_claim_line(actor=self.clerk, case_public_id=self.case.public_id, line_id=self.line.pk)
         args = dict(receipt_line_id=self.receipt_line.pk, case_public_id=self.case.public_id,
             source_line_id=self.line.pk, source_checksum=source["sha256"], amount="60.00",
-            basis="Concurrent retry", request_id=uuid4())
+            basis="Concurrent retry", request_id=uuid4(),
+            expected_receipt_basis=receipt_basis(ReceivingLine.objects.select_related("receipt").get(pk=self.receipt_line.pk)))
         results = self.race(propose_attribution, [args, args], self.clerk.pk)
         self.assertEqual(results[0], results[1])
         self.assertEqual(results[0][0], "ok")

@@ -15,6 +15,7 @@ from vouchers.roles import is_finance_uat_viewer
 
 from .models import ReceiptClaimAttribution, ReceiptClaimEvent
 from .access import visible_attributions
+from .receipt_basis import receipt_basis, receipt_basis_current
 
 
 def _amount(value):
@@ -37,7 +38,7 @@ def _event(row, actor, action, note=""):
         "receipt_public_id": str(row.receipt_line.receipt.public_id),
         "receipt_line_sequence": row.receipt_line.sequence,
         "case_public_id": str(row.case.public_id), "source": row.source_snapshot,
-        "source_checksum": row.source_checksum, "amount": str(row.amount),
+        "source_checksum": row.source_checksum, "receipt": row.receipt_snapshot, "amount": str(row.amount),
         "basis": row.basis, "note": note,
     })
 
@@ -52,8 +53,14 @@ def _accepted_line(pk, *, owner_id=None):
     except ReceivingLine.DoesNotExist:
         raise PermissionDenied
     receipt = ReceivingReceipt.objects.select_for_update().get(pk=line.receipt_id)
+    try:
+        line = lines.get(pk=pk)
+    except ReceivingLine.DoesNotExist:
+        raise PermissionDenied
     if receipt.status != receipt.ACCEPTED or line.is_void or line.accepted_quantity <= 0:
         raise ValidationError("Only an accepted, non-void receipt line can support a claim.")
+    # Refresh after acquiring the receipt lock: a future reviewed amendment may
+    # have committed while this operation waited. Never use the pre-lock line.
     return line
 
 
@@ -66,7 +73,7 @@ def _receipt_support_limit(line):
 
 @transaction.atomic(using="default")
 def propose_attribution(*, actor, receipt_line_id, case_public_id, source_line_id,
-                        source_checksum, amount, basis, request_id):
+                        source_checksum, amount, basis, request_id, expected_receipt_basis):
     if is_finance_uat_viewer(actor) or not has_explicit_permission(
             actor, "inventory_finance.propose_receiptclaimattribution"):
         raise PermissionDenied
@@ -87,6 +94,9 @@ def propose_attribution(*, actor, receipt_line_id, case_public_id, source_line_i
     line = _accepted_line(receipt_line_id, owner_id=department.pk)
     if line.receipt.department_id != department.pk:
         raise PermissionDenied
+    recorded_receipt = receipt_basis(line)
+    if recorded_receipt != expected_receipt_basis:
+        raise ValidationError("The receipt source changed. Preview the current receipt before proposing support.")
     if amount > Decimal(source["source"]["line_amount"]):
         raise ValidationError("The supported amount exceeds the selected claim line.")
     if amount > _receipt_support_limit(line):
@@ -95,6 +105,7 @@ def propose_attribution(*, actor, receipt_line_id, case_public_id, source_line_i
     if existing:
         if (existing.proposed_by_id == actor.pk and existing.receipt_line_id == line.pk
                 and existing.source_checksum == source_checksum and existing.amount == amount
+                and existing.receipt_snapshot == recorded_receipt
                 and existing.basis == basis):
             return existing
         raise ValidationError("This proposal request identity already belongs to different content.")
@@ -104,7 +115,8 @@ def propose_attribution(*, actor, receipt_line_id, case_public_id, source_line_i
         public_id=request_id, receipt_line=line, case=case,
         finance_department_id=source["source"]["finance_department_id"],
         source_line_id=source["source"]["line_local_id"], source_snapshot=source["source"],
-        source_checksum=source_checksum, amount=amount, basis=basis, proposed_by=actor)
+        source_checksum=source_checksum, receipt_snapshot=recorded_receipt,
+        amount=amount, basis=basis, proposed_by=actor)
     row.full_clean()
     row.save()
     _event(row, actor, "proposed")
@@ -125,6 +137,8 @@ def approve_attribution(*, actor, attribution_id, expected_version, note):
         raise ValidationError("This proposal changed. Reload it before review.")
     if row.proposed_by_id == actor.pk:
         raise PermissionDenied("A different officer must review your proposal.")
+    if not receipt_basis_current(row, receipt_line):
+        raise ValidationError("The receipt basis changed or was not retained. Withdraw or reject this link and review a new proposal.")
     if source["sha256"] != row.source_checksum or source["source"]["finance_department_id"] != row.finance_department_id:
         raise ValidationError("The source changed after proposal. A new reviewed proposal is required.")
     if not str(note or "").strip() or len(str(note)) > 4000:
@@ -144,8 +158,10 @@ def approve_attribution(*, actor, attribution_id, expected_version, note):
     total = approved.aggregate(total=Sum("amount"))["total"] or Decimal("0")
     if total + row.amount > Decimal(source["source"]["line_amount"]):
         raise ValidationError("Approved receipt support would exceed the claim line amount.")
-    receipt_total = ReceiptClaimAttribution.objects.filter(receipt_line=receipt_line,
-        status=row.APPROVED).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    receipt_approved = ReceiptClaimAttribution.objects.filter(receipt_line=receipt_line, status=row.APPROVED)
+    if any(not receipt_basis_current(previous, receipt_line) for previous in receipt_approved):
+        raise ValidationError("Earlier approved links have a stale or missing receipt basis; review and withdraw them first.")
+    receipt_total = receipt_approved.aggregate(total=Sum("amount"))["total"] or Decimal("0")
     if receipt_total + row.amount > _receipt_support_limit(receipt_line):
         raise ValidationError("Approved support across claims would exceed the documented accepted receipt value.")
     row.status = row.APPROVED

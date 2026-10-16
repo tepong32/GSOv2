@@ -22,6 +22,7 @@ class ReceiptClaimAttribution(models.Model):
     source_line_id = models.PositiveBigIntegerField()
     source_snapshot = models.JSONField()
     source_checksum = models.CharField(max_length=64)
+    receipt_snapshot = models.JSONField(null=True, blank=True)
     amount = models.DecimalField(max_digits=18, decimal_places=2)
     basis = models.TextField(help_text="Explain the documented amount this receipt line supports in the claim.")
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=PROPOSED)

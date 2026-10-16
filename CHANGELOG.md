@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.0] - 2026-10-17
+### Added
+- Retain receipt facts in reviewed claim support
+
 ## [0.10.1] - 2026-10-17
 ### Documentation
 - Record reviewed stock count release and recovery evidence

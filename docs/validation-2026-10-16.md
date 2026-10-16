@@ -660,3 +660,59 @@ branch CI38955242812 PASS38s; remote master/tag match
 Operator DB SHA-256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 Documentation follow-up uses separate `codex/stock-count-release-notes`, fresh clean
 fetch0/0; no code/schema/storage changes in the follow-up.
+
+## Receipt-side claim evidence — 2026-10-17
+
+Fresh fetch and clean0/0 at217a4d3 before `codex/receipt-support-basis`. GRAND fetched
+0/0 at32ab046; its unpublished Form1 sources and active test freeze preserved.
+The optional adapter now pins receipt facts on preview/proposal/review/history,
+with additive nullable migration0002. No accepted receipt cost is changed by the
+application. This prepares for documentary amendments without inventing old evidence.
+
+PASS: `manage.py test --verbosity 1`, standalone91 discovered/79 executed/12 native
+skips in30.089s, `.tmp/receipt-basis-shell.log`. PASS: actual-GRAND
+`makemigrations inventory_finance --check --dry-run` through isolated harness setup,
+no changes. PASS: `python -m pip check` and `git diff --check`.
+
+FAIL - CAUSED BY CURRENT WORK: initial actual GRAND SQLite71 tests (14.850s) and
+native72 tests (35.988s) each hit one invalid fixture attempting accepted quantity2
+against delivered1. Database quantity-capacity checks correctly rejected it. Changed
+the test to a supply line and coherent delivered/accepted quantities; constraint
+unchanged. Initial logs`.tmp/receipt-basis-{sqlite,native}.log` are not passes.
+PASS: `python scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation`, final72 tests,
+61 executed/11 native skips in12.432s. PASS: same command with `--mysql`,72/72 in
+30.325s. Final logs`.tmp/receipt-basis-{sqlite,native}-final.log`.
+
+Coverage includes signed receipt preview freshness, old signed payload without basis,
+equal-value quantity/cost changes, header changes, historical screen provenance,
+stale cross-claim approvals, NULL legacy basis/capacity/withdrawal, no Finance queries,
+and populated0001→0002 preservation of all old row/event values with new NULL basis.
+Native test observes the approval waiting in MySQL data_lock_waits while a synthetic
+receipt amendment holds the parent lock; after commit it rejects the changed facts
+and creates no approval event. It models future correction locking, not an implemented
+amendment workflow. Existing23 GRAND W036 warnings are outside GSO. All disposable
+schemas removed and owned MySQL33317 shut down normally; Finance33308 untouched.
+
+PASS: actual GRAND browser preview → confirmation → independent approval, followed
+by a controlled change of the isolated fixture's live cost100→200. Approved screen
+retains recorded100 and warns stale, with withdrawal still available. Desktop1440
+and mobile390 inspected, client/scroll widths375, no duplicate IDs. Improved warning
+text contrast using GRAND/Bootstrap text-dark; restarted preview verifies dark text
+rgb(33,37,41). Screenshots`output/playwright/receipt-basis-*.png`; final warning
+image`receipt-basis-warning-mobile-final.png`. Only missing synthetic logo/avatar
+resources; no workflow errors. All browser sessions and preview8024 stopped.
+Final source hashes retained in`.tmp/receipt-basis-final-source.json`; only late
+change was the browser-verified warning contrast class, not service/schema logic.
+
+PASS: stopped synthetic paired recovery preserves201 default/83 finance table
+contents, original receipt/claim snapshots, independent approval and events after
+the live fixture cost changed. Deliberately deleting the restored approval event is
+detected by table reconciliation, then restored from backup; source hashes unchanged.
+Final backup`C:/Users/Administrator/.codex/backups/gsov2-receipt-basis-recovery-20261017-8y_nfx_8`.
+No private attachments in this fixture; earlier receiving/private-evidence recovery
+checks remain separate. NOT RUN - OUT OF SCOPE: operator/online MySQL recovery,
+role grants, GRAND installation, legal/Accounting acceptance and cost amendment UI.
+Standalone native suite not repeated: no inventory implementation/schema changed;
+actual GRAND native covers the changed optional adapter and its shared dependencies.
+Canonical operator DB SHA-256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
