@@ -67,7 +67,8 @@ Named employee custody is published at236c5e1; see
 [verified HR boundary and selected relationships](employee-custody-design.md).
 GRAND currently provides employee identity/current department, but no verified
 separation event. Named-custody migration, services and signed staff screens are implemented;
-clearance workflows remain unimplemented. No operator migration or deployment.
+clearance workflows remain unimplemented. The [custody review workbench](custody-review.md)
+is in validation as the next prerequisite. No operator migration or deployment.
 
 After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
 

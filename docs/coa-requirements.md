@@ -30,12 +30,12 @@ governed Accounting/Budget decisions.
 | --- | --- | --- |
 | Asset and supply registers | Present, scoped permissions and audit history | Receiving/inspection/tagging; explicit physical item versus supply catalog distinction; reviewed classification. |
 | Receipt evidence | Published receipt header/lines, accepted/rejected quantities, private evidence and independent acceptance | Official outputs and reviewed Finance attribution remain separate. |
-| Custody and accountability | Department handoffs with acknowledgement | Employee identities from GRAND, PAR/ICS references and validated outputs, returns and exit-clearance evidence. Never infer signatures. |
+| Custody and accountability | Department and named GRAND employee handoffs with acknowledgement | Employee identities from GRAND, PAR/ICS references and validated outputs, returns and exit-clearance evidence. Never infer signatures. |
 | Stock cards / requisition and issue | Quantity ledger, optional FIFO, department issues | Reviewed requisition/issue/return lineage, dated stock counts and adjustments; confirm RSMI/RPCI and semi-expendable registers/forms before official generation. |
 | Physical counts and Accounting reconciliation | Dated counts, unregistered findings, private Accounting snapshot, working CSV | Signed committee/source evidence and accepted official output; preserve missing/duplicate/unreconciled states. |
 | Disposal / loss | Disposal evidence and decisions; no dedicated loss case | Compare revised disposal manual; distinguish loss investigation/relief from authorized disposal. No automatic retirement or Finance derecognition from a missing-item finding. |
-| Maintenance and other GSO records | Vehicle identifiers only; maintenance status | Repair/service history first; then vehicle use/fuel/service records and accountable office requests where confirmed in scope. Avoid inventing procurement or HR authority. |
-| Financial attribution | Free-text fund/account/PO/voucher/journal references | Explicit reviewed line allocations using [GRAND's actual models](grand-integration-design.md); no journal posting from this shell. |
+| Maintenance and other GSO records | Published maintenance cases, private repair evidence and closure history | Vehicle use/fuel/service records and accountable office requests where confirmed in scope. Avoid inventing procurement or HR authority. |
+| Financial attribution | Free-text references plus optional reviewed GRAND receipt-to-claim amount attribution | Cost correction, quantity allocation and recognized-JEV lineage using [GRAND's actual models](grand-integration-design.md); no journal posting from this shell. |
 
 The source matrix must be updated with exact sections and tested fields as each
 official workflow is implemented. Pending legal/form validation does not block

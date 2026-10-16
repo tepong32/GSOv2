@@ -4,10 +4,12 @@ from . import views
 from . import receiving_views
 from . import maintenance_views
 from . import employee_custody_views
+from . import custody_review
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("custody/", custody_review.custody_review, name="custody-review"),
     path("<int:pk>/employee-handoff/", employee_custody_views.employee_handoff, name="employee-handoff"),
     path("maintenance/", maintenance_views.maintenance_list, name="maintenance-list"),
     path("<int:pk>/maintenance/new/", maintenance_views.maintenance_open, name="maintenance-open"),

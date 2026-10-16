@@ -11,6 +11,8 @@ GRAND [claim-support workflow](docs/claim-attribution.md) supports reviewed amou
 attribution; quantity/cost allocation and GRAND installation remain pending. See
 [receiving operations](docs/receiving.md), [maintenance](docs/maintenance.md) and
 [employee custody](docs/employee-custody-design.md) for permissions and boundaries.
+The GRAND-only [custody review](docs/custody-review.md) separates personal assignments,
+owner-office review, legacy records and pending handoffs. Clearance remains pending.
 Assets, supply items and stock movements have public UUIDs for portable references;
 CSV exports include these IDs. Local integer keys and historical links are retained.
 

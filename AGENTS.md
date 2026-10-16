@@ -57,6 +57,8 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   and require the selected employee to acknowledge a different initiator's request.
   Account deactivation is not employment termination or clearance. HR moves do not
   automatically move inventory; preserve recorded custody for documented review.
+  Personal custody reads do not expand owner-office write authority. Live working
+  lists, empty results and retired history never constitute employee clearance.
 
 ## Validation
 

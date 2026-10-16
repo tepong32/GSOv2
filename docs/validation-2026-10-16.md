@@ -474,3 +474,32 @@ and tag match236c5e1e265bc1a63b97a9d3271133e94b598f10. Final release diff change
 only intended feature/docs and generated VERSION/CHANGELOG. PrimaryCI38945433056
 PASS. No operator migration/grants/deployment. Release-result documentation
 uses separate `codex/custody-release-notes`, created after clean fetch0/0.
+
+## Custody review workbench - 2026-10-17
+
+Fresh clean55fc7bf fetch0/0 before `codex/custody-review`. GRAND fetched0/0 with
+unrelated unpublished Form1 work preserved. No new schema or data mutation workflow.
+PASS: `manage.py test inventory.test_employee_sources --noinput`,4/4 in0.454s.
+PASS: `manage.py test inventory --noinput`,70 discovered/61 executed/nine native
+skips11.670s, `.tmp/custody-review-shell.log`; model drift clear.
+FAIL - CAUSED BY CURRENT WORK: actual GRAND SQLite49 discovered, one incorrect test
+expectation and seven native skips5.273s, `.tmp/grand-custody-review.log`. GRAND's
+explicit-permission helper requires a department; missing-department employee gets
+403. Corrected expectation and checked GSO can still view the retained assignment;
+no permission rule loosened. Native expanded run37525 is in progress.
+
+PASS: `scripts/run_grand_source_tests.py --grand-root <clean32ab046> --mysql`,50/50
+in14.501s, no skips; `.tmp/grand-custody-review-native.log`. Covers all six new review
+cases including retained-identity JSON search on native MySQL. Existing23 GRAND W036
+warnings remain; none in GSO. Both schemas removed; owned33317 SQL SHUTDOWN completed.
+PASS: real GRAND browser office/legacy and moved-employee personal views at1440x1000
+and390x844. Personal scope retains assignment, flags HR movement and omits owner
+register link. Client/scroll width390, no overflow elements or duplicate IDs.
+Screenshots `output/playwright/custody-review-*.png`; only synthetic logo/avatar404s.
+Browser sessions and preview8021 stopped. Synthetic fixture retained separately at
+`.tmp/custody-review-preview-6ypwa4un`, copied from the previous preserved fixture.
+NOT RUN - OUT OF SCOPE: a new migration/recovery rehearsal and full standalone native
+suite. This slice changes only GRAND read queries/screens and a dashboard link;
+no models, services, file formats or writes changed. Existing populated/recovery
+proof remains applicable. Full shell SQLite70 and actual-GRAND native50 cover the
+impacted behavior; tests explicitly preserve inventory state and avoid Finance queries.

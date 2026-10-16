@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.0] - 2026-10-17
+### Added
+- Add scoped custody review across employee movements
+
 ## [0.7.1] - 2026-10-17
 ### Documentation
 - Record verified custody release and recovery results

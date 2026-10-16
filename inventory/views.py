@@ -62,6 +62,7 @@ def _scoped_assets(user):
 
 @login_required
 def dashboard(request):
+    from .custody_review import can_view_custody_review
     from .maintenance_views import can_view_maintenance
     if not can(request.user, "view"):
         from .receiving import require_receiving
@@ -75,6 +76,7 @@ def dashboard(request):
         "in_service_count": assets.filter(status=Asset.ACTIVE).count(),
         "maintenance_count": assets.filter(status=Asset.MAINTENANCE).count(),
         "can_view_maintenance": can_view_maintenance(request.user),
+        "can_view_custody_review": can_view_custody_review(request.user),
         "retired_count": assets.filter(status=Asset.RETIRED).count(),
         "can_add": can(request.user, "add"),
         "can_view_stock": can_stock(request.user, "view"),

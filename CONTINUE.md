@@ -5,6 +5,34 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Current custody review work
+
+Previous goal turn made verified progress: custody236c5e1 and release notes55fc7bf
+are published. Final documentation branchCI38945566281 and primaryCI38945701870
+passed; remote master/tag match55fc7bf and operator DB hash is unchanged.
+Fresh fetch0/0 and clean tree, then created `codex/custody-review`. GRAND also fetched
+0/0 with its unrelated Form1 changes preserved. Rechecked actual profile visibility,
+permissions and absence of structured employee separation in profiles/users.
+
+The [custody review workbench](docs/custody-review.md) is written: personal retained
+assignments, owning-office review, separate legacy records and pending handoffs,
+minimal current-HR comparisons, GET-only/no-store and bounded search/pagination.
+No new schema or clearance decision. Own custody remains visible after HR moves
+without granting owner-office write access. GRAND's explicit permission helper still
+requires an assigned department; GSO can review retained history when the employee
+cannot access it. Clearance cases, witnessed returns and signoff remain next work.
+
+Standalone4/4 boundary tests PASS0.454s, full shell70 discovered/61 executed/nine
+native skips PASS11.670s. SQLite GRAND49 tests had one test expectation failure:
+missing department correctly denies the recipient through GRAND's helper. Corrected
+the test, not the authority check. Expanded native run37525 PASS50/50 in14.501s, no skips; log
+`.tmp/grand-custody-review-native.log`. Both disposable schemas removed and owned
+MySQL33317 session82727 shut down normally.
+Browser office/legacy and moved-employee personal views inspected on isolated
+`.tmp/custody-review-preview-6ypwa4un`, port8021 and browser sessions are now stopped. Mobile390 client/scroll widths match; no overflow
+elements or duplicate IDs. Screenshots output/playwright/custody-review-*.png.
+Next: VM release and CI/integration/remote verification. Overall goal remains incomplete.
+
 ## Published maintenance milestone
 
 See [maintenance workflow](docs/maintenance.md). Migration0016, services, staff

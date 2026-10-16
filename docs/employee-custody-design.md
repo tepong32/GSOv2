@@ -35,7 +35,7 @@ birthdate or claimed employment status. It neither searches by name nor writes H
 custody or Finance data. A later write must re-resolve inside its transaction and
 compare the reviewed fingerprint.
 
-## Selected relationship approach — services in development
+## Implemented relationships
 
 Migration0017 adds nullable protected custodian relationships to the existing Asset/AssetTransfer
 models using `settings.AUTH_USER_MODEL`. GRAND's existing one-to-one employee
@@ -65,6 +65,10 @@ concurrent handoffs, maintenance and disposal cannot detach identity from histor
 HR department changes must flag a review need, not move the asset automatically.
 
 ## Clearance sequence — remaining work
+
+The [custody review workbench](custody-review.md) now implements the read-only
+retained-assignment prerequisite and is in validation. Clearance decisions and
+witnessed returns remain unimplemented.
 
 List retained assets by explicit employee identity, including unresolved legacy
 records separately instead of claiming a complete employee inventory. Preserve

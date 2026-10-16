@@ -12,6 +12,13 @@ class StandaloneEmployeeBoundaryTests(SimpleTestCase):
 
 
 class CustodyOwnerGuardTests(TestCase):
+    def test_standalone_custody_review_requires_real_grand_integration(self):
+        from user.models import User
+        from django.urls import reverse
+        actor = User.objects.create_superuser(username="standalone-review", password="synthetic-only")
+        self.client.force_login(actor)
+        self.assertEqual(self.client.get(reverse("inventory:custody-review")).status_code, 403)
+
     def test_historical_handoff_actors_cannot_be_deleted(self):
         from user.models import User
         from .models import Asset, AssetTransfer
