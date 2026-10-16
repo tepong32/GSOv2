@@ -2,6 +2,8 @@
 
 The planned feature sequence and audit boundaries are in [the inventory roadmap](docs/inventory-roadmap.md).
 
+New equipment and vehicles are registered through a receiving flow that saves the delivery and inspection reference alongside the asset. The app records one individually tagged asset per entry and warns staff when the property tag, serial, or chassis number may already exist.
+
 This repository is a standalone development shell for the GSO asset inventory module intended for integration into the municipal GRAND application. The active product code lives in `inventory/`. Its local `user` app and Django project settings exist only to make the concept runnable; GRAND integration should use GRAND's existing `users.User`, `profiles.EmployeeProfile`, and `departments.Department` records.
 
 ## Current workflow

@@ -1,13 +1,14 @@
-{% extends "inventory/base.html" %}
+﻿{% extends "inventory/base.html" %}
 {% block title %}{{ heading }}{% endblock %}
 {% block content %}
-<header class="hero"><div><p class="eyebrow">GSO workspace · Asset register</p><h1>{{ heading }}</h1><p>Record one tagged item per entry. Add the approved account mapping and purchase references when available; Accounting can confirm them later.</p></div></header>
+<header class="hero"><div><p class="eyebrow">GSO workspace · Asset register</p><h1>{{ heading }}</h1><p>{% if receiving %}Record the delivery and inspection, then enter one tagged item. For several similar items, submit one entry per tag. Accounting can confirm account mapping later.{% else %}Record one tagged item per entry. Add the approved account mapping and purchase references when available; Accounting can confirm them later.{% endif %}</p></div></header>
 <section class="form-card"><form method="post" novalidate>{% csrf_token %}
   {% if form.non_field_errors %}<div role="alert">{{ form.non_field_errors }}</div>{% endif %}
-  <div class="form-grid">{% for field in form %}<div class="field {% if field.name == 'notes' or field.name == 'coa_basis' %}full{% endif %}"{% if field.name == 'plate_number' or field.name == 'engine_number' or field.name == 'chassis_number' or field.name == 'registration_due' %} data-vehicle-fields{% endif %}>
-    {{ field.label_tag }}{{ field }}{% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}{% for error in field.errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}
+  {% if possible_matches %}<section class="panel" role="status"><h2>Check for an existing record</h2><p>These entries share a property tag, serial number, or chassis number with the item you entered. Confirm only if the delivered item is separate.</p><ul>{% for match in possible_matches %}<li><a href="{% url 'inventory:asset-detail' match.pk %}">{{ match.asset_name }}</a> · {{ match.property_tag|default:"No tag" }}{% if match.serial_number %} · serial {{ match.serial_number }}{% endif %}{% if match.chassis_number %} · chassis {{ match.chassis_number }}{% endif %}</li>{% endfor %}</ul></section>{% endif %}
+  <div class="form-grid">{% for field in form %}<div class="field {% if field.name == 'notes' or field.name == 'coa_basis' or field.name == 'inspection_notes' %}full{% endif %}"{% if field.name == 'plate_number' or field.name == 'engine_number' or field.name == 'chassis_number' or field.name == 'registration_due' %} data-vehicle-fields{% endif %}>
+    {% if field.name != 'confirm_possible_duplicate' or possible_matches %}{{ field.label_tag }}{{ field }}{% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}{% for error in field.errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}{% endif %}
   </div>{% endfor %}</div>
-  <div class="actions"><button class="button primary" type="submit">Save asset</button><a class="button" href="{% if asset %}{% url 'inventory:asset-detail' asset.pk %}{% else %}{% url 'inventory:asset-list' %}{% endif %}">Cancel</a></div>
+  <div class="actions"><button class="button primary" type="submit">{% if receiving %}Save receiving record{% else %}Save asset{% endif %}</button><a class="button" href="{% if asset %}{% url 'inventory:asset-detail' asset.pk %}{% else %}{% url 'inventory:asset-list' %}{% endif %}">Cancel</a></div>
 </form></section>
 <script>
   (() => {

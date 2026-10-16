@@ -184,6 +184,33 @@ class AssetAuditEvent(models.Model):
         raise ValidationError("Asset audit events are retained and cannot be deleted.")
 
 
+class AssetReceivingRecord(models.Model):
+    """Permanent receiving and inspection reference for one tagged asset."""
+
+    asset = models.OneToOneField(Asset, on_delete=models.PROTECT, related_name="receiving_record")
+    received_on = models.DateField()
+    delivery_reference = models.CharField(max_length=120)
+    inspection_reference = models.CharField(max_length=120, blank=True)
+    received_by = models.CharField(max_length=160)
+    inspection_notes = models.TextField(blank=True)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_receipts_recorded",
+    )
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-received_on", "-pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Receiving records are immutable; record corrections as an asset audit event.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Receiving records are retained and cannot be deleted.")
+
+
 class AssetTransfer(models.Model):
     """A simple, acknowledged custody handoff for one registered asset."""
 

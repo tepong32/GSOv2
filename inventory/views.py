@@ -18,7 +18,7 @@ from .access import (
 )
 from .forms import (
     AssetDisposalRequestForm, AssetDisposalResponseForm, AssetDisposalReviewForm,
-    AssetForm, AssetTransferForm, ConsumableItemForm, StockAdjustmentForm,
+    AssetForm, AssetReceivingForm, AssetTransferForm, ConsumableItemForm, StockAdjustmentForm,
     StockIssueForm, StockReceiptForm, TransferCancellationForm,
     AssetVerificationRoundForm, AssetVerificationRecordForm, AssetVerificationFollowUpForm,
     AssetVerificationFindingForm, AssetVerificationFindingReviewForm, AssetAccountingImportForm,
@@ -30,13 +30,14 @@ from .models import (
     ConsumableItem, StockMovement,
 )
 from .services import (
-    acknowledge_asset_transfer, cancel_asset_transfer, create_asset,
+    acknowledge_asset_transfer, cancel_asset_transfer,
     create_asset_transfer, create_consumable, record_stock_movement,
     respond_to_disposal_case, review_asset_disposal_case,
     submit_asset_disposal_request, update_asset, update_consumable,
     start_asset_verification_round, record_asset_verification, close_asset_verification_round,
     resolve_asset_verification_followup, record_unregistered_verification_finding,
     review_unregistered_verification_finding, import_accounting_asset_snapshot,
+    receive_asset,
 )
 
 
@@ -154,6 +155,7 @@ def asset_detail(request, pk):
     pending_transfer = asset.transfers.filter(status=AssetTransfer.PENDING).first()
     return render(request, "inventory/asset_detail.html", {
         "asset": asset,
+        "receiving_record": getattr(asset, "receiving_record", None),
         "events": asset.audit_events.all() if can_view_audit(request.user) else (),
         "can_change": can(request.user, "change"),
         "can_retire": can(request.user, "delete"),
@@ -173,12 +175,16 @@ def asset_detail(request, pk):
 
 @asset_access_required("add")
 def asset_create(request):
-    form = AssetForm(request.POST or None)
+    form = AssetReceivingForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        asset = create_asset(actor=request.user, data=form.cleaned_data)
-        messages.success(request, "Asset added to the register.")
+        asset = receive_asset(actor=request.user, data=form.cleaned_data)
+        messages.success(request, "Receiving record saved and asset added to the register.")
         return redirect("inventory:asset-detail", pk=asset.pk)
-    return render(request, "inventory/asset_form.html", {"form": form, "heading": "Add an asset"})
+    matches = form.possible_duplicate_assets(form.cleaned_data) if form.is_bound else Asset.objects.none()
+    return render(request, "inventory/asset_form.html", {
+        "form": form, "heading": "Receive and register an asset", "receiving": True,
+        "possible_matches": matches,
+    })
 
 
 @asset_access_required("change")

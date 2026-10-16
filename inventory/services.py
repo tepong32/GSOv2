@@ -15,7 +15,7 @@ from .access import (
     department_model, department_for_user, gso_department_for_user,
 )
 from .models import (
-    Asset, AssetAuditEvent, AssetDisposalAttachment, AssetDisposalCase,
+    Asset, AssetAuditEvent, AssetReceivingRecord, AssetDisposalAttachment, AssetDisposalCase,
     AssetDisposalEvent, AssetTransfer, AssetVerificationEvent, AssetVerificationRecord,
     AssetVerificationRound, AssetVerificationFinding, AssetVerificationFindingEvent,
     AssetAccountingImport, AssetAccountingLine, ConsumableAuditEvent, ConsumableItem,
@@ -72,6 +72,23 @@ def create_asset(*, actor, data):
         asset=asset, department_id=asset.department_id, actor=actor,
         action=AssetAuditEvent.CREATED, snapshot=asset_snapshot(asset),
     )
+    return asset
+
+
+@transaction.atomic
+def receive_asset(*, actor, data):
+    """Create the register entry and its immutable receiving/inspection record together."""
+    data = dict(data)
+    receipt_fields = {
+        name: data.pop(name) for name in (
+            "received_on", "delivery_reference", "inspection_reference",
+            "received_by", "inspection_notes", "confirm_possible_duplicate",
+        )
+    }
+    asset = create_asset(actor=actor, data=data)
+    AssetReceivingRecord.objects.create(asset=asset, recorded_by=actor, **{
+        name: value for name, value in receipt_fields.items() if name != "confirm_possible_duplicate"
+    })
     return asset
 
 

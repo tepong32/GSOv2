@@ -131,6 +131,42 @@ class AssetForm(forms.ModelForm):
         return cleaned
 
 
+class AssetReceivingForm(AssetForm):
+    received_on = forms.DateField(
+        initial=timezone.localdate, widget=forms.DateInput(attrs={"type": "date"}),
+        label="Delivery / receiving date",
+    )
+    delivery_reference = forms.CharField(max_length=120, label="Delivery / receiving reference")
+    inspection_reference = forms.CharField(max_length=120, required=False, label="Inspection reference")
+    received_by = forms.CharField(max_length=160, label="Received / inspected by")
+    inspection_notes = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 3}), label="Inspection notes")
+    confirm_possible_duplicate = forms.BooleanField(
+        required=False, label="I reviewed the possible matches and this is a separate asset",
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        matches = self.possible_duplicate_assets(cleaned)
+        if matches and not cleaned.get("confirm_possible_duplicate"):
+            self.add_error(None, "Possible matching assets were found. Review the matches below; confirm only if this is a separate item.")
+        return cleaned
+
+    @staticmethod
+    def possible_duplicate_assets(data):
+        from django.db.models import Q
+
+        query = Q()
+        fields = ("property_tag", "serial_number", "chassis_number")
+        for field in fields:
+            value = (data.get(field) or "").strip()
+            if value:
+                query |= Q(**{f"{field}__iexact": value})
+        return Asset.objects.filter(query).order_by("asset_name", "pk")[:10] if query else Asset.objects.none()
+
+    class Meta(AssetForm.Meta):
+        fields = AssetForm.Meta.fields
+
+
 class AssetTransferForm(forms.Form):
     destination_department = forms.TypedChoiceField(choices=(), coerce=int, label="Receiving department")
     destination_custodian = forms.CharField(max_length=160, label="Receiving office / custodian")
