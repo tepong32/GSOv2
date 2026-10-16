@@ -369,7 +369,7 @@ operator-data restoration claim. Synthetic source retained in
 PASS: full shell `manage.py test --noinput`:65 discovered/56 executed/nine native
 skips,7.048s; `.tmp/maintenance-release-shell.log`. Migration drift, `pip check`
 and whitespace checks pass. GitHub API shows no rulesets or master protection.
-External Version Manager README reviewed, inspect/preview proposes minor0.6.1
+External Version Manager README reviewed; inspect/preview proposed the maintenance minor release
 updating only VERSION/CHANGELOG.
 
 PASS: final actual-GRAND native command `scripts/run_grand_source_tests.py --grand-root

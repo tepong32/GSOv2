@@ -16,6 +16,9 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
 - New features use `codex/` branches and worktrees under `~/.codex/worktrees`.
   Use the user's external Version Manager: inspect README, inspect/preview, stage
   intended files, release, integrate/push and verify remote. Honor actual review gates.
+- Version Manager replaces exact version tokens in discovered docs. Preserve
+  historical validation by identifying commits there; retain release tags in the
+  changelog and CONTINUE. Inspect previews and generated diffs before integration.
 - Document durable decisions here, current state in CONTINUE, feature scope in the
   roadmap, and actual commands/results in the validation record. Do not claim
   proposed tables, official forms, deployment, or human acceptance already exist.

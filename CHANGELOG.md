@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.2] - 2026-10-17
+### Documentation
+- Preserve historical maintenance validation references
+
 ## [0.6.1] - 2026-10-17
 ### Documentation
 - Record verified maintenance release and recovery results
