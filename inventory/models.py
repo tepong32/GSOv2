@@ -4,6 +4,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
+from django.utils import timezone
 from uuid import uuid4
 
 
@@ -136,6 +137,7 @@ class Asset(models.Model):
             ("start_asset_verification", "Can start GSO physical asset verification rounds"),
             ("record_asset_verification", "Can record physical asset verification results"),
             ("close_asset_verification", "Can close completed physical asset verification rounds"),
+            ("import_asset_accounting_snapshot", "Can import an Accounting asset snapshot for reconciliation"),
         )
         indexes = (
             models.Index(fields=("department_id", "status"), name="gso_asset_dept_status"),
@@ -239,6 +241,7 @@ class AssetVerificationRound(models.Model):
     """A dated GSO exercise that snapshots the assets to be physically checked."""
 
     title = models.CharField(max_length=160)
+    as_of_date = models.DateField(default=timezone.localdate, verbose_name="Physical count as of")
     department_id = models.PositiveBigIntegerField(db_index=True)
     department_label = models.CharField(max_length=160)
     created_by = models.ForeignKey(
@@ -275,6 +278,14 @@ class AssetVerificationRecord(models.Model):
         (NOT_FOUND, "Not found during visit"),
     )
     CONDITION_CHOICES = (("serviceable", "Serviceable"), ("damaged", "Damaged / needs attention"), ("unknown", "Not assessed"))
+    FOLLOW_UP_OPEN = "open"
+    FOLLOW_UP_RESOLVED = "resolved"
+    FOLLOW_UP_ACCEPTED = "accepted_difference"
+    FOLLOW_UP_CHOICES = (
+        (FOLLOW_UP_OPEN, "Follow-up needed"),
+        (FOLLOW_UP_RESOLVED, "Resolved"),
+        (FOLLOW_UP_ACCEPTED, "Difference reviewed / accepted"),
+    )
 
     verification_round = models.ForeignKey(AssetVerificationRound, on_delete=models.PROTECT, related_name="records")
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="verification_records")
@@ -283,11 +294,22 @@ class AssetVerificationRecord(models.Model):
     serial_number_snapshot = models.CharField(max_length=120, blank=True)
     assigned_department_snapshot = models.CharField(max_length=160, blank=True)
     assigned_office_snapshot = models.CharField(max_length=160, blank=True)
+    account_code_snapshot = models.CharField(max_length=40, blank=True)
+    account_title_snapshot = models.CharField(max_length=140, blank=True)
+    purchase_date_snapshot = models.DateField(null=True, blank=True)
+    acquisition_cost_snapshot = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True)
     result = models.CharField(max_length=20, choices=RESULT_CHOICES, default=NOT_CHECKED, db_index=True)
     observed_department = models.CharField(max_length=160, blank=True)
     observed_office = models.CharField(max_length=160, blank=True)
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, blank=True)
     notes = models.TextField(blank=True)
+    follow_up_status = models.CharField(max_length=24, choices=FOLLOW_UP_CHOICES, default=FOLLOW_UP_OPEN, db_index=True)
+    resolution_note = models.TextField(blank=True)
+    resolved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_verification_followups_resolved",
+    )
+    resolved_at = models.DateTimeField(null=True, blank=True)
     verified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
         related_name="gso_asset_verifications_recorded",
@@ -300,6 +322,10 @@ class AssetVerificationRecord(models.Model):
 
     def __str__(self):
         return f"{self.asset_name_snapshot} — {self.get_result_display()}"
+
+    @property
+    def needs_followup(self):
+        return self.result in (self.DISCREPANCY, self.NOT_FOUND) and self.follow_up_status == self.FOLLOW_UP_OPEN
 
 
 class AssetVerificationEvent(models.Model):
@@ -321,6 +347,125 @@ class AssetVerificationEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Verification history is retained and cannot be deleted.")
+
+
+class AssetVerificationFinding(models.Model):
+    """An asset found during a count that was not in that round's register snapshot."""
+
+    PENDING = "pending"
+    REGISTERED = "registered"
+    NOT_LGU_ASSET = "not_lgu_asset"
+    DUPLICATE = "duplicate"
+    STATUS_CHOICES = (
+        (PENDING, "Needs review"),
+        (REGISTERED, "Added to register"),
+        (NOT_LGU_ASSET, "Confirmed not an LGU asset"),
+        (DUPLICATE, "Duplicate of another record"),
+    )
+
+    verification_round = models.ForeignKey(AssetVerificationRound, on_delete=models.PROTECT, related_name="findings")
+    asset_name = models.CharField(max_length=180)
+    property_tag = models.CharField(max_length=100, blank=True)
+    serial_number = models.CharField(max_length=120, blank=True)
+    found_department = models.CharField(max_length=160, blank=True)
+    found_office = models.CharField(max_length=160, blank=True)
+    condition = models.CharField(max_length=20, choices=AssetVerificationRecord.CONDITION_CHOICES, blank=True)
+    notes = models.TextField(blank=True)
+    status = models.CharField(max_length=24, choices=STATUS_CHOICES, default=PENDING, db_index=True)
+    resolution_note = models.TextField(blank=True)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_findings_recorded",
+    )
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_findings_reviewed",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    related_asset = models.ForeignKey(
+        Asset, null=True, blank=True, on_delete=models.PROTECT,
+        related_name="verification_findings_linked",
+    )
+
+    class Meta:
+        ordering = ("status", "asset_name", "pk")
+
+
+def accounting_import_path(instance, filename):
+    return f"inventory/reconciliation/{instance.verification_round_id}/{uuid4().hex}.csv"
+
+
+class AssetAccountingImport(models.Model):
+    """Immutable imported snapshot from Accounting for a physical count comparison."""
+
+    verification_round = models.ForeignKey(AssetVerificationRound, on_delete=models.PROTECT, related_name="accounting_imports")
+    source_filename = models.CharField(max_length=255)
+    source_file = models.FileField(blank=True, default="", upload_to=accounting_import_path, storage=disposal_private_storage)
+    source_sha256 = models.CharField(max_length=64)
+    imported_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_accounting_snapshots_imported",
+    )
+    imported_at = models.DateTimeField(auto_now_add=True)
+    line_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ("-imported_at", "-pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Accounting snapshots are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Accounting snapshots are retained and cannot be deleted.")
+
+
+class AssetAccountingLine(models.Model):
+    accounting_import = models.ForeignKey(AssetAccountingImport, on_delete=models.PROTECT, related_name="lines")
+    row_number = models.PositiveIntegerField()
+    property_tag = models.CharField(max_length=100, blank=True)
+    asset_name = models.CharField(max_length=180)
+    serial_number = models.CharField(max_length=120, blank=True)
+    department = models.CharField(max_length=160, blank=True)
+    account_code = models.CharField(max_length=40, blank=True)
+    account_title = models.CharField(max_length=140, blank=True)
+    purchase_date = models.DateField(null=True, blank=True)
+    acquisition_cost = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True)
+
+    class Meta:
+        ordering = ("row_number", "pk")
+        constraints = (models.UniqueConstraint(fields=("accounting_import", "row_number"), name="gso_accounting_import_row_once"),)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Imported Accounting rows are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Imported Accounting rows are retained and cannot be deleted.")
+
+
+class AssetVerificationFindingEvent(models.Model):
+    finding = models.ForeignKey(AssetVerificationFinding, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_finding_events",
+    )
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Verification finding history is immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Verification finding history is retained and cannot be deleted.")
 
 
 class AssetDisposalCase(models.Model):

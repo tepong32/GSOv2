@@ -1,0 +1,46 @@
+# GSO inventory roadmap
+
+This roadmap prioritizes practical controls for equipment, vehicles, and consumable supplies. Each feature is developed on its own branch, documented, checked, and merged before the next begins. Accounting decisions and official forms remain subject to confirmation by the LGU Accountant and relevant COA auditor.
+
+## Current foundation
+
+The app currently supports an asset register with department scope and permissions, optional FIFO for consumables, asset handoffs, disposal requests with protected evidence, and GSO physical verification rounds with immutable check history. This branch adds count dates, unregistered findings, private Accounting CSV snapshots, variance review, and a working reconciliation export. Official RPCPPE form generation remains out of scope until the LGU Accountant validates the local format and sign-off process.
+
+## Planned features, in order
+
+### 1. Annual physical count reporting and reconciliation — implemented
+
+Extend verification rounds with an explicit count/as-of date, a way to record items found during the count that are not in the register, and a discrepancy follow-up process. Produce a reviewable comparison between the GSO register, physical findings, and Accounting's asset records. Begin with controlled import/export and manual review; do not update Finance records automatically.
+
+The working comparison distinguishes found and matched, differences in serial/department/account/cost/date, not found, register-only, Accounting-only, ambiguous tags, and items found outside the register. It keeps the original private Accounting CSV and normalized snapshot, records review history, and exports a working reconciliation CSV. It does not generate the official RPCPPE form; validate its fields and sign-off process with the LGU Accountant before creating that output.
+
+COA's published guidance describes an annual PPE physical count presented on RPCPPE (Appendix 71) as of December 31 and submitted to the auditor by January 31. DBM's LGU Internal Audit Manual also recommends periodic physical counts reconciled with Accounting and GSO records. The local process and current form instructions must be confirmed before relying on an app-generated report.
+
+### 2. Asset receiving and tagging
+
+Add a guided GSO intake for newly delivered equipment and vehicles. Capture delivery/inspection date, quantity accepted, supplier and purchase references, the receiving/inspection reference, and the person or office taking custody. Assign or record a property tag and check for possible duplicates by tag, serial, or chassis number before the asset becomes part of the active register. Keep Accounting's official classification and account mapping reviewable; the intake flow must not invent those values.
+
+### 3. Maintenance history
+
+Add a simple repair/work record attached to an asset: reported problem, date, service provider, work performed, cost/reference, current status, and supporting documents. Let authorized GSO users record when an asset enters and leaves maintenance. Preserve history and avoid turning this into a full procurement or work-order planning system in the first version.
+
+### 4. Employee movement and exit clearance
+
+After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
+
+### 5. Consumable stock counts and low-stock reminders
+
+Let GSO record a dated physical count for consumables, compare counted quantity with the movement-ledger balance, and record a reasoned adjustment after review. Add a clear low-stock indicator using the existing minimum-stock value. Keep ordinary supplies quantity-only by default; FIFO remains optional per item. Validate any official supplies count report with the LGU Accountant before adding a form export.
+
+## Deliberate boundaries
+
+- Use GRAND's shared users, departments, and Finance interfaces when integrating; do not create duplicate user or finance systems in this module.
+- Keep Finance reconciliation reviewable and traceable. Do not automatically post journal entries, depreciation, write-offs, or accounting corrections from GSO workflows.
+- Do not promise COA compliance based only on an export. Keep the applicable signatories, source records, and approved local procedures visible in the workflow.
+- Defer public portals, AI classification, broad procurement management, and complex warehouse features until staff have validated the core register, custody, count, and reconciliation workflows.
+
+## References
+
+- [COA: When to submit the Report on the Physical Count of PPE](https://www.coa.gov.ph/FAQS/when-should-the-inventory-report-of-property-plant-and-equipment-be-submitted/)
+- [DBM: Internal Audit Manual for Local Government Units, 2023 edition](https://www.dbm.gov.ph/wp-content/uploads/Issuances/2023/Local-Budget-Circular/IAM-for-LGUs-2023-Edition.pdf)
+- [DBM-COA: Joint Circular No. 2024-01, Revised Manual on the Disposal of Government Properties](https://www.dbm.gov.ph/index.php?catid=342&highlight=WyJkaXNwb3NhbCJd&id=2627%3Ajoint-circular-no-2024-01-dbm-coa&view=article)

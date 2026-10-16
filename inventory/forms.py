@@ -4,7 +4,10 @@ from django.utils import timezone
 from PIL import Image, UnidentifiedImageError
 from pathlib import Path
 from .access import department_model
-from .models import Asset, AssetDisposalCase, AssetVerificationRecord, ConsumableItem, StockMovement
+from .models import (
+    Asset, AssetDisposalCase, AssetVerificationFinding, AssetVerificationRecord,
+    AssetVerificationRound, ConsumableItem, StockMovement,
+)
 
 
 MAX_DISPOSAL_FILE_BYTES = 15 * 1024 * 1024
@@ -162,6 +165,17 @@ class AssetVerificationRoundForm(forms.Form):
         max_length=160, label="Verification round name",
         help_text="Example: 2026 annual physical inventory check.",
     )
+    as_of_date = forms.DateField(
+        initial=timezone.localdate, widget=forms.DateInput(attrs={"type": "date"}),
+        label="Physical count date",
+        help_text="Use the date the inventory committee treats the physical count as covering.",
+    )
+
+    def clean_as_of_date(self):
+        as_of_date = self.cleaned_data["as_of_date"]
+        if as_of_date > timezone.localdate():
+            raise ValidationError("The physical count date cannot be in the future.")
+        return as_of_date
 
 
 class AssetVerificationRecordForm(forms.Form):
@@ -176,6 +190,68 @@ class AssetVerificationRecordForm(forms.Form):
         if cleaned.get("result") in (AssetVerificationRecord.DISCREPANCY, AssetVerificationRecord.NOT_FOUND) and not cleaned.get("notes", "").strip():
             self.add_error("notes", "Add a brief note so GSO knows what needs follow-up.")
         return cleaned
+
+
+class AssetVerificationFollowUpForm(forms.Form):
+    status = forms.ChoiceField(choices=(
+        (AssetVerificationRecord.FOLLOW_UP_RESOLVED, "Resolved"),
+        (AssetVerificationRecord.FOLLOW_UP_ACCEPTED, "Reviewed; difference accepted"),
+    ))
+    note = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), label="What was checked or decided?")
+
+    def clean_note(self):
+        note = self.cleaned_data["note"].strip()
+        if not note:
+            raise ValidationError("Enter a brief follow-up note.")
+        return note
+
+
+class AssetVerificationFindingForm(forms.Form):
+    asset_name = forms.CharField(max_length=180, label="Item found")
+    property_tag = forms.CharField(required=False, max_length=100, label="Property tag / asset number")
+    serial_number = forms.CharField(required=False, max_length=120)
+    found_department = forms.CharField(required=False, max_length=160, label="Department where found")
+    found_office = forms.CharField(required=False, max_length=160, label="Room / office / custodian")
+    condition = forms.ChoiceField(
+        choices=(("", "Select if assessed"),) + AssetVerificationRecord.CONDITION_CHOICES,
+        required=False,
+    )
+    notes = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), label="What should GSO review?")
+
+
+class AssetVerificationFindingReviewForm(forms.Form):
+    status = forms.ChoiceField(choices=tuple(choice for choice in AssetVerificationFinding.STATUS_CHOICES if choice[0] != AssetVerificationFinding.PENDING))
+    related_asset = forms.ModelChoiceField(queryset=Asset.objects.none(), required=False, label="Related asset record")
+    resolution_note = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), label="Review note")
+
+    def __init__(self, *args, verification_round, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["related_asset"].queryset = Asset.objects.filter(
+            department_id=verification_round.department_id,
+        ).order_by("asset_name", "pk")
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("status") in (AssetVerificationFinding.REGISTERED, AssetVerificationFinding.DUPLICATE) and not cleaned.get("related_asset"):
+            self.add_error("related_asset", "Select the asset record that was created or is the duplicate.")
+        if not cleaned.get("resolution_note", "").strip():
+            self.add_error("resolution_note", "Enter the review decision or next step.")
+        return cleaned
+
+
+class AssetAccountingImportForm(forms.Form):
+    csv_file = forms.FileField(
+        label="Accounting asset list (CSV)",
+        help_text="Use the downloadable template. The file is retained as normalized rows and a SHA-256 fingerprint, not as a public download.",
+    )
+
+    def clean_csv_file(self):
+        upload = self.cleaned_data["csv_file"]
+        if upload.size > 10 * 1024 * 1024:
+            raise ValidationError("The CSV file must be 10 MB or smaller.")
+        if Path(upload.name).suffix.lower() != ".csv":
+            raise ValidationError("Upload a .csv file.")
+        return upload
 
 
 class AssetDisposalRequestForm(forms.Form):

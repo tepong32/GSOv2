@@ -20,11 +20,14 @@ from .forms import (
     AssetDisposalRequestForm, AssetDisposalResponseForm, AssetDisposalReviewForm,
     AssetForm, AssetTransferForm, ConsumableItemForm, StockAdjustmentForm,
     StockIssueForm, StockReceiptForm, TransferCancellationForm,
-    AssetVerificationRoundForm, AssetVerificationRecordForm,
+    AssetVerificationRoundForm, AssetVerificationRecordForm, AssetVerificationFollowUpForm,
+    AssetVerificationFindingForm, AssetVerificationFindingReviewForm, AssetAccountingImportForm,
 )
 from .models import (
     Asset, AssetDisposalAttachment, AssetDisposalCase, AssetTransfer,
-    AssetVerificationRecord, AssetVerificationRound, ConsumableItem, StockMovement,
+    AssetVerificationFinding,
+    AssetVerificationRecord, AssetVerificationRound, AssetAccountingImport,
+    ConsumableItem, StockMovement,
 )
 from .services import (
     acknowledge_asset_transfer, cancel_asset_transfer, create_asset,
@@ -32,6 +35,8 @@ from .services import (
     respond_to_disposal_case, review_asset_disposal_case,
     submit_asset_disposal_request, update_asset, update_consumable,
     start_asset_verification_round, record_asset_verification, close_asset_verification_round,
+    resolve_asset_verification_followup, record_unregistered_verification_finding,
+    review_unregistered_verification_finding, import_accounting_asset_snapshot,
 )
 
 
@@ -72,9 +77,9 @@ def dashboard(request):
             AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
             AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
         )).count() if can_review_asset_disposal(request.user) or can_request_asset_disposal(request.user) else 0,
-        "can_view_verifications": any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")),
+        "can_view_verifications": any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")),
         "open_verification_count": _verification_round_queryset(request.user).filter(closed_at__isnull=True).count()
-        if any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close")) else 0,
+        if any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")) else 0,
     })
 
 
@@ -303,7 +308,9 @@ def asset_verification_list(request):
         if not form or not form.is_valid():
             return render(request, "inventory/asset_verification_list.html", {"rounds": _verification_round_queryset(request.user), "form": form, "can_start": bool(form)})
         try:
-            verification_round = start_asset_verification_round(actor=request.user, title=form.cleaned_data["title"])
+            verification_round = start_asset_verification_round(
+                actor=request.user, title=form.cleaned_data["title"], as_of_date=form.cleaned_data["as_of_date"],
+            )
         except (PermissionDenied, ValidationError) as error:
             form.add_error(None, error)
         else:
@@ -322,6 +329,12 @@ def asset_verification_detail(request, pk):
     verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
     records = verification_round.records.select_related("verified_by")
     counts = {key: records.filter(result=key).count() for key, _ in AssetVerificationRecord.RESULT_CHOICES}
+    findings = verification_round.findings.select_related("recorded_by", "reviewed_by", "related_asset")
+    pending_findings = findings.filter(status=AssetVerificationFinding.PENDING).count()
+    pending_followups = records.filter(
+        result__in=(AssetVerificationRecord.DISCREPANCY, AssetVerificationRecord.NOT_FOUND),
+        follow_up_status=AssetVerificationRecord.FOLLOW_UP_OPEN,
+    ).count()
     if request.method == "POST":
         if not can_manage_asset_verification(request.user, "close"):
             raise PermissionDenied
@@ -336,6 +349,8 @@ def asset_verification_detail(request, pk):
         "verification_round": verification_round, "records": records,
         "counts": counts, "can_record": can_manage_asset_verification(request.user, "record"),
         "can_close": can_manage_asset_verification(request.user, "close"),
+        "findings": findings, "pending_findings": pending_findings,
+        "pending_followups": pending_followups,
     })
 
 
@@ -365,6 +380,233 @@ def asset_verification_record(request, pk):
     return render(request, "inventory/asset_verification_record.html", {
         "record": record, "form": form, "events": record.events.select_related("actor").all(),
     })
+
+
+@asset_access_required("view")
+def asset_verification_followup(request, pk):
+    if not can_manage_asset_verification(request.user, "record"):
+        raise PermissionDenied
+    record = get_object_or_404(
+        AssetVerificationRecord.objects.select_related("verification_round"),
+        pk=pk, verification_round__in=_verification_round_queryset(request.user),
+    )
+    form = AssetVerificationFollowUpForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            resolve_asset_verification_followup(
+                actor=request.user, record=record, status=form.cleaned_data["status"],
+                note=form.cleaned_data["note"],
+            )
+        except (PermissionDenied, ValidationError) as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Follow-up decision recorded in the verification history.")
+            return redirect("inventory:asset-verification-detail", pk=record.verification_round_id)
+    return render(request, "inventory/asset_verification_followup.html", {"record": record, "form": form})
+
+
+@asset_access_required("view")
+def asset_verification_finding_add(request, pk):
+    if not can_manage_asset_verification(request.user, "record"):
+        raise PermissionDenied
+    verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
+    if verification_round.closed_at:
+        raise PermissionDenied("This verification round is closed.")
+    form = AssetVerificationFindingForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            finding = record_unregistered_verification_finding(
+                actor=request.user, verification_round=verification_round, data=form.cleaned_data,
+            )
+        except (PermissionDenied, ValidationError) as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Unregistered item recorded for GSO review.")
+            return redirect("inventory:asset-verification-finding-review", pk=finding.pk)
+    return render(request, "inventory/asset_verification_finding_form.html", {
+        "verification_round": verification_round, "form": form,
+    })
+
+
+@asset_access_required("view")
+def asset_verification_finding_review(request, pk):
+    if not can_manage_asset_verification(request.user, "record"):
+        raise PermissionDenied
+    finding = get_object_or_404(
+        AssetVerificationFinding.objects.select_related("verification_round", "recorded_by", "related_asset"),
+        pk=pk, verification_round__in=_verification_round_queryset(request.user),
+    )
+    form = AssetVerificationFindingReviewForm(
+        request.POST or None, verification_round=finding.verification_round,
+        initial={"status": finding.status, "related_asset": finding.related_asset_id, "resolution_note": finding.resolution_note},
+    )
+    if request.method == "POST" and form.is_valid():
+        try:
+            review_unregistered_verification_finding(actor=request.user, finding=finding, data=form.cleaned_data)
+        except (PermissionDenied, ValidationError) as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Finding review recorded.")
+            return redirect("inventory:asset-verification-detail", pk=finding.verification_round_id)
+    return render(request, "inventory/asset_verification_finding_review.html", {
+        "finding": finding, "form": form, "events": finding.events.select_related("actor").all(),
+    })
+
+
+def _verification_reconciliation_data(verification_round, accounting_import):
+    records = list(verification_round.records.all())
+    register_by_tag = {}
+    for record in records:
+        tag = record.property_tag_snapshot.strip().casefold()
+        if tag:
+            register_by_tag.setdefault(tag, []).append(record)
+    matched, accounting_only, ambiguous = [], [], []
+    accounting_tags = set()
+    if accounting_import:
+        for line in accounting_import.lines.all():
+            tag = line.property_tag.strip().casefold()
+            accounting_tags.add(tag)
+            candidates = register_by_tag.get(tag, []) if tag else []
+            if len(candidates) == 1:
+                record = candidates[0]
+                differences = []
+                if line.serial_number and record.serial_number_snapshot and line.serial_number.casefold() != record.serial_number_snapshot.casefold():
+                    differences.append("Serial number differs")
+                if line.department and record.assigned_department_snapshot and line.department.casefold() != record.assigned_department_snapshot.casefold():
+                    differences.append("Department differs")
+                if line.account_code and record.account_code_snapshot and line.account_code != record.account_code_snapshot:
+                    differences.append("Account code differs")
+                if line.acquisition_cost is not None and record.acquisition_cost_snapshot is not None and line.acquisition_cost != record.acquisition_cost_snapshot:
+                    differences.append("Acquisition cost differs")
+                if line.purchase_date and record.purchase_date_snapshot and line.purchase_date != record.purchase_date_snapshot:
+                    differences.append("Purchase date differs")
+                matched.append({"line": line, "record": record, "differences": differences})
+            elif len(candidates) > 1:
+                ambiguous.append(line)
+            else:
+                accounting_only.append(line)
+    matched_records = {row["record"].pk for row in matched}
+    register_only = [record for record in records if record.pk not in matched_records]
+    return {
+        "matched": matched, "accounting_only": accounting_only,
+        "register_only": register_only, "ambiguous": ambiguous,
+        "findings": verification_round.findings.select_related("related_asset", "recorded_by", "reviewed_by").all(),
+    }
+
+
+@asset_access_required("view")
+def asset_verification_reconcile(request, pk):
+    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")):
+        raise PermissionDenied
+    verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
+    can_import = can_manage_asset_verification(request.user, "import")
+    form = AssetAccountingImportForm(request.POST or None, request.FILES or None) if can_import else None
+    if request.method == "POST":
+        if not can_import:
+            raise PermissionDenied
+        if form.is_valid():
+            try:
+                import_accounting_asset_snapshot(
+                    actor=request.user, verification_round=verification_round,
+                    upload=form.cleaned_data["csv_file"],
+                )
+            except (PermissionDenied, ValidationError) as error:
+                form.add_error("csv_file", error)
+            except csv.Error as error:
+                form.add_error("csv_file", f"The CSV file is malformed: {error}")
+            else:
+                messages.success(request, "Accounting snapshot imported. No GSO or Finance records were changed.")
+                return redirect("inventory:asset-verification-reconcile", pk=verification_round.pk)
+    accounting_import = verification_round.accounting_imports.prefetch_related("lines").first()
+    comparison = _verification_reconciliation_data(verification_round, accounting_import)
+    return render(request, "inventory/asset_verification_reconcile.html", {
+        "verification_round": verification_round, "accounting_import": accounting_import,
+        "comparison": comparison, "form": form, "can_import": can_import,
+    })
+
+
+@asset_access_required("view")
+def asset_accounting_template(request):
+    if not can_manage_asset_verification(request.user, "import"):
+        raise PermissionDenied
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="gso-accounting-asset-snapshot-template.csv"'
+    response.write("\ufeff")
+    writer = csv.writer(response)
+    writer.writerow(("property_tag", "asset_name", "serial_number", "department", "account_code", "account_title", "purchase_date", "acquisition_cost"))
+    return response
+
+
+@asset_access_required("view")
+def asset_accounting_source_download(request, pk):
+    if not can_manage_asset_verification(request.user, "import"):
+        raise PermissionDenied
+    snapshot = get_object_or_404(
+        AssetAccountingImport.objects.select_related("verification_round").exclude(source_file=""), pk=pk,
+    )
+    if not _verification_round_queryset(request.user).filter(pk=snapshot.verification_round_id).exists():
+        raise PermissionDenied
+    response = FileResponse(
+        snapshot.source_file.open("rb"), as_attachment=True,
+        content_type="text/csv", filename=snapshot.source_filename,
+    )
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    return response
+
+
+@asset_access_required("view")
+def asset_verification_reconciliation_export(request, pk):
+    if not any(can_manage_asset_verification(request.user, action) for action in ("start", "record", "close", "import")):
+        raise PermissionDenied
+    verification_round = get_object_or_404(_verification_round_queryset(request.user), pk=pk)
+    accounting_import = verification_round.accounting_imports.first()
+    comparison = _verification_reconciliation_data(verification_round, accounting_import)
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="gso-verification-{verification_round.pk}-working-reconciliation.csv"'
+    response.write("\ufeff")
+    writer = csv.writer(response)
+    writer.writerow((
+        "row_type", "as_of_date", "property_tag", "asset_name", "serial_number",
+        "register_department", "register_office", "accounting_department", "account_code",
+        "account_title", "purchase_date", "acquisition_cost", "physical_result",
+        "observed_department", "observed_office", "condition", "differences", "notes",
+    ))
+    def write_row(values):
+        writer.writerow(_csv_cell(value) for value in values)
+    for row in comparison["matched"]:
+        line, record = row["line"], row["record"]
+        write_row(("matched", verification_round.as_of_date, record.property_tag_snapshot,
+                         record.asset_name_snapshot, line.serial_number or record.serial_number_snapshot,
+                         record.assigned_department_snapshot, record.assigned_office_snapshot,
+                         line.department, line.account_code, line.account_title, line.purchase_date,
+                         line.acquisition_cost, record.get_result_display(), record.observed_department,
+                         record.observed_office, record.get_condition_display() if record.condition else "",
+                         "; ".join(row["differences"]), record.notes))
+    for record in comparison["register_only"]:
+        write_row(("register_only", verification_round.as_of_date, record.property_tag_snapshot,
+                         record.asset_name_snapshot, record.serial_number_snapshot,
+                         record.assigned_department_snapshot, record.assigned_office_snapshot, "", "", "",
+                         record.purchase_date_snapshot, record.acquisition_cost_snapshot,
+                         record.get_result_display(), record.observed_department, record.observed_office,
+                         record.get_condition_display() if record.condition else "", "No unique accounting tag match", record.notes))
+    for line in comparison["accounting_only"]:
+        write_row(("accounting_only", verification_round.as_of_date, line.property_tag,
+                         line.asset_name, line.serial_number, "", "", line.department,
+                         line.account_code, line.account_title, line.purchase_date,
+                         line.acquisition_cost, "No GSO register match", "", "", "", "", ""))
+    for line in comparison["ambiguous"]:
+        write_row(("ambiguous_register_tag", verification_round.as_of_date, line.property_tag,
+                         line.asset_name, line.serial_number, "", "", line.department,
+                         line.account_code, line.account_title, line.purchase_date,
+                         line.acquisition_cost, "Multiple GSO records share this tag", "", "", "", "", ""))
+    for finding in comparison["findings"]:
+        write_row(("found_but_unregistered", verification_round.as_of_date, finding.property_tag,
+                         finding.asset_name, finding.serial_number, "", "", finding.found_department,
+                         "", "", "", "", "Not in count snapshot", finding.found_department,
+                         finding.found_office, finding.get_condition_display() if finding.condition else "",
+                         finding.get_status_display(), finding.notes))
+    return response
 
 
 def _disposal_queryset(user):

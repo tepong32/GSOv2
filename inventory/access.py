@@ -115,6 +115,7 @@ def can_manage_asset_verification(user, action="view"):
         "start": "start_asset_verification",
         "record": "record_asset_verification",
         "close": "close_asset_verification",
+        "import": "import_asset_accounting_snapshot",
     }.get(action)
     return bool(permission and in_gso_scope(user) and user.has_perm(f"inventory.{permission}"))
 
