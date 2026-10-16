@@ -151,6 +151,31 @@ disposals, which is distinct from continuing individual custody after issue.
 Therefore neither active asset count nor total named custody can populate that
 balance. Opening stock and external transfers require documented reconciliation.
 
+Source trace at9fc6acc, before implementing card movements:
+
+| Existing source | Retained facts | Card implication |
+| --- | --- | --- |
+| Accepted ReceivingReceipt/Line | Delivery/inspection dates, references, accepted quantity, materialized asset | Keep the physical receipt link; neither timestamp nor an unassigned custodian proves a historical stock opening. |
+| Acknowledged AssetTransfer handoff | Transfer date/reference, source/destination office/person and acknowledgment | It may be an initial issue, reassignment or reissue. No existing field establishes a stock decrease for every handoff. |
+| Witnessed return | Confirmed custody return, condition and private evidence | Physical return does not itself establish serviceable stock or an accounting reversal. |
+| Completed AssetDisposalCase | Completion date/reference/method, approval and completion attachments | Use completed facts only. Pending authorization and retired register status are not substitute source events. Case identity is currently a local PK; imports need explicit remapping. |
+| Supplied property determination | Reviewed classification/acquisition facts and predecessor history | Today's verified successor does not retrospectively recategorize earlier card transactions. Preserve the source version attached to each transaction. |
+
+Selected next approach: attach reviewed source facts to existing physical events,
+then derive the card from a documented opening and the complete ordered source
+chain. Do not maintain a second editable custody balance or subtract every handoff.
+Explicitly distinguish movement between end users from stock issue/return, retain
+assigned item numbers, and stop a balance projection at missing or contradictory
+history. Unknown legacy openings must remain unresolved. Source annotations must
+not independently move custody or post Finance journals.
+
+The disposal source trace exposed two prerequisites. Asset-before-case locking is
+now explicit for request/review/resubmission, including fresh authority checks.
+Its legacy attachments still lack retained SHA-256 fields, and upload validation
+is performed by forms rather than the shared save service. Complete that source
+integrity boundary before presenting disposal evidence as verified card support;
+do not invent hashes for old uploads as though they were captured at upload time.
+
 Physical receipt cost-component allocation remains a separate unfinished workflow:
 documented allocation targets need exact quantities, source amounts, component
 basis and rounding/residual treatment. Existing claim/journal support amounts are

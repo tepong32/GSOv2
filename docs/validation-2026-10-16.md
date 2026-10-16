@@ -1574,3 +1574,48 @@ approval history, native ownership and concurrent setup/property review tests.
 All disposable schemas removed; owned MySQL33317 normal shutdown confirmed.
 VM publication/hosted gates follow. Official SPC, movement numbering, openings, cost allocation and
 operational acceptance remain incomplete; no compliance or deployment claim.
+
+## Disposal lock order and fresh authority — 2026-10-17
+
+Branch `codex/disposal-lock-order`, baseline9fc6acc, after fresh clean0/0 fetch.
+Finance candidate a533482 unchanged except preserved GSO coordination notes;
+remote Finance master32ab046. Source trace of future SPC movement support found
+joined disposal case/asset locks, unlike existing asset-first handoff/maintenance.
+Review/resubmission now use separate asset-before-case locks, reject retargeting
+and recheck fresh scope; submission also rechecks scope after its asset lock.
+Completion reuses the same locked asset. No schema, Finance, UI or evidence-format
+changes. No production deadlock is claimed from source inspection alone.
+
+- FAIL - PRE-EXISTING, reproduced: isolated SQLite baseline probe executes the
+  actual9fc6acc services module in its own process and in-memory test database.
+  `inventory.test_disposal_locking.DisposalLockingTests.test_review_and_response_recheck_locked_asset_scope`
+  fails because PermissionDenied is not raised after the asset owner changes.
+  `.tmp/disposal-lock-baseline.log`,exit1,1 test0.015s. The current implementation
+  passes that same test; no operator code/database was substituted or migrated.
+- PASS: `manage.py test inventory.test_disposal_locking --verbosity 1`,6 discovered,
+  3 run/3 native-only skips,0.036s. Retargeted case denial, fresh owner checks and
+  single completion with retained custody/cost/audit are exercised.
+- PASS: full shell `manage.py test --verbosity 1`,137 discovered,116 run/21 native
+  skips,46.387s,exit0; `.tmp/disposal-lock-shell.log`. Broad suite selected because
+  shared asset services underpin handoff, maintenance, disposal and property work.
+- PASS: `manage.py check`, `manage.py makemigrations --check --dry-run`,
+  `git diff --check`. No migration changes.
+- Native-only coverage: while an asset is locked, competing review/resubmission
+  must wait before taking the case; after observing the worker's lock attempt and
+  a250ms blocked window, the asset holder can lock the case NOWAIT. Competing
+  completions must retain one event and one asset audit entry. Fresh GRAND owner
+  denial and no Finance queries have an actual-native integration test.
+- NOT RUN - OUT OF SCOPE: new browser/layout, populated schema and paired recovery
+  rehearsals; no UI, schema, file namespace/format or recovery contract changes.
+  Prior recovery evidence remains historical. Existing GRAND HTTP/authority tests
+  are included in the broader integration run; no new browser pass is claimed.
+
+Full standalone native `scripts/run_mysql_tests.py` PASS137/137 in132.057s,
+exit0; `.tmp/disposal-lock-native.log`, schema removed. Full actual GRAND native
+`scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql`
+PASS134/134 in54.937s, exit0, against candidate a533482;
+`.tmp/disposal-lock-grand.log`. Both disposable schemas removed and owned
+MySQL33317 normal shutdown confirmed. Actual VM release/hosted gates follow. No operator migration, grant or
+deployment; operator SQLite hash unchanged. The source map documents remaining
+SPC gaps and legacy disposal attachment hash/service-validation prerequisites.

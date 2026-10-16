@@ -73,6 +73,9 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   register edits, handoff and disposal starts. Preserve custody and acquisition cost;
   documented repair amounts do not authorize payment or capitalization. Include
   private maintenance files in recovery and run their read-only evidence checker.
+- Disposal request/review/resubmission also lock asset before case, using separate
+  queries rather than joined locking queries. Recheck scope on locked data and
+  reject a changed case-to-asset link; completion reuses that locked asset.
 - Named custody reuses GRAND users/profiles through nullable protected links; never
   infer employees from legacy labels. Recheck minimal identity snapshots at handoff
   and require the selected employee to acknowledge a different initiator's request.

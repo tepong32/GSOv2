@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.21.1] - 2026-10-17
+### Fixed
+- Serialize disposal actions and recheck locked asset authority
+
 ## [0.21.0] - 2026-10-17
 ### Added
 - Retain reviewed property acquisition sources and receipt-item numbers

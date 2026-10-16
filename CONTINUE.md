@@ -5,7 +5,38 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Supplied acquisition facts — validation in progress
+## Disposal lock order — local validation complete
+
+Previous turn: progress. Actual VM published9fc6acc/v0.21.0; branchCI38982546339
+and masterCI38982680948 PASS. Remote master/tag verified, canonical clean0/0,
+operator database unchanged. Fresh sync this turn: GSO9fc6acc clean0/0; Finance
+a533482 candidate unchanged except the GSO coordination note, master32ab046.
+New branch `codex/disposal-lock-order`.
+
+Tracing SPC movement sources found joined disposal case/asset locking with no
+explicit asset-first order, unlike handoffs/maintenance. Review/resubmission now
+lock asset then case separately and reject a changed relation; all disposal write
+paths recheck scope on fresh locked data. Completion reuses the locked asset.
+No schema, role, Finance, file namespace or UI changes. Source map and remaining
+SPC facts are in property-record-design; do not infer stock effects from custody.
+
+Focused6 (3 run/3 native skips) PASS0.036s; full shell137 (116 run/21 native skips)
+PASS46.387s. Full standalone native137/137 PASS132.057s, exit0; actual
+GRAND native134/134 PASS54.937s, exit0, against candidate a533482. The isolated9fc6acc baseline probe reproduced
+stale-owner review acceptance (PermissionDenied not raised); current tests pass.
+New native tests hold the asset, wait for a competing disposal lock attempt, then
+assert its case remains NOWAIT-lockable; review/resubmission and duplicate
+completion are covered. Fresh native owner denial has an integration test.
+All disposable schemas removed; owned MySQL33317 normal shutdown confirmed.
+Local validation complete; actual VM release and hosted branch/master gates follow.
+
+Next source prerequisite: disposal attachments have no retained hash, and upload
+validation currently lives in forms, not the save service. Add explicit historical
+unknown handling and verified-source checks before card support consumes them.
+Movement annotations/openings, SPC output, physical cost allocation and operational
+acceptance remain unfinished. Overall goal remains active.
+
+## Supplied acquisition facts — published9fc6acc
 
 Previous turn: progress. Working register9acd9b9 was actually VM-published as
 v0.20.0; branchCI38981511749 and masterCI38981661383 PASS. Fresh fetch this turn:
@@ -35,7 +66,8 @@ desktop/mobile reviewed,390px no overflow. Preview/browser stopped. Stopped pair
 recovery217 default/83 Finance tables/7 packets PASS, retaining new facts and old
 unknowns, detecting item-number tampering and stale old association. Backup:
 `C:/Users/Administrator/.codex/backups/gsov2-property-acquisition-recovery-20261017-hr44lsyg`.
-Local gates complete; actual VM publication and hosted checks remain next.
+Actual VM publication completed at9fc6acc; branchCI38982546339 and primary
+CI38982680948 PASS. Remote master/tag verified; canonical clean0/0, operator DB unchanged.
 Official SPC/movement numbering/openings/cost allocation/operational acceptance
 remain unfinished; the overall goal stays active.
 

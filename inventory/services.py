@@ -645,6 +645,8 @@ def submit_asset_disposal_request(*, actor, asset, data):
     if not data.get("photos") or not data.get("signed_request"):
         raise ValidationError("Attach at least one condition photo and the signed request form.")
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
+    if not can_request_asset_disposal(actor, asset):
+        raise PermissionDenied
     from .maintenance import require_no_open_maintenance
     require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
@@ -668,11 +670,24 @@ def submit_asset_disposal_request(*, actor, asset, data):
     return case
 
 
+def _lock_disposal_case(case):
+    # Match handoff, maintenance and property operations. A joined FOR UPDATE
+    # does not establish a portable asset-before-case lock order.
+    asset = Asset.objects.select_for_update().get(pk=case.asset_id)
+    locked = AssetDisposalCase.objects.select_for_update().get(pk=case.pk)
+    if locked.asset_id != asset.pk:
+        raise ValidationError("The disposal asset changed. Reopen the case before continuing.")
+    locked.asset = asset
+    return locked
+
+
 @transaction.atomic
 def review_asset_disposal_case(*, actor, case, data):
     if not can_review_asset_disposal(actor) or not asset_in_scope(actor, case.asset):
         raise PermissionDenied
-    case = AssetDisposalCase.objects.select_for_update().select_related("asset").get(pk=case.pk)
+    case = _lock_disposal_case(case)
+    if not can_review_asset_disposal(actor) or not asset_in_scope(actor, case.asset):
+        raise PermissionDenied
     allowed = {
         AssetDisposalCase.SUBMITTED: {AssetDisposalCase.UNDER_REVIEW, AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.REJECTED},
         AssetDisposalCase.UNDER_REVIEW: {AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED, AssetDisposalCase.REJECTED},
@@ -729,7 +744,7 @@ def review_asset_disposal_case(*, actor, case, data):
     case.save(update_fields=fields)
     _record_disposal_event(case, actor, action, note)
     if action == AssetDisposalCase.DISPOSED:
-        asset = Asset.objects.select_for_update().get(pk=case.asset_id)
+        asset = case.asset
         asset.status = Asset.RETIRED
         asset.updated_by = actor
         asset.save(update_fields=("status", "updated_by", "updated_at"))
@@ -742,11 +757,13 @@ def review_asset_disposal_case(*, actor, case, data):
 
 @transaction.atomic
 def respond_to_disposal_case(*, actor, case, data):
-    case = AssetDisposalCase.objects.select_for_update().select_related("asset").get(pk=case.pk)
-    if case.status != AssetDisposalCase.NEEDS_INFORMATION:
-        raise ValidationError("This case is not waiting for more information.")
     if case.submitted_by_id != actor.pk or not can_request_asset_disposal(actor, case.asset):
         raise PermissionDenied
+    case = _lock_disposal_case(case)
+    if case.submitted_by_id != actor.pk or not can_request_asset_disposal(actor, case.asset):
+        raise PermissionDenied
+    if case.status != AssetDisposalCase.NEEDS_INFORMATION:
+        raise ValidationError("This case is not waiting for more information.")
     note = data["response"].strip()
     if not note:
         raise ValidationError("Add a short response for GSO.")

@@ -44,6 +44,10 @@ Migration0025 now retains supplied acquisition dates, references and receipt-ite
 numbers within the existing reviewed property packet, preserving preexisting
 history and unknown values. This is an SPC source prerequisite; numbered movement
 documents, opening reconciliation, historical balances and accepted output remain.
+Source tracing found disposal lock-order/fresh-authority gaps; these are now fixed
+before card movement integration. Next address legacy disposal evidence integrity
+and service-level upload validation, then reviewed movement annotations/openings.
+See property-record-design for the actual receipt/handoff/return/disposal mapping.
 
 Supplies follow-up: [request and issue design](stock-request-design.md) records
 implemented supplied-approved-requisition entry, independent document review,

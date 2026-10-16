@@ -119,3 +119,20 @@ class GrandAssetAuthorityTests(TestCase):
         self.assertEqual(transfer.status, AssetTransfer.PENDING)
         self.asset.refresh_from_db()
         self.assertEqual(self.asset.assigned_department_id, self.other.pk)
+
+    def test_disposal_rechecks_native_office_after_locking_stale_asset(self):
+        case = AssetDisposalCase.objects.create(asset=self.asset, submitted_by=self.clerk,
+            reason='Synthetic', condition_details='Retained source')
+        Asset.objects.filter(pk=self.asset.pk).update(department_id=self.other.pk)
+        with CaptureQueriesContext(connections['finance']) as finance:
+            with self.assertRaises(PermissionDenied):
+                services.review_asset_disposal_case(actor=self.clerk, case=case, data={'action':'under_review'})
+            AssetDisposalCase.objects.filter(pk=case.pk).update(status='needs_information')
+            with self.assertRaises(PermissionDenied):
+                services.respond_to_disposal_case(actor=self.clerk, case=case, data={'response':'Additional source'})
+            with self.assertRaises(PermissionDenied):
+                services.submit_asset_disposal_request(actor=self.clerk, asset=self.asset,
+                    data={'photos':[object()], 'signed_request':object()})
+        self.assertEqual(len(finance), 0)
+        self.assertEqual(case.events.count(), 0)
+        self.assertEqual(case.attachments.count(), 0)
