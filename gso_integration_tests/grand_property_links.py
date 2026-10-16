@@ -222,6 +222,27 @@ class PropertyLinkTests(TestCase):
         self.assertEqual(row.events.count(), 3)
 
 
+    def test_acquisition_successor_preserves_link_history_but_requires_new_association(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        row = self.decide(self.propose(self.request()))
+        retained = list(row.events.values('snapshot', 'checksum'))
+        data = {name: getattr(self.determination, name) for name in properties.CONTENT_FIELDS}
+        data.update(acquisition_reference='SUPPLIED-IAR-01', acquisition_date=timezone.localdate(),
+                    receipt_item_number='26-01-01', reason='Retain additional supplied acquisition facts')
+        with CaptureQueriesContext(connections['finance']) as queries:
+            successor = properties.record(actor=self.clerk, asset=self.asset, request_id=uuid4(),
+                expected_source=properties.source_basis(self.asset),
+                expected_predecessor=str(self.determination.public_id), data=data,
+                upload=SimpleUploadedFile('acquisition.pdf', b'%PDF-synthetic acquisition packet'))
+            properties.decide(actor=self.reviewer, row=successor, expected_version=1,
+                action='verify', note='Checked acquisition source')
+        self.assertEqual(len(queries), 0)
+        service.verify(row)
+        self.assertEqual(list(row.events.values('snapshot', 'checksum')), retained)
+        with self.assertRaises(ValidationError):
+            service.current(row, self.checker)
+
+
 class PropertyJournalLinkTests(TestCase):
     databases = {"default", "finance"}
 

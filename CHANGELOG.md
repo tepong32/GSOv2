@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.21.0] - 2026-10-17
+### Added
+- Retain reviewed property acquisition sources and receipt-item numbers
+
 ## [0.20.0] - 2026-10-17
 ### Added
 - Add scoped property working register and source-gap review

@@ -102,6 +102,25 @@ Native race tests must establish the final lock order before this path ships.
 
 ## Output and remaining prerequisites
 
+Migration0025 extends the existing PropertyDetermination with nullable supplied
+acquisition_date, acquisition_reference and receipt_item_number. The same private
+packet, independent document check, source locks, signed request, version and
+successor rules apply. Dates/numbers require a source reference in that packet;
+unknown dates remain NULL even if a source number is supplied. Future acquisition
+dates are rejected. Existing Asset.purchase_date and property_tag remain untouched.
+These fields retain a source's assertions; they neither allocate an annual series
+nor validate local numbering policy, quantities, stock opening balances or valuation.
+No uniqueness scope or format is invented for historical supplied numbers.
+
+Historical blank acquisition facts are omitted from the snapshot representation
+so migration does not rewrite existing event checksums or Finance request bases.
+Nonempty new facts join the immutable snapshot and exact replay comparison.
+Corrections require a successor; an independently verified successor makes a prior
+Finance association stale while retaining its approval history. The working register
+shows the supplied acquisition date separately from the register purchase date.
+Numbered issue/transfer/disposal source facts and reviewed opening reconciliation
+remain required before a class/fund SPC can calculate its stock balance.
+
 The property working register (`property-records/`) now provides a paginated,
 owner-scoped preparation view across assets, including retired and undocumented
 items. Filters use only the latest verified supplied treatment/class/fund labels;

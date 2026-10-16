@@ -75,7 +75,10 @@ def property_register(request):
             except ValidationError as error:
                 issues.extend(error.messages)
             for field, label in (("property_class", "Property class"), ("fund_label", "Fund label"),
-                    ("useful_life", "Useful life"), ("expires_on", "Expiry date")):
+                    ("useful_life", "Useful life"), ("expires_on", "Expiry date"),
+                    ("acquisition_date", "Documented acquisition date"),
+                    ("acquisition_reference", "Acquisition source reference"),
+                    ("receipt_item_number", "Receipt-item number")):
                 if getattr(record, field) in (None, ""):
                     issues.append(f"{label} not supplied.")
         if asset.pending_document:
@@ -83,7 +86,7 @@ def property_register(request):
         if not asset.property_tag:
             issues.append("Property tag not recorded.")
         if asset.purchase_date is None:
-            issues.append("Acquisition date not recorded.")
+            issues.append("Asset register purchase date not recorded.")
         if asset.unit_cost is None:
             issues.append("Register unit cost unknown.")
         rows.append({"asset": asset, "record": record, "issues": issues})

@@ -166,6 +166,10 @@ Preserve record/event/predecessor relations and files with both databases; run
 `check_property_evidence` on restored copies. Verification checks fresh source
 bytes and retained asset/receipt basis. Missing files, history drift and stale
 versions fail closed. Useful-life expiry does not erase physical accountability.
+The same packet namespace now covers supplied acquisition facts. Restore item
+numbers, source references/dates and old NULL/blank facts exactly; do not rebuild
+historical snapshots by injecting new blank fields. A verified successor may make
+an older Finance link stale; preserve that link's approval history during recovery.
 
 Property Finance associations reuse the existing determination packet. Include
 adapter link/events/predecessors in the same coordinated backup, along with native

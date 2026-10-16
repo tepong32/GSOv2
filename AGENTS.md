@@ -51,6 +51,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   The property working register is a current preparation view: include retired
   and undocumented assets, filter latest verified supplied labels, flag stale
   sources, and never infer historical balances or Finance identities from labels.
+  Supplied acquisition dates/references and receipt-item numbers reuse the same
+  reviewed property packet. Do not generate numbering from tags or backfill old
+  history. Blank acquisition facts retain the pre-0025 snapshot representation;
+  verified successors require fresh review of older Finance associations.
   Keep association writes in default, committing under Finance dimension locks;
   a GSO reader sees retained history without an implied live ledger check. Keep
   withdrawal possible when a supporting Finance source is missing or stale.

@@ -110,6 +110,43 @@ class PropertyDeterminationTests(TestCase):
         self.assertEqual(Record.objects.count(), 1)
         self.assertEqual(Event.objects.count(), 2)
 
+    def test_acquisition_facts_retain_source_and_do_not_rewrite_asset_or_old_history(self):
+        original = service.source_basis(self.asset)
+        old = self.decide(self.record())
+        before = list(old.events.values("snapshot", "checksum"))
+        self.assertTrue(set(service.ACQUISITION_DEFAULTS).isdisjoint(service.snapshot(old)))
+        facts = self.data(acquisition_date=timezone.localdate(), acquisition_reference="IAR-2026-01",
+                          receipt_item_number="26-01-01")
+        identity = uuid4()
+        row = self.record(data=facts, request_id=identity)
+        replay = self.record(data=facts, request_id=identity)
+        self.assertEqual(row.pk, replay.pk)
+        with self.assertRaises(ValidationError):
+            self.record(data={**facts, "receipt_item_number": "26-01-02"}, request_id=identity)
+        row = self.decide(row)
+        self.assertEqual(service.snapshot(row)["receipt_item_number"], "26-01-01")
+        self.assertEqual(list(old.events.values("snapshot", "checksum")), before)
+        self.asset.refresh_from_db()
+        self.assertEqual(service.source_basis(self.asset), original)
+        service.verify_history(old)
+        service.verify_history(row)
+        self.client.force_login(self.clerk)
+        self.assertContains(self.client.get(reverse("inventory:property-detail", args=[row.pk])), "IAR-2026-01")
+        self.assertContains(self.client.get(reverse("inventory:property-register")), "26-01-01")
+        Record.objects.filter(pk=row.pk).update(receipt_item_number="Altered")
+        row.refresh_from_db()
+        with self.assertRaises(ValidationError):
+            service.verify_history(row)
+
+    def test_acquisition_facts_require_source_but_never_guess_unknown_date(self):
+        for changes in ({"receipt_item_number": "26-01-01"}, {"acquisition_date": timezone.localdate()},
+                {"acquisition_reference": "IAR", "acquisition_date": timezone.localdate()+timedelta(days=1)}):
+            with self.subTest(changes=changes), self.assertRaises(ValidationError):
+                self.record(data=self.data(**changes))
+        row = self.record(data=self.data(acquisition_reference="Legacy IAR", receipt_item_number="Retained source number"))
+        self.assertIsNone(row.acquisition_date)
+        self.assertEqual(row.receipt_item_number, "Retained source number")
+
     def test_working_register_latest_verified_scope_and_missing_facts(self):
         first = self.decide(self.record())
         pending = self.record(data=self.data(property_class="Pending class", fund_label="Pending fund"))

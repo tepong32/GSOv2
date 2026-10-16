@@ -40,6 +40,11 @@ working register now exposes latest supplied class/fund facts and documentation
 gaps across assets; official class/fund SPC output remains planned. Keep physical
 cost allocation as a distinct gap.
 
+Migration0025 now retains supplied acquisition dates, references and receipt-item
+numbers within the existing reviewed property packet, preserving preexisting
+history and unknown values. This is an SPC source prerequisite; numbered movement
+documents, opening reconciliation, historical balances and accepted output remain.
+
 Supplies follow-up: [request and issue design](stock-request-design.md) records
 implemented supplied-approved-requisition entry, independent document review,
 partial issues, unavailable observations and remainder closure. Migration0022

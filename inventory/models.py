@@ -122,6 +122,9 @@ class PropertyDetermination(models.Model):
     source_authority = models.CharField(max_length=240)
     property_class = models.CharField(max_length=160, blank=True)
     fund_label = models.CharField(max_length=160, blank=True)
+    acquisition_date = models.DateField(null=True, blank=True)
+    acquisition_reference = models.CharField(max_length=180, blank=True)
+    receipt_item_number = models.CharField(max_length=100, blank=True)
     useful_life = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0.01"))])
     life_unit = models.CharField(max_length=6, blank=True, choices=(("days", "Days"), ("months", "Months"), ("years", "Years")))
     life_basis = models.CharField(max_length=240, blank=True)
@@ -148,7 +151,10 @@ class PropertyDetermination(models.Model):
         permissions = (("view_property_determination", "Can view supplied property determinations"),
             ("record_property_determination", "Can record supplied property determinations"),
             ("review_property_determination", "Can independently verify supplied property documents"))
-        constraints = [models.UniqueConstraint(fields=("pending_asset",), name="gso_one_pending_property_fact"),
+        constraints = [models.CheckConstraint(condition=(
+            models.Q(acquisition_date__isnull=True, receipt_item_number="") | ~models.Q(acquisition_reference="")),
+            name="gso_property_acquisition_ref"),
+            models.UniqueConstraint(fields=("pending_asset",), name="gso_one_pending_property_fact"),
             models.CheckConstraint(condition=models.Q(useful_life__isnull=True) | models.Q(useful_life__gt=0), name="gso_property_positive_life"),
             models.CheckConstraint(condition=~models.Q(status__in=("verified", "rejected")) | (
                 models.Q(decided_by__isnull=False, decided_at__isnull=False) & ~models.Q(decided_by=models.F("recorded_by"))), name="gso_property_independent")]

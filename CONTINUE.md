@@ -5,7 +5,41 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Property working register — in validation
+## Supplied acquisition facts — validation in progress
+
+Previous turn: progress. Working register9acd9b9 was actually VM-published as
+v0.20.0; branchCI38981511749 and masterCI38981661383 PASS. Fresh fetch this turn:
+GSO clean0/0 at9acd9b9; Finance candidate a533482 unchanged except the preserved
+GSO note, origin/master32ab046. New branch `codex/property-acquisition-facts`.
+
+Inventory0025 extends the existing reviewed property record with supplied
+acquisition date/reference/receipt-item number, without inventing a new registry,
+numbering series or acquisition/Accounting authority. Missing facts remain unknown.
+Historical blank fields keep old snapshot representations and checksums unchanged.
+New source facts enter immutable history/replay checks; successor verification
+requires fresh Finance association review. See property-record-design for limits.
+
+Focused11/11 PASS0.593s; populated migration2/2 PASS1.590s; full SQLite131
+(113 run/18 native skips) PASS45.630s; full standalone native131/131 PASS137.186s.
+Final affected11/11 PASS0.720s after clarifying register purchase-date wording.
+Actual GRAND candidate a533482 full native133/133 PASS55.510s, exit0;
+`.tmp/property-acquisition-grand.log`. All disposable schemas removed; owned
+MySQL33317 shut down normally.
+Populated copied migration preserves prior rows and all Finance bytes, including
+valid old property/link history. Native post-migrate adds27 help guides/198 steps
+for synthetic departments; existing rows are unchanged. This native effect was
+investigated after the initial broad all-row-equality assertion failed.
+
+Browser separate recorder/checker entered and verified the new source facts;
+desktop/mobile reviewed,390px no overflow. Preview/browser stopped. Stopped paired
+recovery217 default/83 Finance tables/7 packets PASS, retaining new facts and old
+unknowns, detecting item-number tampering and stale old association. Backup:
+`C:/Users/Administrator/.codex/backups/gsov2-property-acquisition-recovery-20261017-hr44lsyg`.
+Local gates complete; actual VM publication and hosted checks remain next.
+Official SPC/movement numbering/openings/cost allocation/operational acceptance
+remain unfinished; the overall goal stays active.
+
+## Property working register — published9acd9b9
 
 Previous goal turn: progress. Actual VM published6c1ba3e/v0.19.0, branch
 CI38980459629 and masterCI38980624675 PASS; remote master/tag verified. Fresh
@@ -24,7 +58,8 @@ native MySQL3/3 PASS1.760s, both exit0, candidate a533482. Final label refinemen
 uses register cost rather than claiming original legacy cost; focused9/9 PASS0.566s.
 Browser desktop/mobile and filters inspected before that wording-only refinement.
 Disposable schemas removed, owned MySQL shut down normally, preview/browser closed.
-Local gates complete; actual VM publication and hosted branch/master checks next.
+Actual VM publication completed at9acd9b9; branchCI38981511749 and primary
+CI38981661383 PASS. Remote master/tag verified; canonical clean0/0, operator DB unchanged.
 Official class/fund SPC, physical cost allocation and operational acceptance remain.
 
 ## Property Finance links — published6c1ba3e

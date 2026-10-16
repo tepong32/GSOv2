@@ -1515,3 +1515,62 @@ no models, migrations, write services, Finance queries or permission assignments
   and balances. Stock balance differs from continuing custody after issue.
 
 Local gates complete; actual VM and hosted release checks follow.
+
+## Supplied acquisition facts — 2026-10-17
+
+Fresh sync at9acd9b9, canonical clean0/0; Finance a533482 candidate with only the
+preserved GSO coordination note. Branch `codex/property-acquisition-facts`.
+Reopened official ONAR3842 metadata and visually rechecked retained AnnexA.2 page8;
+PDF hash remains1b00c4e1359868972a84a732dda442619eed040877fb6460acc502250fe15c53.
+The selected engineering change reuses PropertyDetermination and its private packet,
+source locks, grants, independent review and successor history. Inventory0025 adds
+three supplied facts and a source-reference check constraint; no Finance writes,
+number allocation, asset date/tag changes, role grants or operator migration.
+
+- PASS: `manage.py test inventory.test_property_determinations --verbosity 1`,
+  11/11,0.593s. Covers supplied/unknown dates, required source, future date rejection,
+  immutable snapshot, exact replay, changed replay denial, preserved prior events,
+  unchanged asset facts, detail/register rendering and tamper detection.
+- PASS: `manage.py test inventory.test_property_migration --verbosity 1`,2/2,1.590s,
+  `.tmp/property-acquisition-migration.log`. Populated0024-to0025 preserves asset
+  rows, old pending/verified snapshots and checksums; new reference constraint tested.
+- PASS: full shell `manage.py test --verbosity 1`,131 discovered,113 run/18 native
+  skips,45.630s,exit0; `.tmp/property-acquisition-shell.log`. Broad scope selected
+  for schema, shared property snapshots and Finance association dependencies.
+- PASS: full standalone native `scripts/run_mysql_tests.py`, MySQL8.4.11,131/131,
+  137.186s,exit0; `.tmp/property-acquisition-native.log`, disposable schema removed.
+- PASS: final affected11/11,0.720s after clarifying the working register's purchase
+  date wording; that label is distinct from the supplied acquisition date.
+- PASS: `manage.py check`, `manage.py makemigrations --check --dry-run`,
+  copied native-GRAND drift check for both apps, `git diff --check`.
+- Populated actual-GRAND copy: initial broad equality assertion FAIL in ignored
+  validation helper because native post_migrate seeded27 help guides/198 steps for
+  synthetic departments added after the old fixture migration. Inspected actual
+  departments app/signal/seed code and row changes; existing guide rows unchanged.
+  Corrected helper permits only additions in those two native guide tables and
+  still checks every prior row across216 non-migration tables. PASS: old property
+  history, valid approved Finance link, other rows, evidence and Finance bytes
+  preserved. Runtime `.tmp/property-acquisition-preview-vnf1wlwp`.
+- Browser PASS: distinct GSO recorder/checker created and independently verified
+  PROPERTY-ACQUISITION-BROWSER-001, acquisition2026-09-01/source reference/item26-01-01,
+  while asset purchase_date remains unknown. Prior determination retained. Desktop
+  and390px mobile screenshots visually inspected; no horizontal overflow. Screens
+  precede the wording-only register purchase-date clarification. Existing login
+  default image404s remain fixture limitations. Preview and browser stopped.
+- Recovery PASS: stopped paired SQLite217 default/83 Finance tables/7 private
+  packets restored with all row/file manifests equal. New acquisition facts and old
+  unknowns retained; stale decisions, missing file, changed useful life and item
+  number detected. Older approved Finance link retains its history but requires
+  review after the verified property successor. Source copies unchanged.
+  Backup `C:/Users/Administrator/.codex/backups/gsov2-property-acquisition-recovery-20261017-hr44lsyg`;
+  `.tmp/property-acquisition-recovery.log`,exit0. Not online MySQL/operator recovery.
+
+Full actual GRAND native regression PASS133/133 in55.510s, exit0; command
+`scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql`, log
+`.tmp/property-acquisition-grand.log`. Candidate a533482, real two-store router
+and MySQL8.4.11; includes successor-to-Finance association invalidation, unchanged
+approval history, native ownership and concurrent setup/property review tests.
+All disposable schemas removed; owned MySQL33317 normal shutdown confirmed.
+VM publication/hosted gates follow. Official SPC, movement numbering, openings, cost allocation and
+operational acceptance remain incomplete; no compliance or deployment claim.

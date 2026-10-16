@@ -11,8 +11,9 @@ from .access import can, gso_department_for_user, has_inventory_permission, in_g
 from .models import Asset, ReceivingLine, ReceivingReceipt, PropertyDetermination as Record, PropertyDeterminationEvent as Event
 from .receipt_amendments import amendment_basis
 
+ACQUISITION_DEFAULTS = {"acquisition_date": None, "acquisition_reference": "", "receipt_item_number": ""}
 CONTENT_FIELDS = ("treatment", "reference", "source_date", "source_authority", "property_class", "fund_label",
-    "useful_life", "life_unit", "life_basis", "life_start", "expires_on", "reason")
+    "useful_life", "life_unit", "life_basis", "life_start", "expires_on", "reason", *ACQUISITION_DEFAULTS)
 ASSET_FIELDS = ("asset_name", "asset_kind", "inventory_class", "item_type", "property_tag", "serial_number",
     "chassis_number", "purchase_date", "supplier", "purchase_order_reference", "quantity", "unit_cost",
     "fund_code", "coa_account_code", "coa_account_title", "coa_basis")
@@ -75,6 +76,11 @@ def lock_asset(asset_id):
 
 def snapshot(row):
     data = {name: value(getattr(row, name)) for name in CONTENT_FIELDS}
+    # Preserve pre-0025 evidence: absent acquisition facts must not rewrite
+    # historical snapshots or invalidate existing Finance requests.
+    if not any(getattr(row, name) for name in ACQUISITION_DEFAULTS):
+        for name in ACQUISITION_DEFAULTS:
+            data.pop(name)
     data.update(public_id=str(row.public_id), asset_id=row.asset_id, predecessor_id=row.predecessor_id,
         source_snapshot=row.source_snapshot, file=row.file.name, original_filename=row.original_filename,
         sha256=row.sha256, size=row.size, status=row.status, state_version=row.state_version,
@@ -121,12 +127,17 @@ def verify_source(row):
 
 
 def clean_content(data):
+    data = {**ACQUISITION_DEFAULTS, **data}
     if set(data) != set(CONTENT_FIELDS):
         raise ValidationError("Supply the documented property facts only.")
     content = {name: Record._meta.get_field(name).clean(raw.strip() if isinstance(raw, str) else raw, None)
                for name, raw in data.items()}
     if content["source_date"] > timezone.localdate():
         raise ValidationError("The supplied determination date cannot be in the future.")
+    if content["acquisition_date"] and content["acquisition_date"] > timezone.localdate():
+        raise ValidationError("The supplied acquisition date cannot be in the future.")
+    if (content["acquisition_date"] or content["receipt_item_number"]) and not content["acquisition_reference"]:
+        raise ValidationError("Identify the retained acquisition source when supplying its date or receipt-item number.")
     if content["useful_life"] is None:
         if content["life_unit"] or content["life_basis"] or content["life_start"]:
             raise ValidationError("Supply the useful-life duration when recording its unit or start basis.")

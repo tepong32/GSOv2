@@ -41,6 +41,14 @@ the mapping below. No GRAND application code or migrations were changed here.
 
 ## Existing records and ownership
 
+Inventory0025 adds only supplied acquisition facts to PropertyDetermination in
+default. It creates no new identity, Finance relation, role or write to finance.
+Historical blank facts preserve the earlier serialized snapshot representation;
+existing Finance links remain valid through migration. A subsequently verified
+property successor needs a new association review. Importers must preserve these
+document facts and snapshot/event bytes alongside existing UUID/predecessor maps;
+do not substitute a delivery date or generate receipt-item numbering from IDs.
+
 The optional [recognition journal preview](journal-source-preview.md) now exposes
 source-bound posted debit observations to explicitly authorized owner-office ledger
 readers. It creates no cross-store relationship or retained allocation. Documentary
