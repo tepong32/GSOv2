@@ -126,6 +126,10 @@ for current validation and publication status.
 
 ## Deliberate boundaries
 
+Next property milestone: implement the [native Finance link request and review](property-finance-links.md).
+It resolves the distinct GSO/Finance ownership boundary before class/fund output;
+the design is recorded, while adapter code and acceptance tests remain unfinished.
+
 - Use GRAND's shared users, departments, and Finance interfaces when integrating; do not create duplicate user or finance systems in this module.
 - Keep Finance reconciliation reviewable and traceable. Do not automatically post journal entries, depreciation, write-offs, or accounting corrections from GSO workflows.
 - Do not promise COA compliance based only on an export. Keep the applicable signatories, source records, and approved local procedures visible in the workflow.

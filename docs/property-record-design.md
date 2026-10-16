@@ -74,6 +74,10 @@ files for that read-only checker to report; they are not silently deleted.
 
 ## GRAND authority and dimension link
 
+The [implementation design](property-finance-links.md) now supplies the explicit
+GSO-to-Finance request boundary missing from this initial design. It is not yet
+implemented; a ledger grant alone must not expose a GSO-owned property packet.
+
 Inspected accounting/models.py: Fund, LedgerAccount and ResponsibilityCenter have
 public UUIDs, owner department, codes and effective/active facts. Used dimensions
 have governed edit rules. A code is unique within its ledger owner, not globally.

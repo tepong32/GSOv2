@@ -1362,3 +1362,30 @@ the same actual-GRAND native harness:116/116 PASS40.854s, Python exit0, log
 `.tmp/property-grand-v173-native.log`. Both disposable schemas were destroyed.
 The active Finance checkout was preserved; this proves compatibility with that
 candidate, not its hosted gates, deployment or LGU acceptance.
+
+Publication: actual VM release9070496, branch CI38977539972 PASS, primary
+CI38977725084 PASS. Remote master and release tag resolved to
+907049686079bd609bdc15bf1edf1610a44d37f0. Canonical checkout clean0/0;
+operator SQLite SHA256 unchanged at
+5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Disposable MySQL33317 shut down normally after all test schemas were removed.
+
+## Native property-link ownership design — 2026-10-17
+
+Previous turn: progress (published property workflow). Fresh fetch/status:
+GSO9070496 clean0/0; Finance a533482 candidate, origin/master32ab046, only the
+preserved GSO coordination note untracked. Reviewed actual source listed in
+property-finance-links.md. Found the earlier design lacked explicit cross-office
+property sharing and that native Department has no UUID. Selected a scoped GSO
+request with separate Finance proposal/review and explicit import-ID remapping.
+Reviewed setup UPDATE/issuance/readiness paths to distinguish direct dimension
+lock order from journal-backed case-before-receipt order. Native concurrency proof
+is a future implementation gate, not claimed by source inspection.
+
+Some attempted reads used nonexistent paths or PowerShell wildcard arguments;
+corrected via rg file discovery and inspected accounting/services.py and the GSO
+adapter in their actual separate repositories. No missing API was assumed.
+NOT RUN - OUT OF SCOPE: new application/native/browser/recovery suites for this
+documentation-only design. Prior9070496 results remain historical evidence.
+Documentation links/diff checks and hosted publication checks are the applicable
+gates. No migrations, grants, operator changes or Finance application edits.

@@ -5,7 +5,27 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Supplied property determinations — release validation
+## Next: explicit property request to Finance
+
+Previous goal turn: progress. Supplied property workflow9070496 was VM-published;
+branch CI38977539972 and primary CI38977725084 PASS. Remote master/tag verified,
+canonical clean0/0, operator SQLite hash unchanged. This turn fetched again:
+GSO9070496 clean0/0; Finance candidate a533482 clean except the preserved GSO note,
+remote Finance master32ab046. No active Finance work was changed.
+
+Selected [native property-link design](docs/property-finance-links.md) after
+checking actual owner/access/models/setup mutation code. The old design omitted
+how Finance obtains scoped access to GSO-owned evidence. Use an explicit GSO
+request to a selected native department, then Finance proposal and independent
+association review; no global property access from a ledger grant. Department
+has no public UUID, so installation merges need explicit ID remapping.
+
+Next implement the adapter request/model/services/UI and native tests described
+there. Direct dimension and journal-backed paths require different source-lock
+prefixes; do not acquire voucher cases after receipt/asset locks. This checkpoint
+is design/documentation only, not an implemented Finance link or official SPC.
+
+## Supplied property determinations — published9070496
 
 Branch `codex/property-determination-workflow` started from08b777b after clean0/0
 fetch. Prior design publication branchCI38975367167/primaryCI38975483442 PASS.
@@ -28,7 +48,8 @@ Final SQLite126 (108 run/18 native skips) PASS41.953s; native126/126 PASS124.516
 actual GRAND32ab046116/116 PASS42.772s. Final logs use the `-final` suffix.
 Finance candidate a533482 also passes116/116 in40.854s (exit0), tested separately
 in clean detached `gsov2-grand-v173-validation`; log `.tmp/property-grand-v173-native.log`.
-Local release validation is complete; VM publication and hosted checks are next.
+VM publication completed at9070496; branch CI38977539972 and primary
+CI38977725084 PASS. Remote master and tag v0.18.0 were verified at that commit.
 
 Populated copied migration preserves prior inventory/claim/mapping/return rows and
 Finance bytes. Browser separate recorder/reviewer verified five years with unknown
