@@ -87,6 +87,13 @@ offsite retention, operational RPO/RTO or complete GRAND private-file recovery.
 
 ## Gates still open
 
+Witnessed returns add private files under `inventory/custody_returns/`; include them
+in the coordinated backup alongside both GRAND databases. Run the read-only
+`check_custody_return_evidence` on the restored copy. The stopped synthetic rehearsal
+preserved198 default/83 finance tables plus one return file, detected/restored file
+corruption and loss, and preserved source hashes. See [returns](custody-returns.md)
+and [validation](validation-2026-10-16.md); online/operator recovery remains open.
+
 - Use GRAND's authentication, permissions and source-visibility checks during merge,
   including its UAT-viewer mutation denials. This shell is not a replacement IdP.
 - Internet deployment needs tested login/reset rate limiting, secret/email setup,

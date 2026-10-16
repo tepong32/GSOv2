@@ -115,6 +115,8 @@ class Asset(models.Model):
     custodian_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
         null=True, blank=True, related_name="gso_custodied_assets")
     custodian_snapshot = models.JSONField(default=dict, blank=True)
+    last_custody_return = models.ForeignKey("AssetTransfer", on_delete=models.PROTECT,
+        null=True, blank=True, related_name="assets_last_returned")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
     returned_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True)
@@ -135,6 +137,8 @@ class Asset(models.Model):
             ("view_asset_audit", "Can view GSO asset change history"),
             ("export_asset_register", "Can export the scoped GSO asset register"),
             ("transfer_asset", "Can initiate GSO asset handoffs"),
+            ("record_asset_return", "Can record witnessed asset returns to GSO"),
+            ("verify_asset_return", "Can independently confirm witnessed asset returns"),
             ("acknowledge_asset_transfer", "Can acknowledge asset handoffs to the assigned department"),
             ("request_asset_disposal", "Can request assessment for disposal of an assigned asset"),
             ("review_asset_disposal", "Can review and record GSO asset disposal cases"),
@@ -158,9 +162,10 @@ class AssetAuditEvent(models.Model):
     RETIRED = "retired"
     TRANSFERRED = "transferred"
     DISPOSED = "disposed"
+    RETURNED = "returned"
     ACTION_CHOICES = (
         (CREATED, "Created"), (UPDATED, "Updated"), (TRANSFERRED, "Transferred"),
-        (RETIRED, "Retired"), (DISPOSED, "Disposed"),
+        (RETIRED, "Retired"), (DISPOSED, "Disposed"), (RETURNED, "Returned to GSO"),
     )
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="audit_events")
@@ -189,6 +194,8 @@ class AssetAuditEvent(models.Model):
 
 
 class AssetTransfer(models.Model):
+    HANDOFF = "handoff"
+    RETURN = "return"
     """A simple, acknowledged custody handoff for one registered asset."""
 
     PENDING = "pending"
@@ -201,6 +208,11 @@ class AssetTransfer(models.Model):
     )
 
     public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    kind = models.CharField(max_length=12, default=HANDOFF, choices=((HANDOFF, "Handoff"), (RETURN, "Witnessed return")))
+    state_version = models.PositiveIntegerField(default=1)
+    return_condition = models.CharField(max_length=16, blank=True,
+        choices=(("serviceable", "Serviceable"), ("damaged", "Damaged / needs attention"), ("unknown", "Not assessed")))
+    return_review_note = models.CharField(max_length=240, blank=True)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="transfers")
     source_custodian_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
         null=True, blank=True, related_name="gso_custody_handoffs_from")
@@ -247,6 +259,11 @@ class AssetTransfer(models.Model):
                 fields=("asset", "pending_identity_marker"),
                 name="gso_one_pending_asset_transfer",
             ),
+            models.CheckConstraint(condition=(
+                models.Q(kind="handoff", return_condition="")
+                | (models.Q(kind="return", source_custodian_user__isnull=False, destination_custodian_user__isnull=True)
+                   & models.Q(return_condition__in=("serviceable", "damaged", "unknown")))),
+                name="gso_custody_movement_kind"),
         )
 
     def __str__(self):
@@ -1032,3 +1049,51 @@ class AssetMaintenanceEvidence(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Maintenance evidence is retained.")
+
+
+class AssetReturnEvent(models.Model):
+    transfer = models.ForeignKey(AssetTransfer, on_delete=models.PROTECT, related_name="return_events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_return_events")
+    action = models.CharField(max_length=24)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Return events cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Return events are retained.")
+
+
+def custody_return_evidence_path(instance, filename):
+    extension = filename.rsplit(".", 1)[-1].lower()
+    return f"inventory/custody_returns/{instance.transfer.public_id}/{uuid4().hex}.{extension}"
+
+
+class AssetReturnEvidence(models.Model):
+    transfer = models.ForeignKey(AssetTransfer, on_delete=models.PROTECT, related_name="return_evidence")
+    file = models.FileField(upload_to=custody_return_evidence_path, storage=disposal_private_storage, max_length=255)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    note = models.CharField(max_length=240)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_return_uploads")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("uploaded_at", "pk")
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Return evidence cannot be replaced. Append a correction document.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Return evidence is retained.")

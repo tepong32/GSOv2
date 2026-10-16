@@ -46,6 +46,7 @@ def asset_snapshot(asset):
         result[name] = value
     result["custodian_user_local_id"] = asset.custodian_user_id
     result["custodian_source"] = asset.custodian_snapshot
+    result["last_custody_return_uuid"] = str(asset.last_custody_return.public_id) if asset.last_custody_return_id else None
     return result
 
 
@@ -128,7 +129,7 @@ def update_asset(*, actor, asset, data):
     validate_asset_identifiers(asset.department_id, data, existing=asset)
     has_department = "assigned_department" in data
     assigned_department = _resolve_assigned_department(data.pop("assigned_department", None)) if has_department else None
-    if asset.custodian_user_id and (
+    if (asset.custodian_user_id or asset.last_custody_return_id) and (
         (has_department and (assigned_department.pk if assigned_department else None) != asset.assigned_department_id)
         or ("assigned_office" in data and data["assigned_office"] != asset.assigned_office)
     ):
@@ -213,7 +214,7 @@ def create_asset_transfer(*, actor, asset, data, request_id=None, expected_custo
         destination = _resolve_assigned_department(employee["source"]["department_local_id"])
         custodian = employee["source"]["display_name"] or employee["source"]["username"]
     else:
-        if asset.custodian_user_id:
+        if asset.custodian_user_id or asset.last_custody_return_id:
             raise ValidationError("Select a named employee to hand off existing employee custody.")
         destination = _resolve_assigned_department(data["destination_department"])
         custodian = data["destination_custodian"].strip()
@@ -244,7 +245,8 @@ def create_asset_transfer(*, actor, asset, data, request_id=None, expected_custo
 
 def custody_source(asset):
     return {"department_id": asset.assigned_department_id, "custodian": asset.assigned_office,
-            "employee_id": asset.custodian_user_id, "employee_source": asset.custodian_snapshot}
+            "employee_id": asset.custodian_user_id, "employee_source": asset.custodian_snapshot,
+            "last_return_id": asset.last_custody_return_id}
 
 
 @transaction.atomic
@@ -290,6 +292,8 @@ def acknowledge_asset_transfer(*, actor, transfer):
 def cancel_asset_transfer(*, actor, transfer, reason):
     asset = Asset.objects.select_for_update().get(pk=transfer.asset_id)
     transfer = AssetTransfer.objects.select_for_update().get(pk=transfer.pk, asset=asset)
+    if transfer.kind == AssetTransfer.RETURN:
+        raise PermissionDenied("Use the witnessed return review to cancel this record.")
     if not can_transfer_asset(actor) or not asset_in_scope(actor, transfer.asset):
         raise PermissionDenied
     if transfer.destination_custodian_user_id:

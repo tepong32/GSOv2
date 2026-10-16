@@ -5,6 +5,29 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Validated witnessed returns — release in progress
+
+Custody-review notes published as v0.8.1 at efbc671; branch CI38947862792 and
+primary CI38948007851 passed. Fresh fetch and clean 0/0 preceded branch
+`codex/witnessed-custody-returns`; a further fetch found no upstream changes.
+[Witnessed returns](docs/custody-returns.md) are validated and ready for VM release.
+Migration0018, services, private evidence/checker and signed staff screens are implemented.
+Standalone SQLite71 discovered/62 executed/nine native skips PASS17.436s;
+populated0017-to0018 preservation PASS1/1. Initial GRAND service SQLite55 discovered,
+48 executed/seven native skips PASS5.792s. Standalone native71/71 PASS51.702s.
+Initial actual-GRAND native60/60 PASS17.049s. Expanded61-test run had one fixture
+error: maintenance closure correctly required recorded work. Corrected the test;
+final native61/61 PASS16.937s, log`.tmp/grand-returns-native-corrected.log`.
+Both disposable schemas removed; owned MySQL33317 shut down normally.
+Existing23 GRAND warnings remain outside GSO.
+Browser record/upload/independent confirmation/returned review passes desktop/mobile;
+both sessions and preview8022 stopped. Paired stopped recovery preserves198 default,
+83 finance tables and one return file; corruption/loss detected and restored with
+source unchanged. Backup `.codex/backups/gsov2-return-recovery-20261017-tiw0kkdn`.
+No operator database or Finance implementation changes. Clearance remains unimplemented.
+Next: HR-reference review cases/unresolved-item decisions, then consumable counts;
+Finance cost correction/allocation and recognized-JEV relationships remain separate gaps.
+
 ## Published custody review milestone
 
 Previous goal turn made verified progress: custody236c5e1 and release notes55fc7bf

@@ -161,6 +161,7 @@ def asset_export(request):
 
 @asset_access_required("view")
 def asset_detail(request, pk):
+    from .custody_returns import can_manage_return
     from .maintenance import can_manage_maintenance
     from .maintenance_views import can_view_maintenance
     asset = get_object_or_404(_scoped_assets(request.user), pk=pk)
@@ -171,6 +172,8 @@ def asset_detail(request, pk):
         AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED)).exists()
     return render(request, "inventory/asset_detail.html", {
         "asset": asset,
+        "can_record_return": can_manage_return(request.user, "record", asset) and asset.custodian_user_id
+        and asset.custodian_user_id != request.user.pk and not pending_transfer and not open_disposal and asset.status != Asset.RETIRED,
         "events": asset.audit_events.all() if can_view_audit(request.user) else (),
         "can_change": can(request.user, "change") and not open_maintenance,
         "maintenance_history": asset.maintenance_cases.all() if can_view_maintenance(request.user) else (),
@@ -251,8 +254,10 @@ def _transfer_queryset(user):
     if not department:
         return transfers.none()
     if _is_gso_department(department):
-        return transfers.filter(Q(asset__department_id=department.pk) | Q(destination_custodian_user=user))
-    return transfers.filter(Q(destination_department_id=department.pk) | Q(destination_custodian_user=user))
+        return transfers.filter(Q(asset__department_id=department.pk) | Q(destination_custodian_user=user)
+            | Q(kind=AssetTransfer.RETURN, source_custodian_user=user))
+    return transfers.filter(Q(destination_department_id=department.pk) | Q(destination_custodian_user=user)
+        | Q(kind=AssetTransfer.RETURN, source_custodian_user=user))
 
 
 @asset_access_required("view")
@@ -263,7 +268,7 @@ def asset_transfer_list(request):
     for transfer in rows:
         transfer.user_can_acknowledge = can_acknowledge_asset_transfer(request.user, transfer)
         transfer.user_can_view_asset = asset_in_scope(request.user, transfer.asset)
-        transfer.user_can_cancel = (can_transfer_asset(request.user) and asset_in_scope(request.user, transfer.asset)
+        transfer.user_can_cancel = (transfer.kind != AssetTransfer.RETURN and can_transfer_asset(request.user) and asset_in_scope(request.user, transfer.asset)
             and (not transfer.destination_custodian_user_id or can_manage_employee_custody(request.user)))
     return render(request, "inventory/asset_transfer_list.html", {
         "transfers": rows,
@@ -278,7 +283,7 @@ def asset_transfer_create(request, pk):
     if not can_transfer_asset(request.user):
         raise PermissionDenied
     asset = get_object_or_404(_scoped_assets(request.user), pk=pk)
-    if asset.custodian_user_id:
+    if asset.custodian_user_id or asset.last_custody_return_id:
         return redirect("inventory:employee-handoff", pk=asset.pk)
     if asset.status == Asset.RETIRED or asset.transfers.filter(status=AssetTransfer.PENDING).exists():
         messages.error(request, "This asset cannot start another handoff right now.")

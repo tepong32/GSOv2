@@ -5,10 +5,15 @@ from . import receiving_views
 from . import maintenance_views
 from . import employee_custody_views
 from . import custody_review
+from . import custody_return_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("custody-returns/", custody_return_views.return_list, name="custody-return-list"),
+    path("<int:pk>/custody-return/", custody_return_views.return_start, name="custody-return-start"),
+    path("custody-returns/<int:pk>/", custody_return_views.return_detail, name="custody-return-detail"),
+    path("custody-returns/evidence/<int:pk>/", custody_return_views.return_evidence, name="custody-return-evidence"),
     path("custody/", custody_review.custody_review, name="custody-review"),
     path("<int:pk>/employee-handoff/", employee_custody_views.employee_handoff, name="employee-handoff"),
     path("maintenance/", maintenance_views.maintenance_list, name="maintenance-list"),

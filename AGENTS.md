@@ -59,6 +59,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   automatically move inventory; preserve recorded custody for documented review.
   Personal custody reads do not expand owner-office write authority. Live working
   lists, empty results and retired history never constitute employee clearance.
+- Witnessed returns reuse custody movements with independent GSO confirmation and
+  private evidence. Retain original employee identity; change physical custody only,
+  not maintenance, acquisition value or Finance. Distinguish known GSO returns from
+  unlinked legacy names. See [return design](docs/custody-returns.md).
 
 ## Validation
 

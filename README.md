@@ -13,6 +13,8 @@ attribution; quantity/cost allocation and GRAND installation remain pending. See
 [employee custody](docs/employee-custody-design.md) for permissions and boundaries.
 The GRAND-only [custody review](docs/custody-review.md) separates personal assignments,
 owner-office review, legacy records and pending handoffs. Clearance remains pending.
+The [witnessed return workflow](docs/custody-returns.md) adds independently confirmed
+GSO receipt with private evidence; it preserves maintenance and Finance values.
 Assets, supply items and stock movements have public UUIDs for portable references;
 CSV exports include these IDs. Local integer keys and historical links are retained.
 
@@ -54,6 +56,8 @@ The assigned department scopes each view. GSO staff with the appropriate permiss
 | `inventory.view_asset_audit` | View change history |
 | `inventory.export_asset_register` | Export the scoped asset register and accounting references as CSV |
 | `inventory.transfer_asset` | Start and cancel GSO asset handoffs |
+| `inventory.record_asset_return` | GRAND: record witnessed returns and retain evidence for the owning GSO |
+| `inventory.verify_asset_return` | GRAND: independently confirm another officer's witnessed return |
 | `inventory.acknowledge_asset_transfer` | Acknowledge pending handoffs addressed to the user's department |
 | `inventory.request_asset_disposal` | Submit a disposal assessment request for an assigned asset |
 | `inventory.review_asset_disposal` | Review GSO disposal cases and record decisions |

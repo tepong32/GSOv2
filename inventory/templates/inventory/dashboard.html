@@ -11,7 +11,7 @@
 </header>
 <nav class="quick-links" aria-label="Everyday tasks">
   <a href="{% url 'inventory:asset-list' %}">Open asset register</a>
-  {% if can_view_custody_review %}<a href="{% url 'inventory:custody-review' %}">Custody review</a>{% endif %}
+  {% if can_view_custody_review %}<a href="{% url 'inventory:custody-review' %}">Custody review</a><a href="{% url 'inventory:custody-return-list' %}">Witnessed returns</a>{% endif %}
   {% if can_view_stock %}<a href="{% url 'inventory:consumable-list' %}">Open consumables</a>{% endif %}
   {% if can_view_transfers %}<a href="{% url 'inventory:asset-transfer-list' %}">Asset handoffs{% if pending_transfer_count %} ({{ pending_transfer_count }} pending){% endif %}</a>{% endif %}
   {% if can_view_disposals %}<a href="{% url 'inventory:asset-disposal-list' %}">Disposal requests{% if open_disposal_count %} ({{ open_disposal_count }} open){% endif %}</a>{% endif %}

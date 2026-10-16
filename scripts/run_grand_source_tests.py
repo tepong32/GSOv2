@@ -73,6 +73,9 @@ def main():
                  "gso_integration_tests.grand_employee_custody_http",
                  "gso_integration_tests.grand_employee_custody_races",
                  "gso_integration_tests.grand_custody_review",
+                 "gso_integration_tests.grand_custody_returns",
+                 "gso_integration_tests.grand_custody_return_http",
+                 "gso_integration_tests.grand_custody_return_races",
                  interactive=False, keepdb=False, verbosity=1)
 
 

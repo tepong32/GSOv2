@@ -511,3 +511,45 @@ matchfb2eae2c59df7669cb228eb344bc3f1521f1469a. Operator hash remains
 No installation, operator migration or grants. PrimaryCI38947689210 PASS.
 Documentation follow-up uses separate `codex/custody-review-release-notes`, created
 from a clean fetch0/0 checkpoint. No source/schema changes in this follow-up.
+
+## Witnessed custody returns — 2026-10-17
+
+Fresh fetch and clean0/0 at efbc671 preceded `codex/witnessed-custody-returns`.
+Further fetch0/0 confirmed no upstream change. Finance checkout was fetched and
+unrelated Form1 changes preserved; only its authorized GSO integration note changed.
+Scope includes schema, custody services, authorization, private files and HTTP, so
+full standalone SQLite/native and actual GRAND native integration are appropriate.
+
+PASS: `manage.py test inventory --noinput`,71 discovered/62 executed/nine native
+skips17.436s; `.tmp/returns-shell-final.log`. PASS: `scripts/run_mysql_tests.py`,
+71/71 in51.702s; `.tmp/returns-native-shell.log`. Populated0017-to0018 test preserves
+existing named custody and transfer identities, defaults old movements to
+handoffs and enforces the new kind constraint; isolated1/1 PASS1.048s and included
+in both full suites. `makemigrations --check --dry-run` and `pip check` PASS.
+
+PASS: initial GRAND service SQLite55 discovered/48 executed/seven native skips in
+5.792s, `.tmp/grand-returns-services.log`. Initial expanded actual GRAND MySQL60/60
+PASS17.049s, `.tmp/grand-returns-native.log`, including three return races. Final
+expanded61-test run adds maintenance overlap and later-custodian evidence privacy.
+FAIL - CAUSED BY CURRENT WORK: that run ended61 tests/one error19.332s because the
+new maintenance test attempted completion without recording work. The existing guard
+correctly rejected it. Corrected the fixture to record work before closing, preserving
+the production guard. Corrected native run61/61 PASS16.937s,
+`.tmp/grand-returns-native-corrected.log`; both schemas removed and owned MySQL33317
+shut down normally. Existing23 native GRAND W036 warnings remain outside GSO.
+
+PASS: actual GRAND browser record receipt, upload retained evidence, independently
+confirm and review known GSO-held asset, desktop1440x1000/mobile390x844. Recording
+officer cannot confirm. Confirmed page and returned workbench have matching375px
+client/scroll widths (15px scrollbar), no duplicate IDs. Screenshots under
+`output/playwright/custody-return-*.png` visually inspected. Only synthetic
+logo/favicon404s; no application workflow errors. Both browser sessions and
+preview8022 stopped. Fixture `.tmp/grand-source-tests-xrmc1cx7` retained.
+
+PASS: stopped synthetic paired SQLite and private-evidence recovery reconciled198
+default and83 finance tables plus one retained return file. Original identity,
+independent actors, confirmed assignment and three return events survive. Checker
+detected corrupted and missing evidence; restored files pass and source remains
+unchanged. Backup `C:/Users/Administrator/.codex/backups/gsov2-return-recovery-20261017-tiw0kkdn`.
+NOT RUN - OUT OF SCOPE: online MySQL/operator restoration, deployment, role grants
+and human COA/Accounting/HR acceptance. This rehearsal is synthetic stopped recovery.

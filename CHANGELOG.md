@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.0] - 2026-10-17
+### Added
+- Add witnessed custody returns with independent verification
+
 ## [0.8.1] - 2026-10-17
 ### Documentation
 - Record verified custody review release and next clearance work

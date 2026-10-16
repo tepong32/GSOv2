@@ -92,6 +92,8 @@ def can_transfer_asset(user):
 
 
 def can_acknowledge_asset_transfer(user, transfer=None):
+    if transfer is not None and transfer.kind == transfer.RETURN:
+        return False
     if not can(user, "view") or not user.has_perm("inventory.acknowledge_asset_transfer"):
         return False
     department = department_for_user(user)

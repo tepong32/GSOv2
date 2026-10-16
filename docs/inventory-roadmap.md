@@ -70,6 +70,11 @@ separation event. Named-custody migration, services and signed staff screens are
 clearance workflows remain unimplemented. The [custody review workbench](custody-review.md)
 is published atfb2eae2 as the next prerequisite. No operator migration or deployment.
 
+[Witnessed returns](custody-returns.md) are the next implemented development slice:
+independent GSO confirmation, protected receipt evidence and retained former custody,
+with no HR clearance or Finance decision. See CONTINUE for release validation status.
+HR-reference review cases and unresolved-item decisions remain after this slice.
+
 After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
 
 ### 5. Consumable stock counts and low-stock reminders

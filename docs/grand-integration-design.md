@@ -7,6 +7,9 @@ Reviewed claim support is published at28da3f1; see [claim support](claim-attribu
 Maintenance is published at3905a74. [Employee custody](employee-custody-design.md)
 is published at236c5e1 with protected user relationships and signed handoffs.
 Employee movement/exit clearance remains unimplemented.
+The [witnessed return design](custody-returns.md) extends the same custody movement
+and native user relationships in default. It preserves Finance and maintenance
+authority; see CONTINUE for validation/publication status.
 
 ## Source of truth inspected
 
