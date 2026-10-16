@@ -5,6 +5,25 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Recognition journal inspection
+
+Current branch `codex/journal-source-preview`, based onf0b20e2 after fresh clean
+fetch0/0. GRAND32ab046 fetched0/0; parallel87 dirty/untracked files preserved.
+Only its GSO coordination note was appended. Optional adapter now exposes scoped
+read-only recognition requests and source-bound posted debit observations from
+receipt support. Requires explicit owner-office ledger grant and existing source
+visibility; verifies retained source/posting facts and flags active reversals.
+No migrations, new grants, persisted allocation or ledger writes. See
+[design/limits](docs/journal-source-preview.md).
+
+Focused actual-GRAND SQLite4/4 PASS0.480s; shell99/85 executed/14 skips
+PASS31.769s. Drift/dependencies/diff checks PASS. Browser desktop/mobile inspected,
+local table scroll and no page overflow. Missing copied GRAND logo/avatar media
+is pre-existing fixture setup. Preview8028/browser stopped; operator DB unchanged.
+Full GRAND native87/87 PASS30.051s; both test schemas removed and owned33317 stopped.
+VM minor preview inspected; publication follows branch CI. See validation record for exact scope. Quantity/cost allocation and reviewed JEV
+relationships, HR clearance and official outputs remain incomplete.
+
 ## Reviewed documentary cost amendments
 
 Started `codex/receipt-cost-amendments` after fresh clean fetch0/0 at83570a2.
@@ -35,7 +54,8 @@ and3 private files; original asset100/effective75 and approval history retained.
 Missing/changed evidence and removed approval event detected/restored. Backup:
 `C:/Users/Administrator/.codex/backups/gsov2-receipt-amendments-recovery-20261017-g1qxchpl`.
 Source/operator DB unchanged. Native schemas removed and owned MySQL33317 stopped.
-VM minor preview inspected; publication follows branch CI. See validation record.
+VM releasef0b20e2/v0.12.0 integrated/pushed; branchCI38962084835 and
+primaryCI38962259902 PASS. Master/tag verified and checkout clean0/0. See validation record.
 
 Next: financial quantity/cost allocation and journal relationships using GRAND's
 existing authorities; HR-reference clearance and official outputs remain incomplete.

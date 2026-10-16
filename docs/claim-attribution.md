@@ -87,9 +87,11 @@ Use GRAND's coordinated recovery procedure and separately protect evidence files
 Existing GRAND conditional-uniqueness warnings remain an integration gate, not resolved
 by these passing tests. See [security and recovery](security-and-recovery.md).
 
-Accepted-receipt cost correction, quantity/cost allocation, recognized JEV attribution,
-official forms and historical imports remain unfinished. Receipts with unknown costs
-cannot currently be linked financially; keep their physical records and resolve the
-documented cost through a future reviewed correction workflow. No automatic cost or
-classification may be invented to bypass this limitation. This feature is not legal,
+Reviewed documentary cost amendments now preserve the original accepted cost and
+provide a separately reviewed effective documentary ceiling. See [cost corrections](receipt-cost-corrections.md).
+Adapter migration0003 declares inventory0020 as a dependency without operations.
+Unknown effective cost still provides no positive claim-support capacity. Quantity/cost
+allocation, recognized JEV attribution, official forms and historical imports remain
+unfinished. [Journal inspection](journal-source-preview.md) is read-only and establishes
+no receipt allocation. No automatic cost or classification may be invented. This feature is not legal,
 Accounting, operator or production acceptance of the whole system.

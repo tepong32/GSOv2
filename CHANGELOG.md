@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.13.0] - 2026-10-17
+### Added
+- Add scoped read-only recognition journal inspection
+
 ## [0.12.0] - 2026-10-17
 ### Added
 - Add independently reviewed documentary receipt cost amendments

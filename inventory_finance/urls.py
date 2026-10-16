@@ -6,4 +6,5 @@ urlpatterns = [
     path("", views.workbench, name="workbench"),
     path("case/<uuid:case_id>/propose/", views.propose, name="propose"),
     path("<uuid:attribution_id>/", views.detail, name="detail"),
+    path("<uuid:attribution_id>/journal-sources/", views.journal_sources, name="journal-sources"),
 ]

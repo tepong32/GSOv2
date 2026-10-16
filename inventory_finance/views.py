@@ -20,6 +20,7 @@ from .forms import ProposalForm, ConfirmProposalForm, ReviewForm
 from .models import ReceiptClaimAttribution
 from .services import propose_attribution, approve_attribution, close_attribution
 from .receipt_basis import receipt_basis, receipt_basis_current
+from .journal_sources import can_inspect_journals, inspect_recognition
 
 TOKEN_SALT = "gso-receipt-claim-proposal-v1"
 
@@ -146,4 +147,22 @@ def detail(request, attribution_id):
     return render(request, "inventory_finance/detail.html", {
         "row": row, "form": form, "can_review": can_review, "source_current": source_current,
         "receipt_current": receipt_current,
+        "can_inspect_journals": can_inspect_journals(request.user, row.case),
         "events": row.events.select_related("actor").all()})
+
+
+@login_required
+@never_cache
+@require_http_methods(["GET"])
+def journal_sources(request, attribution_id):
+    row = get_object_or_404(visible_attributions(request.user).select_related(
+        "case__configuration_release"), public_id=attribution_id)
+    if not can_inspect_journals(request.user, row.case):
+        raise PermissionDenied
+    from vouchers.models import VoucherPostingRequest
+    sources = VoucherPostingRequest.objects.filter(case=row.case, kind="recognition",
+        finance_department_id=row.case.configuration_release.department_id).select_related("case").order_by("-version", "-pk")
+    page = Paginator(sources, 20).get_page(request.GET.get("page"))
+    observations = [{"source": source, **inspect_recognition(source, actor=request.user)} for source in page]
+    return render(request, "inventory_finance/journal_sources.html", {
+        "row": row, "page": page, "observations": observations})

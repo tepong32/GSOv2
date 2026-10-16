@@ -36,6 +36,11 @@ the mapping below. No GRAND application code or migrations were changed here.
 
 ## Existing records and ownership
 
+The optional [recognition journal preview](journal-source-preview.md) now exposes
+source-bound posted debit observations to explicitly authorized owner-office ledger
+readers. It creates no cross-store relationship or retained allocation. Documentary
+receipt cost amendments are implemented atf0b20e2; Accounting valuation remains separate.
+
 | Information | Existing authority | GSO relationship and boundary |
 | --- | --- | --- |
 | People and offices | `users.User`, `profiles.EmployeeProfile.assigned_department`, `departments.Department` in default | Use existing actors and employee/office directory after migration. Keep shell IDs in a reviewed import map; do not reuse them as GRAND IDs. |

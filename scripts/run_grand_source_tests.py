@@ -82,6 +82,7 @@ def main():
                  "gso_integration_tests.grand_receiving_authority",
                  "gso_integration_tests.grand_asset_authority",
                  "gso_integration_tests.grand_receipt_amendments",
+                 "gso_integration_tests.grand_journal_sources",
                  interactive=False, keepdb=False, verbosity=1)
 
 

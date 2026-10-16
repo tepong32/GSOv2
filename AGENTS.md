@@ -95,6 +95,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
 
 ## Validation
 
+Recognition source inspection reuses GRAND's explicit ledger-read grant and actual
+Finance owner; claim visibility alone is insufficient. It is a live read across
+stores, never approval or allocation authority. See [journal inspection](docs/journal-source-preview.md).
+
 Start with affected tests; expand for model, migration, auth, shared service and
 deployment changes. Full shell suite is currently small and is appropriate for
 release. Include populated migration replay and recovery preservation checks.

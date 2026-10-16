@@ -850,3 +850,52 @@ untouched. Canonical operator DB SHA256 remains
 NOT RUN - OUT OF SCOPE: online/operator recovery, deployment/grants, quantity
 reversal, Accounting valuation/JEV changes, official-form or LGU acceptance.
 Actual external VM README/inspect/minor preview checked before publication.
+
+## Recognition journal preview — 2026-10-17
+
+Started `codex/journal-source-preview` after fresh fetch, clean GSO HEAD/master0/0
+atf0b20e2. GRAND active checkout fetched0/0 at32ab046, with87 parallel dirty/untracked
+files preserved; only its authorized GSO coordination note was appended. Actual
+published GRAND posting/source/access/model code inspected before implementation.
+No schema, permission definitions, allocation reservations or ledger writes added.
+
+- PASS — `grand-auth-venv/Scripts/python.exe .tmp/test_journal_sources_grand.py
+  --grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation`:
+  4/4 actual-GRAND SQLite tests,0.480s. Synthetic retained posting fixture, not a
+  claim of end-to-end governed posting acceptance. Both-store captured resolver
+  queries are SELECT only. Exact binding, checksum changes, draft/unbound/payment
+  sources, corrupted posting audit, draft reversal, voided reversal, explicit grant
+  including superuser, wrong office, HTTP405/403/404, private-payload omission and
+  no-cache response covered. Log `.tmp/journal-sources-focused.log`.
+- PASS — `gsov2-development/Scripts/python.exe manage.py test --verbosity 1`:
+  99 discovered,85 executed,14 native-only skips;31.769s. Tests standalone optional
+  app isolation and broad existing shell regressions. Log `.tmp/journal-sources-shell-sqlite.log`.
+- PASS — standalone `manage.py makemigrations --check --dry-run`, `python -m pip check`,
+  and `git diff --check`. No schema changes or new dependencies.
+- PASS — actual GRAND synthetic reviewer login and source page on disposable8028;
+  desktop/mobile screenshots inspected.390px viewport,375px page and scroll widths;
+  journal table scrolls locally. Browser and preview stopped. Screens under
+  `output/playwright/journal-sources-{desktop,mobile,mobile-lines}.png`.
+  Copied fixture lacks GRAND logo/avatar media (404), unrelated to this page;
+  no product error observed. Fixture `.tmp/receiving-authority-probe-69jwlgyv`.
+- NOT RUN - OUT OF SCOPE — repeating standalone native99-case run: no standalone
+  implementation/schema changed; its previous full native PASS is atf0b20e2.
+  Full actual-GRAND native suite is the relevant optional-adapter release gate.
+- NOT RUN - OUT OF SCOPE — new backup/restore rehearsal: this read-only feature adds
+  no persisted data/files or mutations. The paired amendment recovery evidence at
+  f0b20e2 remains applicable. Operator migration, grants, deployment and formal LGU
+  Accounting/COA acceptance remain unperformed.
+
+Native integration result and release identifiers follow after completion. VM
+README/inspect and minor preview inspected: only VERSION and CHANGELOG generated.
+
+PASS — final full native `grand-auth-venv/Scripts/python.exe
+scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`:
+87/87 tests,30.051s, MySQL8.4.11 strict mode on owned33317; both schemas removed.
+Existing23 GRAND non-GSO W036 warnings remain. Log
+`.tmp/journal-sources-grand-native.log`. Normal owned MySQL shutdown requested after
+schema cleanup. Operator DB SHA256 remains
+`5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
+No additional full GRAND SQLite run: focused4-case SQLite plus full87-case native
+cover this read-only adapter change. Branch CI must pass before primary integration.
