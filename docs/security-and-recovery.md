@@ -166,3 +166,11 @@ Preserve record/event/predecessor relations and files with both databases; run
 `check_property_evidence` on restored copies. Verification checks fresh source
 bytes and retained asset/receipt basis. Missing files, history drift and stale
 versions fail closed. Useful-life expiry does not erase physical accountability.
+
+Property Finance associations reuse the existing determination packet. Include
+adapter link/events/predecessors in the same coordinated backup, along with native
+Finance dimensions and any supporting receipt-journal mapping. Finance access to
+one shared packet is scoped through an explicit request and action grants; it
+does not widen the original GSO property routes. Verify retained link history and
+live dimension/mapping availability after restore. Missing/changed dimensions
+invalidate current-use assertions without deleting the historical association.

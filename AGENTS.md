@@ -48,6 +48,9 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   Finance owner; ledger grants alone do not expose GSO records. Follow the
   [link design](docs/property-finance-links.md), including direct versus
   journal-backed lock ordering and explicit Department-ID remapping on imports.
+  Keep association writes in default, committing under Finance dimension locks;
+  a GSO reader sees retained history without an implied live ledger check. Keep
+  withdrawal possible when a supporting Finance source is missing or stale.
 - Enforce department and action permissions in views and services. Preserve audit
   and correction history, private evidence, and independent review where required.
   Do not grant roles, change the operator database, or deploy as part of a code release.

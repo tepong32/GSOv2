@@ -1389,3 +1389,79 @@ NOT RUN - OUT OF SCOPE: new application/native/browser/recovery suites for this
 documentation-only design. Prior9070496 results remain historical evidence.
 Documentation links/diff checks and hosted publication checks are the applicable
 gates. No migrations, grants, operator changes or Finance application edits.
+
+## Explicit property Finance requests — 2026-10-17
+
+Previous turn: progress. Design checkpoint e9b3c74 had branch CI38978070046 and
+primary CI38978241661 PASS. Fresh fetch/status GSO e9b3c74 clean0/0; Finance
+a533482 candidate with remote master32ab046 and only GSO note untracked.
+Feature branch codex/property-finance-links preserves the parallel work.
+
+Adapter0005 adds two default tables, a unique virtual active-link marker and
+independent-approval constraint. No data backfill or role grants. GSO explicitly
+shares one verified property record/packet; selected Finance owner proposes
+native UUID dimensions and a different actor reviews. Optional approved mapping
+support checks exact materialized-asset lineage and retained source. Writes use
+default only; Finance locks cover the durable default commit. Withdrawal does
+not require unavailable current sources. Existing GSO URLs remain owner-scoped.
+
+Executed validation:
+- `python .tmp/run_property_links.py --grand-root .../gsov2-grand-v173-validation`:
+  initial7/7 PASS0.688s, exit0, `.tmp/property-links-focused.log`.
+- Same command with `--mysql`:12 tests, FAIL - CAUSED BY CURRENT WORK, one fixture
+  error and one HTTP test failure. Journal fixture passed a newly created asset's
+  integer100 cost into a snapshot compared against reloaded Decimal100.00. Refresh
+  the persisted fixture before capturing its source. HTTP test used old names
+  after browser-discovered form-prefix correction. Updated its payload; no source
+  guard or independent-review requirement was weakened. Log
+  `.tmp/property-links-native-focused.log`. Other10 tests passed, including native
+  review/withdraw and actual GRAND setup archive concurrency.
+- `python manage.py test inventory.test_property_determinations --verbosity 1`:
+  7/7 PASS0.414s, exit0, `.tmp/property-links-shell-focused.log`.
+- `python manage.py test --verbosity 1`:126 discovered/108 executed/18 native
+  skips PASS46.216s, exit0, `.tmp/property-links-shell-full.log`.
+- `python scripts/run_grand_source_tests.py --grand-root
+  C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql`:
+  full native130/130 PASS70.080s, exit0; `.tmp/property-links-grand-full.log`.
+- Final focused native command also includes the new actual setup-edit race,
+  in addition to archive/review/withdraw/property-successor checks and populated
+  migration. Separate unique schemas, `.tmp/property-links-native-final.log`:
+  15/15 PASS14.809s, exit0. Adding that test did not change application code after
+  the broad run began.
+- Strengthened the setup-race assertion: the native UPDATE must remain incomplete
+  during a250ms execution window while approval holds its lock, not merely before
+  its thread has been scheduled. Targeted actual archive/edit tests rerun through
+  `.tmp/run_property_setup_locks.py`, `.tmp/property-links-setup-locks-final.log`:
+  2/2 PASS2.984s, exit0; application code unchanged.
+- Standalone check/migration drift, optional-adapter drift in copied preview and
+  git diff check PASS. Operator databases were not migrated.
+
+Populated preview copied stopped property fixture into
+`.tmp/property-link-preview-4zdv8fr8`, using clean GRAND32ab046. Applying adapter0005
+preserved all existing inventory/claim/mapping/property rows and exact Finance
+bytes, before adding clearly synthetic Finance users/dimensions. No operator
+grants or source-fixture edits. Browser initially reached citizen sign-in; followed
+the documented employee route. The full workflow used separate requester,
+proposer and reviewer logins. Proposer had no approval control. Corrected duplicate
+reason-field IDs with separate form prefixes, added office codes for duplicate
+department names, and styled controls using GRAND's existing conventions.
+Inspected desktop/mobile screenshots under output/playwright/property-finance-
+approved-*.png. Mobile client390/scroll390; approved page duplicate IDs empty.
+Synthetic missing-logo/avatar assets remain fixture limitations.
+
+Stopped preview before seeding a service-driven withdrawn predecessor/approved
+replacement for recovery; verified those operations made no Finance writes.
+`python .tmp/rehearse_property_link_recovery.py`: PASS, exit0; backup
+`C:/Users/Administrator/.codex/backups/gsov2-property-link-recovery-20261017-4_u2xo4w`.
+Retained217 default tables,83 Finance tables,6 private files, exact all-table/file
+manifests, original property/custody and both link histories. Restore checks reject
+stale approval, altered link/useful-life history, missing packet and missing native
+Fund. Tamper probes roll back; restored manifests and untouched source hashes agree.
+This is stopped synthetic paired SQLite recovery, not online MySQL recovery,
+operator installation, official SPC/PAR/ICS acceptance or production readiness.
+
+All native runs terminated and removed their disposable schemas. Owned MySQL33317
+shut down normally. Clean source checkout a533482 is unchanged; canonical GSO
+operator SQLite hash remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Documentation links/diff checks PASS. VM inspect/preview selects a minor feature
+release touching VERSION/CHANGELOG; actual publication and hosted gates follow.

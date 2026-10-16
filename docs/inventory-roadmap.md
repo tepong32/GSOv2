@@ -34,8 +34,9 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 
 The [property-record workflow](property-record-design.md) now retains supplied
 treatment/useful-life evidence and independent documentary verification through
-migration0024. Native Finance dimension association and class/fund SPC output remain
-planned. Keep physical cost allocation as a distinct gap.
+migration0024. Native Finance association now has an explicit GSO request and
+independent Finance review in adapter0005, undergoing release validation. Class/fund
+SPC output remains planned. Keep physical cost allocation as a distinct gap.
 
 Supplies follow-up: [request and issue design](stock-request-design.md) records
 implemented supplied-approved-requisition entry, independent document review,
@@ -126,9 +127,9 @@ for current validation and publication status.
 
 ## Deliberate boundaries
 
-Next property milestone: implement the [native Finance link request and review](property-finance-links.md).
-It resolves the distinct GSO/Finance ownership boundary before class/fund output;
-the design is recorded, while adapter code and acceptance tests remain unfinished.
+The [native Finance link request and review](property-finance-links.md) is implemented
+and undergoing validation. It resolves the distinct GSO/Finance ownership boundary
+before class/fund output. See CONTINUE for actual publication state.
 
 - Use GRAND's shared users, departments, and Finance interfaces when integrating; do not create duplicate user or finance systems in this module.
 - Keep Finance reconciliation reviewable and traceable. Do not automatically post journal entries, depreciation, write-offs, or accounting corrections from GSO workflows.

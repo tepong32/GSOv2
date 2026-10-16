@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.19.0] - 2026-10-17
+### Added
+- Add scoped property requests and reviewed native Finance associations
+
 ## [0.18.1] - 2026-10-17
 ### Documentation
 - Define explicit property requests and native Finance ownership

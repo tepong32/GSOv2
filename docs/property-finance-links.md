@@ -1,6 +1,7 @@
 # Property links to native Finance dimensions
 
-Selected implementation design, 2026-10-17. **Not implemented yet.**
+Selected design and implementation, 2026-10-17. Local validation passed; see the
+handoff for publication state.
 Build on the supplied property workflow published at9070496 and the
 [property-record design](property-record-design.md). This is an engineering
 association workflow, not a new Accounting recognition or valuation procedure.
@@ -28,7 +29,7 @@ the core property queryset or requiring a fictional common GSO/Finance owner.
 
 ## One request and its retained decisions
 
-Add a PropertyFinanceLink and immutable events in inventory_finance/default.
+Migration0005 adds PropertyFinanceLink and immutable events in inventory_finance/default.
 Reuse protected FKs to the property determination, native Department and users.
 Retain public UUID, source/property snapshot, source checksum, selected Finance
 department, request reason/date, actors, state version and event checksums.
@@ -63,6 +64,13 @@ needed before replacement. A successor property determination requires its own
 request. Use signed actor/property/source/request identities, exact replay and
 state-version checks. Permission grants are operational, never migration data.
 
+Explicit permissions are inventory_finance.view_propertyfinancelink,
+request_propertyfinancelink, propose_propertyfinancelink and review_propertyfinancelink
+(all four in the inventory_finance app). GSO request/read also needs the existing
+asset/property read authority and actual owning department. Finance read/propose/
+review also needs accounting.view_general_ledger and the selected native owner.
+Journal support additionally retains existing claim/mapping visibility checks.
+
 Only the source GSO office and explicitly selected Finance office may read this
 case. Finance readers additionally require the ledger grant plus a link view or
 action grant. Do not expose other GSO records, asset lists or unrelated packets.
@@ -91,7 +99,7 @@ the supplied determination packet and explicit request form their evidence path.
 
 ## Transactions, drift and recovery
 
-Proposed mutation order: linked receipt, asset, property determination, link,
+Implemented direct mutation order: linked receipt, asset, property determination, link,
 then Finance Fund, LedgerAccount and optional ResponsibilityCenter. Acquire no
 voucher case/journal locks after these: a journal-backed operation must instead
 use the existing case-before-receipt mapping order, with a dedicated tested path.
@@ -136,6 +144,23 @@ must not add inventory_finance to the standalone shell.
   and rehearse paired restore with an approved link and a retained predecessor.
   Run full actual-GRAND regression on its then-current source before VM publication.
 
-Implementation is the next task. Official class/fund SPC output, local signatory
+Entry from the verified property page shares exactly one record/packet; the
+adapter workbench lists only scoped requests. Finance proposal has a signed
+30-minute preview; decision forms have distinct field prefixes and current
+versions. The department picker shows native office codes to distinguish names.
+GSO sees retained Finance history without an unsupported claim of current ledger
+validation. Authorized Finance readers recheck current dimensions and optional
+mapping support. A stale association stays historical and can be withdrawn even
+when its Finance source is no longer available.
+
+Services are in inventory_finance/property_links.py; views/templates remain in
+the optional adapter. The standalone shell imports them only when installed.
+The journal-backed path prefixes receipt/asset/property/link locks with the
+voucher case, then locks claim/mapping/posting request/journal before dimensions.
+Rejection/withdrawal need no current Finance source and acquire no journal locks.
+No new private-file namespace or duplicate packet is created.
+
+See [validation](validation-2026-10-16.md) for completed and pending gates.
+Official class/fund SPC output, local signatory
 acceptance and physical cost allocation remain subsequent requirements; this
-design does not mark any of them complete.
+workflow does not mark any of them complete.

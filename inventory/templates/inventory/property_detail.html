@@ -2,6 +2,7 @@
 <header class="hero"><div><p class="eyebrow">GSO · Supplied property evidence</p><h1>{{ record.reference }}</h1><p>{{ record.asset.asset_name }} · {{ record.get_status_display }}</p></div></header>
 <nav class="quick-links"><a href="{% url 'inventory:property-records' record.asset_id %}">Property history</a><a href="{% url 'inventory:asset-detail' record.asset_id %}">Asset record</a><a href="{% url 'inventory:property-evidence' record.pk %}">Download supplied evidence</a></nav>
 <section class="panel"><p>Verification checks the supplied document. It is not Accounting approval, valuation, an official property card or release of custody.</p>
+{% if can_request_finance %}<p><a href="{% url 'inventory_finance:property-link-request' record.public_id %}">Request native Finance association</a> · <a href="{% url 'inventory_finance:property-links' %}">Association requests</a></p>{% endif %}
 {% if integrity_error %}<p class="errorlist">{{ integrity_error }}</p>{% endif %}{% if stale %}<p class="errorlist">The current asset or receipt facts differ from this retained basis. Review is required; history is preserved.</p>{% endif %}
 {% if latest and latest.pk != record.pk %}<p>Latest verified document: <a href="{% url 'inventory:property-detail' latest.pk %}">{{ latest.reference }}</a>.</p>{% endif %}
 {% if record.predecessor %}<p>Predecessor: <a href="{% url 'inventory:property-detail' record.predecessor_id %}">{{ record.predecessor.reference }}</a>.</p>{% endif %}

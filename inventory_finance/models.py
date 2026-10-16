@@ -148,3 +148,83 @@ class ReceiptJournalMappingEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Mapping events must be retained.")
+
+
+class PropertyFinanceLink(models.Model):
+    """Explicit GSO sharing request and retained native dimension association."""
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    determination = models.ForeignKey("inventory.PropertyDetermination", on_delete=models.PROTECT, related_name="finance_links")
+    finance_department = models.ForeignKey("departments.Department", on_delete=models.PROTECT, related_name="gso_property_links")
+    predecessor = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True, related_name="successors")
+    property_snapshot = models.JSONField()
+    owner_snapshot = models.JSONField()
+    request_reason = models.CharField(max_length=1000)
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_property_links_requested")
+    requested_at = models.DateTimeField(auto_now_add=True)
+    as_of = models.DateField(null=True, blank=True)
+    fund_public_id = models.UUIDField(null=True, blank=True)
+    account_public_id = models.UUIDField(null=True, blank=True)
+    center_public_id = models.UUIDField(null=True, blank=True)
+    # Same-store support FK; the dimensions themselves remain in finance.
+    journal_mapping = models.ForeignKey(ReceiptJournalMapping, on_delete=models.PROTECT, null=True, blank=True, related_name="property_links")
+    dimension_snapshot = models.JSONField(null=True, blank=True)
+    mapping_snapshot = models.JSONField(null=True, blank=True)
+    proposal_reason = models.CharField(max_length=1000, blank=True)
+    proposed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_property_links_proposed")
+    proposed_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=12, default="requested", choices=tuple((v, v.title()) for v in ("requested", "proposed", "approved", "rejected", "withdrawn")))
+    state_version = models.PositiveIntegerField(default=1)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_property_links_decided")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.CharField(max_length=1000, blank=True)
+    open_determination = models.GeneratedField(expression=models.Case(
+        models.When(status__in=("requested", "proposed", "approved"), then=models.F("determination")),
+        default=models.Value(None), output_field=models.BigIntegerField()), output_field=models.BigIntegerField(), db_persist=False)
+
+    class Meta:
+        ordering = ("-requested_at", "-pk")
+        default_permissions = ()
+        permissions = tuple((f"{action}_propertyfinancelink", f"Can {action} property Finance links") for action in ("view", "request", "propose", "review"))
+        constraints = [
+            models.UniqueConstraint(fields=("open_determination",), name="gso_one_open_property_link"),
+            models.CheckConstraint(condition=~models.Q(status="approved") | (
+                models.Q(proposed_by__isnull=False, decided_by__isnull=False, decided_at__isnull=False)
+                & ~models.Q(decided_by=models.F("requested_by")) & ~models.Q(decided_by=models.F("proposed_by"))), name="gso_property_link_independent"),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            prior = type(self).objects.get(pk=self.pk)
+            mutable = {"status", "state_version", "decided_by_id", "decided_at", "decision_note"}
+            if prior.status == "requested":
+                mutable |= {"as_of", "fund_public_id", "account_public_id", "center_public_id", "journal_mapping_id",
+                    "dimension_snapshot", "mapping_snapshot", "proposal_reason", "proposed_by_id", "proposed_at"}
+            if not getattr(self, "_workflow_write", False) or any(
+                getattr(prior, f.attname) != getattr(self, f.attname)
+                for f in self._meta.concrete_fields if not f.generated and f.attname not in mutable):
+                raise ValidationError("Property link evidence is immutable; withdraw and create a replacement.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Property link history must be retained.")
+
+
+class PropertyFinanceLinkEvent(models.Model):
+    link = models.ForeignKey(PropertyFinanceLink, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_property_link_events")
+    action = models.CharField(max_length=16)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Property link events are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Property link events must be retained.")

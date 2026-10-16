@@ -5,7 +5,44 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Next: explicit property request to Finance
+## Property Finance links — implementation validation
+
+Previous turn: progress (design published e9b3c74; branch CI38978070046 and primary
+CI38978241661 PASS). Fresh fetch: GSO clean0/0 at e9b3c74; Finance a533482 candidate,
+origin/master32ab046, only preserved GSO note untracked. Branch
+`codex/property-finance-links` implements adapter0005 PropertyFinanceLink/Event,
+explicit GSO sharing, owner-scoped native dimension proposal, independent review,
+withdrawal/replacement, signed forms, history, scoped downloads and navigation.
+No Finance writes, auto-grants, operator migrations or deployment.
+
+Initial actual-GRAND SQLite service tests7/7 PASS0.688s; shell property tests7/7
+PASS0.414s. Initial native12 FAIL with one fixture error (new asset integer cost
+versus reloaded Decimal) and one HTTP test still using pre-prefix form names;
+fixture refreshed and test payload aligned. Full shell126 (108 run/18 native
+skips) PASS46.216s. Full native GRAND, including journal support, populated
+migration replay and3 concurrency tests, PASS130/130 in70.080s, exit0:
+`.tmp/property-links-grand-full.log`.
+Final focused native15/15 PASS14.809s, exit0, adds the governed setup-edit race
+(`.tmp/property-links-native-final.log`). Both runs use unique disposable schemas.
+The added test changes no application behavior.
+Two setup-race assertions were subsequently strengthened to wait for an actual
+blocked UPDATE execution window; targeted2/2 PASS2.984s, exit0,
+`.tmp/property-links-setup-locks-final.log`. Application code is unchanged.
+
+Browser completed separate GSO requester/Finance proposer/reviewer flow; desktop
+and390px mobile inspected, no horizontal overflow or duplicate IDs on approved
+page. Fixed duplicate form IDs while proposal and decision forms coexist; office
+picker now includes native codes. Preview/browser stopped. Synthetic stopped
+recovery retains an approved replacement and withdrawn predecessor,217 default/
+83 Finance tables/6 packets; source rows/files unchanged and missing dimension,
+link tampering and stale decision detected. Backup:
+`C:/Users/Administrator/.codex/backups/gsov2-property-link-recovery-20261017-4_u2xo4w`.
+
+Local gates are complete; actual VM publication and hosted checks are next.
+All disposable test schemas were removed; owned MySQL33317 shut down normally.
+Official class/fund SPC output and physical cost allocation remain unfinished.
+
+## Property Finance request design — reference checkpoint
 
 Previous goal turn: progress. Supplied property workflow9070496 was VM-published;
 branch CI38977539972 and primary CI38977725084 PASS. Remote master/tag verified,

@@ -1,4 +1,5 @@
 from uuid import uuid4
+from django.apps import apps
 from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -95,7 +96,12 @@ def property_detail(request, pk):
     except ValidationError as error:
         integrity_error, stale = " ".join(error.messages), True
     latest = service.latest_verified(row.asset)
+    can_request_finance = False
+    if apps.is_installed("inventory_finance"):
+        from inventory_finance.property_links import gso_allowed
+        can_request_finance = gso_allowed(request.user, row, "request")
     return render(request, "inventory/property_detail.html", {"record": row, "version": version,
+        "can_request_finance": can_request_finance,
         "verify_form": forms["verify"], "reject_form": forms["reject"], "cancel_form": forms["cancel"],
         "can_review": review and row.status == "pending", "can_cancel": record and row.status == "pending",
         "integrity_error": integrity_error, "stale": stale, "latest": latest,

@@ -288,3 +288,16 @@ UUID, new movement and optional return lot. The cost is retained only from an
 explicit documented allocation; otherwise it stays NULL. This is operational
 stock history, not a Finance expense reversal or a replacement valuation policy.
 Both requisition fulfillment and original issue remain unchanged after a return.
+
+## Property dimension requests
+
+Adapter0005 adds default-store PropertyFinanceLink/Event; see the
+[implemented workflow and locks](property-finance-links.md). An explicit GSO request
+shares one verified record/packet with a selected native department; Finance
+proposes and independently approves UUID-based Fund/account/optional-center links.
+Optional recognition support must identify an approved mapping whose receipt line
+materialized exactly that asset. Legacy/donation paths need no voucher.
+Finance remains read-only to GSO services. Preserve request/predecessor/event UUIDs,
+property and dimension snapshots, source packet and explicit Department/user key
+remappings in any future installation import. This code does not implement that
+import or deploy the module into the operator GRAND instance.

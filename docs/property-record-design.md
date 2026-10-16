@@ -1,7 +1,8 @@
 # Property records and Finance relationships
 
 Design decision, 2026-10-17. The supplied-document workflow below is implemented;
-native Finance dimension links, SPC output and Accounting approval remain separate.
+native Finance links are implemented separately in the optional adapter; SPC
+output and Accounting treatment approval remain separate requirements.
 GSO source:25004cc; GRAND source:32ab046. Finance's unpublished work is preserved.
 
 ## Evidence and consequence
@@ -75,8 +76,8 @@ files for that read-only checker to report; they are not silently deleted.
 ## GRAND authority and dimension link
 
 The [implementation design](property-finance-links.md) now supplies the explicit
-GSO-to-Finance request boundary missing from this initial design. It is not yet
-implemented; a ledger grant alone must not expose a GSO-owned property packet.
+GSO-to-Finance request boundary missing from this initial design. The optional
+adapter implements it; a ledger grant alone cannot expose a GSO-owned packet.
 
 Inspected accounting/models.py: Fund, LedgerAccount and ResponsibilityCenter have
 public UUIDs, owner department, codes and effective/active facts. Used dimensions
