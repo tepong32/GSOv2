@@ -7,7 +7,12 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 
 ## Reviewed receipt recognition mappings
 
-Current branch `codex/receipt-journal-mapping`, based onbc2fabc after clean fresh
+Published code milestone: ba17b63/v0.14.0, integrated/pushed after branchCI38965891940
+PASS. Remote master/tag verified atba17b6357f192478a2180ea89b41aa4317d1ff0a.
+Primary CI38966060591 PASS. Documentation cleanup follows on
+`codex/recognition-mapping-handoff`, preserving the tested implementation.
+
+Developed on `codex/receipt-journal-mapping`, based onbc2fabc after clean fresh
 fetch0/0. GRAND32ab046 fetched0/0 with87 parallel dirty/untracked files preserved;
 only the authorized GSO coordination note was appended. Adapter0004 creates two
 default-store mapping/event tables. Signed proposal, exact source/claim/receipt

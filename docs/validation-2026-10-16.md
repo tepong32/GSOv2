@@ -989,3 +989,14 @@ warnings remain. Operator DB hash unchanged at5c6c3c66e46d8a6f4a95799806ec96f4ef
 
 VM README/inspect/minor preview inspected; only VERSION/CHANGELOG generated.
 Branch CI is required before integration; verify primary CI and remote refs afterward.
+
+Mapping releaseba17b63 integrated/pushed after branchCI38965891940 PASS; primary
+CI38966060591 PASS. Master/tag matchba17b6357f192478a2180ea89b41aa4317d1ff0a.
+Follow-up documentation-only branch `codex/recognition-mapping-handoff` starts from
+that completed primary milestone after fresh clean fetch0/0. Reconciles stale
+historical design paragraphs that still described now-published cost amendments and
+recognized-JEV links as unimplemented, retaining the genuinely unfinished quantity,
+cost-component and valuation scope. Affected local Markdown links and diff check
+PASS. NOT RUN - OUT OF SCOPE: repeating local application/native suites for this
+prose-only correction; code is unchanged from the final97-case native PASS.
+VM inspect/patch preview checked; generated changes are VERSION and CHANGELOG only.

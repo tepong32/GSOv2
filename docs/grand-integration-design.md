@@ -124,19 +124,21 @@ in finance. This is fresh SQLite compatibility, not populated import or native
 concurrent re-preparation proof.
 Seven native MySQL integration tests also pass, including a source reader observed
 waiting on the preparation case lock and rejecting the old line after replacement.
-Next implement reviewed receipt-line attribution. Read authority does not grant mutation authority:
+Reviewed receipt-line attribution is now implemented below. Read authority does not grant mutation authority:
 UAT viewers must be rejected on writes, and independent Finance review must respect
 the pinned owner even when GSO custody belongs to a different office. No default
 role grants or permission-copying from the prototype are allowed.
 
-## Receipt-side review evidence — current prerequisite
+## Receipt-side review evidence and corrections
 
 The [cost-correction design](receipt-cost-corrections.md) records actual materialized
-cost copies and the selected amendment boundary. Before any correction is enabled,
-claim support now pins receipt facts as well as the Finance claim source. The optional
+cost copies and the selected amendment boundary. Claim support pins receipt facts
+as well as the Finance claim source. The optional
 adapter's migration0002 adds nullable receipt snapshots without inventing old review
 evidence or altering approved amounts. Current development/release evidence belongs
-in CONTINUE; cost amendments and recognized-JEV relationships remain unfinished.
+in CONTINUE. Reviewed documentary amendments are implemented atf0b20e2, and
+reviewed recognition amount mappings atba17b63. Physical quantity and cost-component
+allocation, financial valuation and official outputs remain incomplete.
 
 ## Financial relationships (adapter after physical receiving)
 
@@ -148,24 +150,27 @@ DV lines retain local identity and source snapshot instead of a foreign key.
 The initial service proposes and independently approves a documented claim
 support amount, with explicit permissions, owner checks and stale-source rejection.
 It does not allocate physical quantities, determine acquisition cost, reserve Budget
-capacity or post accounting entries. Quantity/cost attribution and recognized-JEV
-relationships below remain later work. Rejection/withdrawal now retain events and
+capacity or post accounting entries. Quantity/cost-component attribution remains
+later work; recognized-JEV amount mappings now use the separate adapter0004
+workflow. Rejection/withdrawal retain events and
 original approval evidence; stale or replaced source lines can still be withdrawn.
 Scoped reads require both attribution permission/office scope and existing case
 visibility. Actual-model service, native capacity races and integrated HTTP tests pass; browser
 clerk/reviewer/withdrawal flow was inspected. GRAND-base screens and signed-preview confirmation are included, with HTTP/native
 and browser validation recorded in the validation document. Approved support is capped both by the
 claim line and, across claims, by accepted quantity times positive documented receipt
-unit cost. Unknown/zero cost fails closed; accepted-receipt cost correction remains
-unfinished. This ceiling is documentary support, not Accounting valuation. The app
+unit cost, including an independently reviewed documentary amendment where present.
+Unknown/zero effective cost fails closed. This ceiling is documentary support, not Accounting valuation. The app
 is not enabled in the standalone shell. See [claim support](claim-attribution.md).
 
-An explicit allocation row is needed when a receipt line supports a claim or a
-recognized accounting amount. The shape is many-to-many: one receipt line may be
-claimed in parts; one claim/JEV can cover multiple receipt lines. It must retain
-receipt/line identity, case UUID, financial owner, source version/checksum, purpose,
-allocated quantity/amount, actor and reviewed decision. Use a separate relationship
-for recognized JEV/line attribution; never equate delivery value with payment net.
+The implemented relationships are many-to-many through explicit reviewed amounts:
+one receipt line may support parts of claims; one recognition debit may support
+several receipt claim links. Claim support retains receipt/line identity, case UUID,
+financial owner, source/receipt evidence, amount, basis and reviewed actors. The
+separate [recognition mapping](receipt-journal-mappings.md) retains posting-request
+identity, journal UUID/line sequence and independently reviewed amount, capped by
+both debit and claim support. Physical allocated quantity remains unimplemented;
+never infer it from money or equate delivery value with payment net.
 
 Keep gross invoice amount, recoverable/nonrecoverable tax, deductions, freight,
 discounts and approved acquisition cost distinct. A source allocation cannot exceed
