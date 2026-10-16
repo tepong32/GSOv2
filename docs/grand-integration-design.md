@@ -41,6 +41,11 @@ source-bound posted debit observations to explicitly authorized owner-office led
 readers. It creates no cross-store relationship or retained allocation. Documentary
 receipt cost amendments are implemented atf0b20e2; Accounting valuation remains separate.
 
+[Reviewed recognition mappings](receipt-journal-mappings.md) add protected default-store
+claim/request relationships and retained journal UUID/sequence evidence in adapter0004.
+Only default is written; the existing Finance journal lock is held through that
+commit. No Accounting model, journal or authority is duplicated.
+
 | Information | Existing authority | GSO relationship and boundary |
 | --- | --- | --- |
 | People and offices | `users.User`, `profiles.EmployeeProfile.assigned_department`, `departments.Department` in default | Use existing actors and employee/office directory after migration. Keep shell IDs in a reviewed import map; do not reuse them as GRAND IDs. |

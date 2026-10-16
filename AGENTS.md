@@ -98,6 +98,12 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
 Recognition source inspection reuses GRAND's explicit ledger-read grant and actual
 Finance owner; claim visibility alone is insufficient. It is a live read across
 stores, never approval or allocation authority. See [journal inspection](docs/journal-source-preview.md).
+Reviewed recognition mappings are separate default-store records. Keep case →
+receipt → claim → mapping → posting request → journal lock order; durable default
+commit occurs inside the Finance read/lock transaction. Never wrap these mutation
+services in an outer default transaction. No Finance writes. Withdraw approved
+mappings before their claim support; retain approval history and recheck staleness.
+See [mapping design](docs/receipt-journal-mappings.md).
 
 Start with affected tests; expand for model, migration, auth, shared service and
 deployment changes. Full shell suite is currently small and is appropriate for

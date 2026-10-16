@@ -27,9 +27,9 @@ cost. Payment requests are not represented as recognition allocations.
 
 This is a live observation across two databases. It does not retain an approval,
 certify cross-store consistency, establish cost or allocate any journal amount to
-a receipt. A later allocation workflow must explicitly select the journal UUID and
-line sequence, retain and revalidate source evidence, track capacity independently
-from documentary claim support, and preserve reversal/correction history. Do not
+a receipt. The separate [reviewed mapping workflow](receipt-journal-mappings.md)
+selects the journal UUID and line sequence, retains and revalidates evidence,
+tracks debit and claim capacities and preserves correction history. Do not
 infer that mapping from account codes, matching amounts or descriptive text.
 
 Source baseline: GRAND `32ab04669da05b868f6c8b8ff37e0f71b3805555`, including

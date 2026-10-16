@@ -90,8 +90,11 @@ by these passing tests. See [security and recovery](security-and-recovery.md).
 Reviewed documentary cost amendments now preserve the original accepted cost and
 provide a separately reviewed effective documentary ceiling. See [cost corrections](receipt-cost-corrections.md).
 Adapter migration0003 declares inventory0020 as a dependency without operations.
-Unknown effective cost still provides no positive claim-support capacity. Quantity/cost
-allocation, recognized JEV attribution, official forms and historical imports remain
-unfinished. [Journal inspection](journal-source-preview.md) is read-only and establishes
-no receipt allocation. No automatic cost or classification may be invented. This feature is not legal,
+Unknown effective cost still provides no positive claim-support capacity. The separate
+[reviewed recognition amount mapping](receipt-journal-mappings.md) now links selected
+posted debit portions. Physical quantity/cost allocation, valuation, official forms
+and historical imports remain unfinished.
+That mapping must be withdrawn before its approved claim support can be withdrawn.
+[Journal inspection](journal-source-preview.md) itself is read-only. No automatic cost
+or classification may be invented. This feature is not legal,
 Accounting, operator or production acceptance of the whole system.

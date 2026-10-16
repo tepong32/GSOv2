@@ -22,9 +22,10 @@ workflow are implemented; operator installation remains pending.
 Receiving/inspection is now implemented as described in [receiving operations](receiving.md).
 An optional GRAND claim-support workflow now provides reviewed amount attribution;
 see [claim support and limits](claim-attribution.md). Reviewed documentary receipt
-cost amendments are implemented; quantity/cost allocation and recognized-JEV links
-remain incomplete. The [recognition source preview](journal-source-preview.md)
-inspects existing posting evidence without allocating or changing it. Continue the
+cost amendments and [reviewed recognition amount mappings](receipt-journal-mappings.md)
+are implemented; physical quantity/cost-component allocation and valuation remain
+incomplete. The [recognition source preview](journal-source-preview.md) inspects
+existing posting evidence without allocating or changing it. Continue the
 maintenance/clearance/stock-count sequence alongside these financial integration gaps.
 Later general-office records should use
 GRAND's records/custody/HR capabilities where available instead of duplicating them.

@@ -211,6 +211,8 @@ def close_attribution(*, actor, attribution_id, expected_version, action, reason
     else:
         if row.status not in (row.PROPOSED, row.APPROVED):
             raise ValidationError("Only proposed or approved links can be withdrawn.")
+        if row.journal_mappings.filter(status="approved").exists():
+            raise ValidationError("Withdraw the approved recognition mappings before withdrawing their claim support.")
         row.status = row.WITHDRAWN
         # Preserve the original approval actor/date/note; withdrawal has its own event.
     row.state_version += 1

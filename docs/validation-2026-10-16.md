@@ -899,3 +899,93 @@ schema cleanup. Operator DB SHA256 remains
 `5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
 No additional full GRAND SQLite run: focused4-case SQLite plus full87-case native
 cover this read-only adapter change. Branch CI must pass before primary integration.
+
+## Reviewed receipt recognition mapping — 2026-10-17
+
+Fresh GSO fetch clean0/0 atbc2fabc before branch `codex/receipt-journal-mapping`.
+GRAND fetched0/0 at32ab046; its active Form1 handoff/source freeze preserved. Only
+GSO coordination documentation is changed there. Actual GRAND source posting,
+reversal journal lock and retained attribution patterns inspected before design.
+
+Adapter0004 adds default-store mapping/events, no historical backfill or Finance
+schema changes. Signed proposal, independent review, dual amount ceilings,
+immutable proposal/event checksums, explicit owner/grant/UAT controls and ordered
+withdrawal preserve original receipt cost and claim decisions. Default commit is
+inside a Finance read/lock transaction; durable default rejects deferred caller
+commits. This is one write store, not distributed accounting or valuation.
+
+- PASS — initial actual-GRAND focused SQLite:5 executed/1 native skip,1.548s via
+  `.tmp/test_journal_mappings_grand.py --grand-root .../gsov2-grand-source-validation`.
+  `.tmp/journal-mappings-focused.log`. Before final durable/authority refinements;
+  final native regression below is the release gate.
+- PASS — initial full GRAND native94/94,39.534s; included actual create_reversal
+  committing while mapping approval observably waited on its original journal.
+  `.tmp/journal-mappings-grand-native.log`. Repeated after durable commit guard,
+  post-lock authorization recheck and additional signed/UAT tests; not counted as
+  final-tree coverage.
+- PASS — `gsov2-development/Scripts/python.exe manage.py test --verbosity 1`:
+  99 discovered/85 executed/14 native skips,24.295s; standalone remains independent
+  of GRAND adapter. `.tmp/journal-mappings-shell-sqlite.log`.
+- PASS — populated optional migration on copied amendment fixture: all pre-existing
+  inventory/claim rows and Finance DB bytes unchanged. Both-app makemigrations
+  check/dry-run passes. `.tmp/journal-mappings-preview-final.log`.
+- PASS — actual GRAND browser proposal/preview/confirmation then different officer
+  approval60.00 against100.00 source/support. Proposer sees withdrawal only, not
+  self-approval. Desktop/mobile screenshots inspected;375px document/scroll widths
+  at390px viewport, no duplicate IDs. Files `output/playwright/journal-mapping-approved-*.png`.
+  Copied GRAND logo/avatar media absent (404), unrelated fixture limitation. Preview
+  8029 and browser stopped. Finance file hash before/after is identical:
+  `d2dd9481ea1baa61327b517f3c885b2955dad18d3dd29d824316b3d6b57b9d7c`.
+- PASS — stopped paired SQLite recovery:205 default/83 finance tables, retained
+  approved60.00 mapping, independent actors/events and original100.00 claim/receipt
+  cost. Changed amount and lost approval event detected in restored copy, restored
+  from backup; all source rows/files unchanged. No new private evidence location.
+  Backup `C:/Users/Administrator/.codex/backups/gsov2-journal-mappings-recovery-20261017-38zpatp_`;
+  script `.tmp/rehearse_journal_mappings_recovery.py`, log `.tmp/journal-mappings-recovery.log`.
+  Initial harness failed before verification because its private-storage setting
+  was missing; fixed the copied-runtime setting, rerun PASS. No product regression.
+- NOT RUN - OUT OF SCOPE — standalone native repeat (no standalone implementation
+  changed); final native GRAND suite covers the added adapter schema/services.
+  Online MySQL operational restore, operator migrations/grants/deployment, financial
+  valuation and LGU/COA acceptance remain unperformed.
+
+Final native result and publication checks follow after completion. No test process
+was restarted because it was quiet; each handle was tracked to its actual outcome.
+
+Native96/96 PASS34.043s after durable transaction/authority refinements, log
+`.tmp/journal-mappings-grand-native-final.log`. Before release review found the
+mapping depended on retained receipt metadata without reopening original private
+files. Added existing verify_receipt_evidence to current-basis capture and a test
+for missing/changed documents with withdrawal still available. Final native97-case
+run uses `.tmp/journal-mappings-grand-native-evidence.log`; result pending.
+
+Final recovery rerun after that change:205 default/83 finance tables +2 retained
+private delivery/inspection files. Approved60.00 mapping/original100.00 support and
+cost preserved. Missing/changed files, changed mapping amount and removed approval
+event detected and restored; source stores/files unchanged. Backup
+`C:/Users/Administrator/.codex/backups/gsov2-journal-mappings-recovery-20261017-1jvg_14e`;
+script `.tmp/rehearse_journal_mappings_recovery_final.py`, log
+`.tmp/journal-mappings-recovery-final.log`. Fresh service fixture records and
+independently approves using final evidence check; existing browser templates are
+unchanged from inspected flow. No new upload location; existing receiving evidence
+must be included in coordinated recovery.
+
+PASS — supplementary final-code debit-capacity probe on a fresh copied actual-GRAND
+SQLite fixture (`.tmp/probe_journal_debit_capacity.py --grand-root .../gsov2-grand-source-validation`):
+two independently approved claim supports of50 each proposed40 each against one60
+debit within a balanced100 journal. First approved; second denied for debit capacity,
+with claim capacities independently sufficient. This separates debit-ceiling evidence
+from the competing same-claim native race. Log `.tmp/journal-mappings-debit-capacity.log`.
+
+PASS — final full actual-GRAND native97/97,34.530s, MySQL8.4.11 strict mode:
+`grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py
+--grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`.
+Log `.tmp/journal-mappings-grand-native-evidence.log`. Includes original private
+file absence/corruption, UAT/ungranted-superuser denial, signed token tampering and
+actor mismatch, CSRF, immutable history, source staleness, competing approvals,
+actual reversal lock wait and durable-transaction nesting rejection. Both schemas
+removed; owned33317 shutdown requested normally. Existing23 non-GSO GRAND W036
+warnings remain. Operator DB hash unchanged at5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+
+VM README/inspect/minor preview inspected; only VERSION/CHANGELOG generated.
+Branch CI is required before integration; verify primary CI and remote refs afterward.

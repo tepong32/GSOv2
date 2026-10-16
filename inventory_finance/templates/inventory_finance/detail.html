@@ -5,6 +5,7 @@
   <a href="{% url 'inventory_finance:workbench' %}">Receipt claim support</a>
   <h1 class="h3 mt-2">{{ row.case.reference_code }} · {{ row.get_status_display }}</h1>
   {% if can_inspect_journals %}<p><a href="{% url 'inventory_finance:journal-sources' row.public_id %}">Inspect recognition journal sources</a></p>{% endif %}
+  {% if can_inspect_journals %}<p><a href="{% url 'inventory_finance:journal-mappings' row.public_id %}">Reviewed recognition mappings</a></p>{% endif %}
   {% if not source_current %}<div class="alert alert-warning text-dark" role="status">The claim source has changed or its line was replaced. This historical link needs review; it cannot be approved as current support.</div>{% endif %}
   {% if not receipt_current %}<div class="alert alert-warning text-dark" role="status">The receipt basis changed or was not retained with this historical link. Review and withdraw or reject it before proposing current support.</div>{% endif %}
   <div class="card"><div class="card-body"><dl>

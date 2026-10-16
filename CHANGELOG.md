@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.14.0] - 2026-10-17
+### Added
+- Add independently reviewed receipt recognition mappings
+
 ## [0.13.0] - 2026-10-17
 ### Added
 - Add scoped read-only recognition journal inspection

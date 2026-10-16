@@ -73,3 +73,78 @@ class ReceiptClaimEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Claim attribution events must be retained.")
+
+
+class ReceiptJournalMapping(models.Model):
+    """Reviewed portion of a recognition debit supporting one receipt claim."""
+    PROPOSED, APPROVED, REJECTED, WITHDRAWN = "proposed", "approved", "rejected", "withdrawn"
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    claim = models.ForeignKey(ReceiptClaimAttribution, on_delete=models.PROTECT, related_name="journal_mappings")
+    posting_request = models.ForeignKey("vouchers.VoucherPostingRequest", on_delete=models.PROTECT,
+                                       related_name="gso_receipt_mappings")
+    journal_public_id = models.UUIDField()
+    line_sequence = models.PositiveSmallIntegerField()
+    amount = models.DecimalField(max_digits=18, decimal_places=2)
+    basis = models.TextField()
+    source_snapshot = models.JSONField()
+    claim_snapshot = models.JSONField()
+    proposal_checksum = models.CharField(max_length=64)
+    proposed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+                                   related_name="gso_journal_mappings_proposed")
+    proposed_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=12, default=PROPOSED,
+        choices=tuple((value, value.title()) for value in (PROPOSED, APPROVED, REJECTED, WITHDRAWN)))
+    state_version = models.PositiveIntegerField(default=1)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        related_name="gso_journal_mappings_reviewed", null=True, blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("-proposed_at", "-pk")
+        default_permissions = ("view",)
+        permissions = (("propose_receiptjournalmapping", "Can propose receipt recognition mapping"),
+                       ("review_receiptjournalmapping", "Can independently review receipt recognition mapping"))
+        indexes = [models.Index(fields=("journal_public_id", "line_sequence", "status"), name="gso_journal_mapping_source")]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(amount__gt=0), name="gso_mapping_positive_amount"),
+            models.CheckConstraint(condition=models.Q(line_sequence__gt=0), name="gso_mapping_positive_sequence"),
+            models.CheckConstraint(condition=~models.Q(status__in=("approved", "rejected")) | (
+                models.Q(reviewed_by__isnull=False, reviewed_at__isnull=False)
+                & ~models.Q(reviewed_by=models.F("proposed_by"))), name="gso_mapping_independent_review"),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            prior = type(self).objects.get(pk=self.pk)
+            decision = {"status", "state_version", "reviewed_by_id", "reviewed_at", "review_note"}
+            if not getattr(self, "_decision_write", False) or any(
+                getattr(prior, field.attname) != getattr(self, field.attname)
+                for field in self._meta.concrete_fields if field.attname not in decision
+            ):
+                raise ValidationError("Mapping proposals are immutable; retain them and propose a correction.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Mapping history must be retained.")
+
+
+class ReceiptJournalMappingEvent(models.Model):
+    mapping = models.ForeignKey(ReceiptJournalMapping, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_journal_mapping_events")
+    action = models.CharField(max_length=16)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at", "pk")
+        default_permissions = ("view",)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Mapping events are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Mapping events must be retained.")

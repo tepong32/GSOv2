@@ -5,6 +5,34 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Reviewed receipt recognition mappings
+
+Current branch `codex/receipt-journal-mapping`, based onbc2fabc after clean fresh
+fetch0/0. GRAND32ab046 fetched0/0 with87 parallel dirty/untracked files preserved;
+only the authorized GSO coordination note was appended. Adapter0004 creates two
+default-store mapping/event tables. Signed proposal, exact source/claim/receipt
+basis, private-file checks, independent review, debit/claim ceilings and retained
+withdrawal history now relate approved receipt support to selected recognition
+debits. No Finance writes, asset valuation, physical quantity split or new roles.
+See [mapping design](docs/receipt-journal-mappings.md), especially lock order and
+durable default commit inside the outer Finance read/lock transaction.
+
+Initial focused SQLite5 executed/1 native skip PASS1.548s; native94/94 then96/96
+PASS39.534s/34.043s before final private-file recheck. Final native97/97 PASS34.530s;
+both schemas removed and owned33317 stopped. Shell99/85 executed/
+14 skips PASS24.295s. Populated optional migration preserves existing inventory/claim
+rows and Finance bytes; drift check passes. Browser60.00 independent mapping against
+100.00 source/support passes; mobile375px page/scroll widths, no duplicate IDs.
+Preview/browser stopped. Final service fixture includes original delivery/inspection
+files. Stopped paired recovery205 default/83 finance tables +2 files passes;
+altered amount, missing approval event and missing/changed files detected/restored.
+Backup `.codex/backups/gsov2-journal-mappings-recovery-20261017-1jvg_14e`.
+No operator migration, grants, deployment or formal acceptance performed.
+
+Next: physical quantity/cost-component allocation and Accounting valuation remain
+separate; HR-reference clearance and accepted official outputs remain incomplete.
+Overall goal stays active. Check current Finance source before the next design.
+
 ## Recognition journal inspection
 
 Current branch `codex/journal-source-preview`, based onf0b20e2 after fresh clean
@@ -21,7 +49,8 @@ PASS31.769s. Drift/dependencies/diff checks PASS. Browser desktop/mobile inspect
 local table scroll and no page overflow. Missing copied GRAND logo/avatar media
 is pre-existing fixture setup. Preview8028/browser stopped; operator DB unchanged.
 Full GRAND native87/87 PASS30.051s; both test schemas removed and owned33317 stopped.
-VM minor preview inspected; publication follows branch CI. See validation record for exact scope. Quantity/cost allocation and reviewed JEV
+VM releasebc2fabc/v0.13.0 integrated/pushed; branchCI38963611751 and primary
+CI38963770182 PASS. Remote master/tag verified, canonical clean0/0. See validation record for exact scope. Quantity/cost allocation and reviewed JEV
 relationships, HR clearance and official outputs remain incomplete.
 
 ## Reviewed documentary cost amendments
