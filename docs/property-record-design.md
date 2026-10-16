@@ -1,7 +1,7 @@
 # Property records and Finance relationships
 
-Design decision, 2026-10-17. This is the selected next implementation, not a claim
-that property treatment, SPC output or Accounting approval already exists.
+Design decision, 2026-10-17. The supplied-document workflow below is implemented;
+native Finance dimension links, SPC output and Accounting approval remain separate.
 GSO source:25004cc; GRAND source:32ab046. Finance's unpublished work is preserved.
 
 ## Evidence and consequence
@@ -30,7 +30,7 @@ recognition recipe, automatic accountability cancellation or local signatory pol
 | Disposal | AssetDisposalCase and its events/evidence | Reuse completed disposal facts. A missing count or expired useful life is not disposal. |
 | Legacy grouped quantity | Asset permits historical pooled rows | Flag for explicit reconciliation; do not silently split identity, cost or custody among invented units. |
 
-The first vertical workflow records and independently checks a supplied property
+The implemented vertical workflow records and independently checks a supplied property
 determination for an existing individually tracked asset. Bundle treatment,
 documented useful-life/expiry facts, source fund/class labels and reason in one
 revision, with one private source packet, public UUID, explicit source date,
@@ -41,12 +41,36 @@ treatment. UI wording must distinguish documentary verification from Accounting
 approval. Unknown or missing source facts stay explicit and block official output.
 
 Keep the record in inventory/default with protected Asset/native-user relations.
-Implement models only together with entry/review/history/private-download screens,
-scope checks, tests and recovery coverage. Do not add empty speculative migrations.
-Use the existing asset lock before the property case; same-version retries must not
+Migration0024 adds PropertyDetermination and PropertyDeterminationEvent, together
+with entry/review/history/private-download screens and scoped asset navigation.
+Lock linked receipt first, then asset, then property case; same-version retries must not
 produce duplicate effective revisions. Source files and the current asset/receipt
 basis must still agree at verification. A changed receipt cost basis requires review,
-not silent reclassification. Do not acquire Finance locks from the core workflow.
+not silent reclassification. Receipt locking serializes against documentary cost
+amendments without reversing receipt acceptance's lock order. Do not acquire
+Finance locks from the core workflow.
+
+Only one pending entry per asset is permitted by an ordinary unique constraint on
+a virtual generated marker. Verify/reject requires a different recorder/reviewer;
+cancel requires the record grant. Dedicated view/record/review permissions plus
+owning-GSO asset visibility are checked in services and HTTP. GRAND UAT mutations
+and ungranted superusers are denied; no automatic role grants. Source entry uses
+signed actor/asset/basis/request identity with a30-minute form lifetime; exact
+replays retain the same record. Decisions require the current pending version.
+
+Useful life is an exact positive duration with explicit unit and start basis, or
+NULL. Supplied expiry may remain unknown even when duration is known; no date is
+computed. Source fund/class labels are documentary text. Receipt-origin assets and
+legacy individual assets are supported; pooled quantities are rejected pending
+reconciliation. Verified predecessors remain intact when successors are checked.
+Changes to retained asset/receipt basis display a review warning. History checks
+detect drift but do not authenticate documents or defeat privileged administrators.
+
+Private packets use `inventory/property-determinations/<UUID>/...`, the existing
+PDF/image validation and15MB limit. No public media route is created; downloads are
+scoped attachments with no-store/nosniff. Include this namespace in paired recovery
+and run `check_property_evidence`. Failed database transactions may leave unreferenced
+files for that read-only checker to report; they are not silently deleted.
 
 ## GRAND authority and dimension link
 
@@ -87,7 +111,7 @@ basis and rounding/residual treatment. Existing claim/journal support amounts ar
 not that allocation. Preserve gross consideration, taxes, freight, deductions and
 acquisition value separately; Accounting owns inclusion/treatment decisions.
 
-Acceptance for the next vertical workflow: known/unknown useful life; no guessed
+Acceptance for the supplied-document workflow: known/unknown useful life; no guessed
 expiry; supplied semi-expendable determination below/above an apparent threshold
 without automatic override; stale source rejection; independent review; protected
 history and successor correction; forged/stale HTTP posts; owner/UAT denial;

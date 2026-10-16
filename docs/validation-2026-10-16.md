@@ -1281,3 +1281,84 @@ NOT RUN - OUT OF SCOPE: application/native/migration/recovery/browser suites for
 documentation-only change. Retain25004cc results above without presenting them as
 new executions. Branch/resulting-primary CI remain the publication gates. No operator
 migrations, grants, data updates or deployment.
+
+## Supplied property determination workflow — 2026-10-17
+
+Previous goal turn: progress (source-backed design published08b777b). Fresh GSO
+fetch/status clean0/0; feature branch codex/property-determination-workflow.
+Finance32ab0460/0 with104 modified/untracked paths preserved; its current handoff
+is103-path release preparation. No Finance application code or operator data changed.
+
+Inventory0024 creates two default-only tables with protected asset/native actors,
+UUID/predecessor history, a unique virtual pending marker and independent decisions.
+The service records supplied facts; unknown duration/expiry stay unknown. It does
+not set financial treatment, mutate custody or expire accountability. Review locks
+linked receipt then asset then case, matching acceptance/amendment ordering. Exact
+UUID replay and version checks retain one operation. Forms, scoped/no-store views,
+private downloads, asset navigation and read-only evidence checker accompany it.
+
+Executed commands/results:
+- Initial `python manage.py test inventory.test_property_determinations`: FAIL -
+  CAUSED BY CURRENT WORK: four source-basis comparisons differed because a newly
+  created Decimal60000 serialized differently from its reloaded60000.00 value.
+  Normalized monetary/duration snapshots to two decimals; subsequent6/6 PASS0.301s.
+- `python manage.py test inventory.test_property_determinations
+  inventory.test_property_migration inventory.test_property_races`: initially8
+  discovered/7 run/1 native skip PASS0.942s. Added receipt-version rejection and
+  guarded-save/replay cases; final focused9/8 run/1 skip PASS1.073s.
+- Initial full `python manage.py test --verbosity 1`:126 discovered,108 executed,
+  18 native skips PASS39.469s (`.tmp/property-shell.log`,exit0).
+- Initial `python scripts/run_mysql_tests.py`:126/126 PASS124.260s
+  (`.tmp/property-shell-native.log`,exit0). Competing reviewers retain one decision;
+  populated migration preserves assets and enforces pending/independent/life constraints.
+- Initial `python scripts/run_grand_source_tests.py --grand-root
+  C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`:
+  116/116 PASS43.659s (`.tmp/property-grand-native.log`,exit0). New actual-GRAND tests
+  prove native actor links, explicit permissions, owner/UAT/revocation denial,
+  rendered/scoped history and zero Finance queries.
+- Final versions of those three broad commands after guarded-save and presentation
+  refinements: SQLite126 discovered/108 executed/18 native skips PASS41.953s;
+  native126/126 PASS124.516s; actual GRAND32ab046116/116 PASS42.772s. All exit0.
+  Logs use the same names with `-final` suffix.
+- `python manage.py check`, `python manage.py makemigrations --check --dry-run`
+  and `git diff --check`: PASS. No runtime migration was applied to operator data.
+
+Disposable GRAND preview: `.tmp/preview_property.py`, final runtime
+`.tmp/property-preview-bdk61_k6`. Copied prior stopped paired fixture; migration
+preserves all preexisting inventory/claim/mapping/return rows and Finance bytes.
+The first preview helper stopped because that fixture contained no owner-office
+asset; supplied a clearly synthetic individual laptop in the copy, then continued.
+This was a fixture setup failure, not a bypass of an application check. Its failed
+copy `.tmp/property-preview-71fwhnni` is retained. Synthetic users retain explicit
+permissions; these are not migration role grants.
+
+Playwright `property`: clerk recorded PROPERTY-DOC-BROWSER-001, semi-expendable
+as supplied, five years from supplied start basis, expiry blank. Separate reviewer
+verified it; original asset cost12500/custody unchanged. Refined raw choice codes to
+readable labels, restarted the preview on the same data, and visually inspected
+`output/playwright/property-verified-desktop.png` and `property-verified-mobile.png`.
+Mobile width390 client/390 scroll. Browser closed and server stopped before backup.
+Existing synthetic logo/avatar404s are fixture limitations. No official-form acceptance.
+
+`python .tmp/rehearse_property_recovery.py`: PASS, stopped paired SQLite backup and
+restore at `C:/Users/Administrator/.codex/backups/gsov2-property-recovery-20261017-onipyxpj`.
+215 default tables,83 finance tables,6 private files. Original and restored table/file
+manifests agree. Supplied facts, events and prior workflow rows are retained. This
+fixture has one property record with NULL predecessor; successor chains are covered
+by unit tests, not this restore. Stale verification is denied, changed useful life and repeatedly
+missing source file are detected. `check_property_evidence` reports1 checked and
+no missing/changed/unsafe/unreferenced files. Source database/file hashes unchanged.
+This does not prove live MySQL recovery, deployment or LGU operational acceptance.
+
+Recovery predates the final internal save-guard tightening; its persisted schema,
+file handling and read-only history checks are unchanged. Final focused tests
+exercise the stricter save path; final broad native reruns passed as recorded above.
+
+During validation, parallel Finance produced candidate a533482. Its inspected
+diff adds Form 1 roles; GSO access helpers and native identity/dimension definitions
+are unchanged. A separate clean detached checkout at
+`C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation` is used for
+the same actual-GRAND native harness:116/116 PASS40.854s, Python exit0, log
+`.tmp/property-grand-v173-native.log`. Both disposable schemas were destroyed.
+The active Finance checkout was preserved; this proves compatibility with that
+candidate, not its hosted gates, deployment or LGU acceptance.

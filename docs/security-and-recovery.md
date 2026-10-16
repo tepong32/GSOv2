@@ -160,3 +160,9 @@ Supply return evidence adds `inventory/supply-returns`; run
 issue/allocation, return case/event, new stock movement and optional FIFO lot as
 one trail. Accepted returns never remove the original requisition fulfillment.
 See [return boundaries](supply-returns.md), including unknown costs and legacy gaps.
+
+Supplied property determination packets use `inventory/property-determinations`.
+Preserve record/event/predecessor relations and files with both databases; run
+`check_property_evidence` on restored copies. Verification checks fresh source
+bytes and retained asset/receipt basis. Missing files, history drift and stale
+versions fail closed. Useful-life expiry does not erase physical accountability.

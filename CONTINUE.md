@@ -5,7 +5,43 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Property-record design selected — implementation next
+## Supplied property determinations — release validation
+
+Branch `codex/property-determination-workflow` started from08b777b after clean0/0
+fetch. Prior design publication branchCI38975367167/primaryCI38975483442 PASS.
+Finance initially32ab046 fetched0/0 with104 modified/untracked paths preserved.
+Its parallel release candidate is now a533482; origin/master remains32ab046 at
+this check. Only coordination notes are appended to its active checkout.
+
+Inventory0024 adds PropertyDetermination/Event: supplied PPE/semi-expendable treatment,
+source authority/date, class/fund labels, optional exact useful life/start/expiry,
+private packet, independent verification, rejection/cancellation and retained
+verified predecessors. Core services never change asset/custody/Finance. Lock
+receipt (if linked) before asset before case. Signed entry identities, exact replay,
+current-version decisions and a unique virtual pending marker prevent duplicates.
+See [design and implementation](docs/property-record-design.md).
+
+Initial full SQLite126 (108 run/18 native skips) PASS39.469s; native126/126
+PASS124.260s; actual GRAND116/116 PASS43.659s. Then tightened the model's internal
+save guard and refined rendered labels; focused9 (8 run/1 skip) PASS1.073s.
+Final SQLite126 (108 run/18 native skips) PASS41.953s; native126/126 PASS124.516s;
+actual GRAND32ab046116/116 PASS42.772s. Final logs use the `-final` suffix.
+Finance candidate a533482 also passes116/116 in40.854s (exit0), tested separately
+in clean detached `gsov2-grand-v173-validation`; log `.tmp/property-grand-v173-native.log`.
+Local release validation is complete; VM publication and hosted checks are next.
+
+Populated copied migration preserves prior inventory/claim/mapping/return rows and
+Finance bytes. Browser separate recorder/reviewer verified five years with unknown
+expiry; desktop/mobile inspected,390px client/scroll. Preview/browser stopped.
+Stopped paired recovery215 default/83 finance tables/6 files PASS; retained history,
+asset/custody and all prior rows preserved; stale verification denied, altered
+useful life/missing packet detected. Backup:
+`C:/Users/Administrator/.codex/backups/gsov2-property-recovery-20261017-onipyxpj`.
+No operator migration/grant/deployment or official-form/Accounting approval.
+Native Finance dimension association, class/fund SPC and physical cost allocation
+remain next work; the overall goal remains active and incomplete.
+
+## Property-record design selected — reference checkpoint
 
 Fresh fetch: GSO25004cc clean,0/0 against remote master. Prior VM publication is
 complete: branchCI38974856868 and primaryCI38975011553 PASS; remote master/tag

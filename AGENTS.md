@@ -41,6 +41,9 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   treatment/useful-life facts without inventing Accounting approval; individual
   custody survives expensing. Class/fund SPC output is distinct from Accounting's
   SPLC. Native dimension associations require separate Finance authority.
+  Supplied property determinations lock receipt (if linked), then asset, then case;
+  preserve verified predecessors and unknown useful-life/expiry facts. No expiry
+  event releases custody. Include private property-determination packets in recovery.
 - Enforce department and action permissions in views and services. Preserve audit
   and correction history, private evidence, and independent review where required.
   Do not grant roles, change the operator database, or deploy as part of a code release.

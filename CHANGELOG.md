@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.18.0] - 2026-10-17
+### Added
+- Add supplied property determination and useful-life evidence workflow
+
 ## [0.17.3] - 2026-10-17
 ### Documentation
 - Document property records and native Finance ownership

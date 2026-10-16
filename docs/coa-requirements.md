@@ -34,7 +34,7 @@ governed Accounting/Budget decisions.
 
 | Workflow | Current implementation | Next work / authority boundary |
 | --- | --- | --- |
-| Asset and supply registers | Scoped registers/audit, guided receiving/inspection and inventory materialization | Reviewed classification, accepted official forms and historical corrections remain gaps. |
+| Asset and supply registers | Scoped registers/audit, guided receiving/inspection, inventory materialization and supplied property-determination/useful-life evidence | Native Accounting classification/dimension approval, accepted official forms and historical corrections remain gaps. |
 | Receipt evidence | Header/lines, accepted/rejected quantities, private evidence, independent acceptance and documentary cost amendments | Quantity reversal, physical cost-component allocation and accepted official outputs remain separate. |
 | Custody and accountability | Department/named GRAND handoffs, witnessed returns and qualified HR-request custody reviews | Accepted PAR/ICS outputs and HR clearance authority remain separate. Never infer signatures or universal clearance. |
 | Stock cards / requisition and issue | Quantity/FIFO ledger, reviewed counts, supplied requisitions, partial issues and [reviewed original-issue returns](supply-returns.md) | Legacy return reconciliation and accepted RSMI/RPCI outputs remain gaps; semi-expendable property needs its own authority/form treatment. |

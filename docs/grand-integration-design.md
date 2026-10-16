@@ -190,8 +190,10 @@ decision that Financial inventory valuation uses FIFO.
 No automatic PPE/semi-expendable threshold or depreciation calculation is selected.
 The [property-record design](property-record-design.md) selects retained supplied
 determinations, individual custody and a separately authorized native Finance
-dimension link. It distinguishes the class/fund SPC from Accounting's SPLC; these
-extensions are not yet implemented.
+dimension link. Supplied determination/useful-life evidence is implemented in
+inventory0024/default with protected Asset/native-user relations and retained
+successors. Native dimension association and class/fund SPC remain unimplemented;
+Accounting's SPLC is separate. No Finance writes or cross-database FK are added.
 Accounting must pin treatment, fund/account, applicable policy release and evidence.
 Keep physical custody for semi-expendable items after expense recognition; never
 delete an asset because its carrying value reaches zero. Corrections, impairments,

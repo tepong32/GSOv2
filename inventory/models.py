@@ -107,6 +107,88 @@ class EmployeeCustodyReviewEvent(models.Model):
         raise ValidationError("Retain custody review events.")
 
 
+def property_determination_path(instance, filename):
+    return f"inventory/property-determinations/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class PropertyDetermination(models.Model):
+    """Supplied property facts verified as documents, not Accounting approval."""
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    asset = models.ForeignKey("Asset", on_delete=models.PROTECT, related_name="property_determinations")
+    predecessor = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True, related_name="successors")
+    treatment = models.CharField(max_length=20, choices=(("ppe", "PPE (as supplied)"), ("semi_expendable", "Semi-expendable (as supplied)")))
+    reference = models.CharField(max_length=160)
+    source_date = models.DateField()
+    source_authority = models.CharField(max_length=240)
+    property_class = models.CharField(max_length=160, blank=True)
+    fund_label = models.CharField(max_length=160, blank=True)
+    useful_life = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0.01"))])
+    life_unit = models.CharField(max_length=6, blank=True, choices=(("days", "Days"), ("months", "Months"), ("years", "Years")))
+    life_basis = models.CharField(max_length=240, blank=True)
+    life_start = models.DateField(null=True, blank=True)
+    expires_on = models.DateField(null=True, blank=True)
+    reason = models.CharField(max_length=500)
+    source_snapshot = models.JSONField()
+    file = models.FileField(upload_to=property_determination_path, storage=disposal_private_storage, max_length=500)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    status = models.CharField(max_length=12, default="pending", choices=tuple((v, v.title()) for v in ("pending", "verified", "rejected", "cancelled")))
+    state_version = models.PositiveIntegerField(default=1)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_property_recorded")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_property_decided")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.CharField(max_length=500, blank=True)
+    pending_asset = models.GeneratedField(expression=models.Case(models.When(status="pending", then=models.F("asset_id")), default=models.Value(None)), output_field=models.BigIntegerField(null=True), db_persist=False)
+
+    class Meta:
+        ordering = ("-recorded_at", "-pk")
+        default_permissions = ()
+        permissions = (("view_property_determination", "Can view supplied property determinations"),
+            ("record_property_determination", "Can record supplied property determinations"),
+            ("review_property_determination", "Can independently verify supplied property documents"))
+        constraints = [models.UniqueConstraint(fields=("pending_asset",), name="gso_one_pending_property_fact"),
+            models.CheckConstraint(condition=models.Q(useful_life__isnull=True) | models.Q(useful_life__gt=0), name="gso_property_positive_life"),
+            models.CheckConstraint(condition=~models.Q(status__in=("verified", "rejected")) | (
+                models.Q(decided_by__isnull=False, decided_at__isnull=False) & ~models.Q(decided_by=models.F("recorded_by"))), name="gso_property_independent")]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            prior = type(self).objects.get(pk=self.pk)
+            mutable = {"status", "state_version", "decided_by_id", "decided_at", "decision_note"}
+            if not getattr(self, "_workflow_write", False) or any(
+                getattr(prior, field.attname) != getattr(self, field.attname)
+                for field in self._meta.concrete_fields if not field.generated and field.attname not in mutable
+            ):
+                raise ValidationError("Retain property evidence; use the review workflow.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain property determinations and their history.")
+
+
+class PropertyDeterminationEvent(models.Model):
+    determination = models.ForeignKey(PropertyDetermination, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_property_events")
+    action = models.CharField(max_length=16)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Property events are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain property events.")
+
+
 class Asset(models.Model):
     """One register line for an asset or a homogeneous group of assets."""
 

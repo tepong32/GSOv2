@@ -32,10 +32,10 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 
 ## Planned features, in order
 
-Next property milestone: implement the [selected property-record workflow](property-record-design.md)
-for supplied treatment/useful-life evidence and independent documentary verification,
-then native Finance dimension association and class/fund SPC output. These are
-planned, not existing capabilities. Keep physical cost allocation as a distinct gap.
+The [property-record workflow](property-record-design.md) now retains supplied
+treatment/useful-life evidence and independent documentary verification through
+migration0024. Native Finance dimension association and class/fund SPC output remain
+planned. Keep physical cost allocation as a distinct gap.
 
 Supplies follow-up: [request and issue design](stock-request-design.md) records
 implemented supplied-approved-requisition entry, independent document review,

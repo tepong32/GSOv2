@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from . import property_views
 from . import receiving_views
 from . import receipt_amendment_views
 from . import maintenance_views
@@ -15,6 +16,9 @@ from . import hr_custody_review_views
 app_name = "inventory"
 
 urlpatterns = [
+    path("assets/<int:pk>/property-records/", property_views.property_records, name="property-records"),
+    path("property-records/<int:pk>/", property_views.property_detail, name="property-detail"),
+    path("property-records/<int:pk>/evidence/", property_views.property_evidence, name="property-evidence"),
     path("supply-returns/", supply_return_views.return_list, name="supply-return-list"),
     path("stock-issues/<int:pk>/return/", supply_return_views.return_start, name="supply-return-start"),
     path("supply-returns/<int:pk>/", supply_return_views.return_detail, name="supply-return-detail"),

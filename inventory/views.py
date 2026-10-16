@@ -2,6 +2,7 @@ import csv
 from uuid import uuid4
 
 from .employee_sources import can_manage_employee_custody
+from . import property_determinations as property_service
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -180,6 +181,7 @@ def asset_detail(request, pk):
         and asset.custodian_user_id != request.user.pk and not pending_transfer and not open_disposal and asset.status != Asset.RETIRED,
         "events": asset.audit_events.all() if can_view_audit(request.user) else (),
         "can_change": can(request.user, "change") and not open_maintenance,
+        "can_property_records": property_service.can_act(request.user, "view", asset),
         "maintenance_history": asset.maintenance_cases.all() if can_view_maintenance(request.user) else (),
         "can_start_maintenance": can_manage_maintenance(request.user, asset) and not open_maintenance
         and not open_disposal and pending_transfer is None and asset.status != Asset.RETIRED,
