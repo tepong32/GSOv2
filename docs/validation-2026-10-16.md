@@ -225,3 +225,12 @@ while preparation held the case lock and then rejected the replaced line. Both t
 schemas were verified absent and the owned MySQL server shut down normally.
 Full standalone release suite PASS: 49 discovered, 43 executed, six native skips,
 4.124s. Migration drift, pip check and diff check PASS. Operator hash unchanged.
+
+Native integration limitation: the clean published GRAND source at `32ab046`
+emitted 23 models.W036 warnings for conditional uniqueness in account, accounting,
+departments, finance, leave_mgt, reporting, tracepoint and vouchers. None concern
+inventory. These constraints are not created by MySQL; the seven passing tests do
+not establish safety for those unrelated workflows. This is evidenced existing
+GRAND schema behavior, not a new GSO migration regression. The exact model list is
+retained in `.tmp/grand-native-lock-proof.log`, and the parallel Finance review note
+flags the issue. Do not claim the full integrated system is production-ready.

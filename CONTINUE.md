@@ -37,6 +37,11 @@ and pip check PASS. Operator hash unchanged. Source resolver prerequisite is rea
 for vm-release, branch CI, integration/push and primary verification. Do not describe
 it as a completed financial attribution workflow.
 
+Source prerequisite release `74b51d5` was vm-committed/tagged and pushed on the feature
+branch. Integration/primary CI are still pending. Native integration also emitted
+23 existing GRAND conditional-uniqueness warnings (none inventory); see validation.
+These remain an integration risk outside this read-only source resolver's coverage.
+
 ## Published receiving milestone
 
 Receiving `7d3547f` and documentation `9ae80c0` are published; primary checks
