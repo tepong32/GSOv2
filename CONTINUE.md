@@ -5,11 +5,32 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Current reviewed claim support milestone
+## Maintenance release candidate
 
-Branch `codex/reviewed-receipt-claims`, worktree
+See [maintenance workflow](docs/maintenance.md). Migration0016, services, staff
+screens, private evidence, asset/dashboard links and recovery checker are implemented.
+Final standalone MySQL65/65 PASS15.703s; SQLite65 discovered/56 executed/nine native
+skips PASS7.048s. Three races cover duplicate starts, handoff versus maintenance and
+duplicate closure. Populated0015-to0016 preserves existing inventory history.
+Drift/pip checks passed. Actual GRAND SQLite29 discovered/24 executed/five native
+skips PASS2.777s; native GRAND29/29 PASS8.430s. Existing23 GRAND W036 warnings remain,
+none in GSO apps. Both disposable schemas removed and owned MySQL stopped normally.
+
+Browser login/open/work/upload/complete inspected desktop1440x1000/mobile390x844.
+Completed mobile width390 matches viewport and no duplicate IDs. Only favicon404.
+Browser and preview port8019 stopped. Synthetic source remains at
+`.tmp/maintenance-preview-_g03g7vp`. Stopped DB+private-file recovery reconciled
+37 tables and one file, detected/restored corrupted and missing evidence, and left
+source unchanged; backup `C:/Users/Administrator/.codex/backups/gsov2-maintenance-recovery-20261017-nzu80ff7`.
+Not online MySQL/operator recovery. Prepared external Version Manager minor release;
+verify branch/primary CI and remote state before the next feature. No operator
+migration, permissions grant or deployment. Finance coordination note updated only.
+
+## Published reviewed claim support
+
+Branch `codex/asset-maintenance`, worktree
 `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on published
-`d13554c`. Fresh fetch showed 0/0 before work. Optional `inventory_finance` includes
+`28da3f1`. Fresh fetch showed 0/0 before new-branch work. Optional `inventory_finance` includes
 same-store protected receipt/case/owner/actor relationships, source snapshots,
 proposal/independent approval/rejection/withdrawal, immutable event saves and
 scoped GRAND-base screens. Signed previews bind actor/case/content and expire.
@@ -42,11 +63,13 @@ and recovered; source hashes unchanged. Evidence:
 `C:/Users/Administrator/.codex/backups/gsov2-attribution-rehearsal-20261017-011803`.
 This database-only rehearsal does not cover private uploads or online MySQL recovery.
 
-Release pending: no branch ruleset/protection found. Inspect/preview vm-release,
-stage intended files only, publish branch/tag, wait branchCI, fast-forward/push master
-and verify primaryCI/remote/operator hash. Then start the next feature branch.
-Source prerequisite releases74b51d5/d13554c are published; primaryCI38935738686 passed.
-No live test, preview or browser process remains from this work.
+Published via actual Version Manager minor release28da3f1, v0.5.0. BranchCI38938855245
+passed before fast-forward/push to master. Remote master/tag match and operator hash
+is unchanged. MasterCI38939041377 passed at the verified release commit. No branch rulesets/protection found.
+Parallel Finance integration note updated without code/migration/shared-handoff edits.
+
+Financial cost-correction, JEV links, stock counts, clearance and wider
+general-office records remain open in the roadmap.
 
 ## Published receiving milestone
 
@@ -83,9 +106,9 @@ parallel work; fetch and inspect its current source before adapter work.
 
 1. Check live primary/documentation CI and fetch sync before the next feature;
    preserve operator data and use a separate feature branch.
-2. On a new feature branch after fresh sync, implement concrete reviewed Finance
-   attribution using existing parties/claims/posting identities, without duplicating
-   authority. Recheck actual GRAND state first.
+2. Complete maintenance release gates, then select the next roadmap workflow on a
+   separate branch. Claim support is published; accepted-receipt cost correction
+   and recognized-JEV linkage still need explicit design against current GRAND.
 3. All 21 pages of the retained 2024-006 copy are visually reviewed. Establish
    publication/amendments and review relevant 2002-003/2023-004 text before official outputs.
 4. Continue maintenance, stock counts, custody/clearance, general-office records,

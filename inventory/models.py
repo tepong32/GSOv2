@@ -931,3 +931,93 @@ class ReceivingEvidence(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Receiving evidence is retained.")
+
+
+class AssetMaintenanceCase(models.Model):
+    OPEN, COMPLETED, CANCELLED = "open", "completed", "cancelled"
+    STATUS_CHOICES = ((OPEN, "Open"), (COMPLETED, "Completed"), (CANCELLED, "Cancelled"))
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="maintenance_cases")
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=OPEN)
+    state_version = models.PositiveIntegerField(default=1)
+    prior_asset_status = models.CharField(max_length=16, choices=Asset.STATUS_CHOICES)
+    reported_date = models.DateField()
+    problem = models.TextField(max_length=4000)
+    provider = models.CharField(max_length=240, blank=True)
+    work_performed = models.TextField(max_length=4000, blank=True)
+    documented_cost = models.DecimalField(max_digits=18, decimal_places=2, null=True, blank=True,
+                                         validators=[MinValueValidator(0)])
+    cost_reference = models.CharField(max_length=240, blank=True)
+    finished_date = models.DateField(null=True, blank=True)
+    resulting_asset_status = models.CharField(max_length=16, blank=True, choices=Asset.STATUS_CHOICES)
+    closure_note = models.TextField(max_length=4000, blank=True)
+    opened_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_maintenance_opened")
+    opened_at = models.DateTimeField(auto_now_add=True)
+    closed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True,
+                                  related_name="gso_maintenance_closed")
+    closed_at = models.DateTimeField(null=True, blank=True)
+    open_identity_marker = models.GeneratedField(
+        expression=models.Case(models.When(status="open", then=models.Value(1)), default=models.Value(None)),
+        output_field=models.PositiveSmallIntegerField(), db_persist=False, null=True,
+    )
+
+    class Meta:
+        ordering = ("-opened_at", "-pk")
+        default_permissions = ("view",)
+        permissions = (("manage_assetmaintenancecase", "Can record asset maintenance work"),)
+        constraints = (
+            models.UniqueConstraint(fields=("asset", "open_identity_marker"), name="gso_one_open_maintenance"),
+            models.CheckConstraint(condition=models.Q(documented_cost__isnull=True) | models.Q(documented_cost__gte=0),
+                                   name="gso_maintenance_cost_nonnegative"),
+        )
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Maintenance history is retained. Cancel an open case instead.")
+
+
+class AssetMaintenanceEvent(models.Model):
+    case = models.ForeignKey(AssetMaintenanceCase, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_maintenance_events")
+    action = models.CharField(max_length=24)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Maintenance events cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Maintenance events are retained.")
+
+
+def maintenance_evidence_path(instance, filename):
+    extension = filename.rsplit(".", 1)[-1].lower()
+    return f"inventory/maintenance/{instance.case.public_id}/{uuid4().hex}.{extension}"
+
+
+class AssetMaintenanceEvidence(models.Model):
+    case = models.ForeignKey(AssetMaintenanceCase, on_delete=models.PROTECT, related_name="evidence")
+    file = models.FileField(upload_to=maintenance_evidence_path, storage=disposal_private_storage, max_length=255)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    note = models.CharField(max_length=240)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_maintenance_uploads")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("uploaded_at", "pk")
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Maintenance evidence cannot be replaced. Append a correction document.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Maintenance evidence is retained.")

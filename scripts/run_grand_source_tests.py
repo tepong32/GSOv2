@@ -67,6 +67,7 @@ def main():
     print(f"GRAND source: {grand}; isolated runtime: {runtime}", flush=True)
     call_command("test", "gso_integration_tests.grand_claim_sources", "gso_integration_tests.grand_attribution",
                  "gso_integration_tests.grand_attribution_http",
+                 "gso_integration_tests.grand_maintenance",
                  interactive=False, keepdb=False, verbosity=1)
 
 

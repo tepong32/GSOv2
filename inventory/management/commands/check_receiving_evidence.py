@@ -11,16 +11,18 @@ from inventory.models import ReceivingEvidence
 
 class Command(BaseCommand):
     help = "Check receiving evidence hashes and report unreferenced files. Never changes data or files."
+    evidence_model = ReceivingEvidence
+    namespace_name = "receiving"
 
     def handle(self, *args, **options):
-        storage = ReceivingEvidence._meta.get_field("file").storage
+        storage = self.evidence_model._meta.get_field("file").storage
         if not hasattr(storage, "location"):
             raise CommandError("This check requires the configured local private file storage.")
         root = Path(storage.location).resolve()
-        namespace = root / "inventory" / "receiving"
+        namespace = root / "inventory" / self.namespace_name
         report = {"checked": 0, "missing": [], "changed": [], "unsafe": [], "unreferenced": []}
         referenced = set()
-        for record in ReceivingEvidence.objects.order_by("pk").iterator():
+        for record in self.evidence_model.objects.order_by("pk").iterator():
             name = record.file.name
             path = root / name
             try:
@@ -46,10 +48,10 @@ class Command(BaseCommand):
                 report["changed"].append({"id": record.pk, "path": name})
 
         def unreadable(error):
-            raise CommandError("Cannot enumerate receiving storage; check filesystem access.") from error
+            raise CommandError(f"Cannot enumerate {self.namespace_name} storage; check filesystem access.") from error
 
         if namespace.resolve() != namespace:
-            report["unsafe"].append({"path": "inventory/receiving"})
+            report["unsafe"].append({"path": f"inventory/{self.namespace_name}"})
         else:
             for directory, dirs, files in os.walk(namespace, followlinks=False, onerror=unreadable):
                 for name in list(dirs):
@@ -66,4 +68,4 @@ class Command(BaseCommand):
                         report["unreferenced"].append(relative)
         self.stdout.write(json.dumps(report, indent=2))
         if any(report[key] for key in ("missing", "changed", "unsafe", "unreferenced")):
-            raise CommandError("Receiving evidence requires investigation. No data or files were changed.")
+            raise CommandError(f"{self.namespace_name.title()} evidence requires investigation. No data or files were changed.")

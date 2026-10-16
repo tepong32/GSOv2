@@ -110,6 +110,8 @@ def create_asset(*, actor, data):
 def update_asset(*, actor, asset, data):
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
     _require(actor, "change", asset)
+    from .maintenance import require_no_open_maintenance
+    require_no_open_maintenance(asset)
     if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
         raise PermissionDenied("This asset has a handoff waiting for acknowledgment.")
     if asset.disposal_cases.filter(status__in=(
@@ -156,6 +158,8 @@ def create_asset_transfer(*, actor, asset, data):
     if not can_transfer_asset(actor) or not asset_in_scope(actor, asset):
         raise PermissionDenied
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
+    from .maintenance import require_no_open_maintenance
+    require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
         raise ValidationError("Retired assets cannot be handed off.")
     if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
@@ -549,6 +553,8 @@ def submit_asset_disposal_request(*, actor, asset, data):
     if not data.get("photos") or not data.get("signed_request"):
         raise ValidationError("Attach at least one condition photo and the signed request form.")
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
+    from .maintenance import require_no_open_maintenance
+    require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
         raise ValidationError("This asset is already retired.")
     if asset.transfers.filter(status=AssetTransfer.PENDING).exists():

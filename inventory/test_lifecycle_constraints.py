@@ -116,7 +116,8 @@ class LifecycleMigrationTests(TransactionTestCase):
                 model = apps.get_model("inventory", name)
                 self.assertEqual(list(model.objects.order_by("pk").values(*rows[0].keys())), rows)
         finally:
-            MigrationExecutor(connection).migrate(self.after)
+            restore = MigrationExecutor(connection)
+            restore.migrate(restore.loader.graph.leaf_nodes())
 
     def test_native_duplicate_preflight_stops_before_schema_changes(self):
         if connection.vendor != "mysql":
@@ -140,4 +141,5 @@ class LifecycleMigrationTests(TransactionTestCase):
             # Synthetic fixture cleanup only; migration itself must never deduplicate.
             if duplicates is not None:
                 duplicates.delete()
-            MigrationExecutor(connection).migrate(self.after)
+            restore = MigrationExecutor(connection)
+            restore.migrate(restore.loader.graph.leaf_nodes())

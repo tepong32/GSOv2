@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0] - 2026-10-17
+### Added
+- Add auditable asset maintenance and protected repair evidence
+
 ## [0.5.0] - 2026-10-17
 ### Added
 - Add independently reviewed GRAND receipt claim support

@@ -45,6 +45,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   unique constraints. GSO markers are virtual so populated SQLite upgrades work;
   test populated migrations as well as fresh MySQL schemas. Never auto-deduplicate
   historical cases to make a migration pass.
+- Maintenance is operational history. Lock asset before case; an open case blocks
+  register edits, handoff and disposal starts. Preserve custody and acquisition cost;
+  documented repair amounts do not authorize payment or capitalization. Include
+  private maintenance files in recovery and run their read-only evidence checker.
 
 ## Validation
 

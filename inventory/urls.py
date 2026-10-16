@@ -2,10 +2,15 @@ from django.urls import path
 
 from . import views
 from . import receiving_views
+from . import maintenance_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("maintenance/", maintenance_views.maintenance_list, name="maintenance-list"),
+    path("<int:pk>/maintenance/new/", maintenance_views.maintenance_open, name="maintenance-open"),
+    path("maintenance/<int:pk>/", maintenance_views.maintenance_detail, name="maintenance-detail"),
+    path("maintenance/evidence/<int:pk>/", maintenance_views.maintenance_evidence, name="maintenance-evidence"),
     path("receiving/", receiving_views.receipt_list, name="receiving-list"),
     path("receiving/new/", receiving_views.receipt_create, name="receiving-create"),
     path("receiving/<int:pk>/", receiving_views.receipt_detail, name="receiving-detail"),

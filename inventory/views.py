@@ -60,6 +60,7 @@ def _scoped_assets(user):
 
 @login_required
 def dashboard(request):
+    from .maintenance_views import can_view_maintenance
     if not can(request.user, "view"):
         from .receiving import require_receiving
         require_receiving(request.user, "view")
@@ -71,6 +72,7 @@ def dashboard(request):
         "total_assets": assets.count(),
         "in_service_count": assets.filter(status=Asset.ACTIVE).count(),
         "maintenance_count": assets.filter(status=Asset.MAINTENANCE).count(),
+        "can_view_maintenance": can_view_maintenance(request.user),
         "retired_count": assets.filter(status=Asset.RETIRED).count(),
         "can_add": can(request.user, "add"),
         "can_view_stock": can_stock(request.user, "view"),
@@ -155,18 +157,28 @@ def asset_export(request):
 
 @asset_access_required("view")
 def asset_detail(request, pk):
+    from .maintenance import can_manage_maintenance
+    from .maintenance_views import can_view_maintenance
     asset = get_object_or_404(_scoped_assets(request.user), pk=pk)
     pending_transfer = asset.transfers.filter(status=AssetTransfer.PENDING).first()
+    open_maintenance = asset.maintenance_cases.filter(status="open").exists()
+    open_disposal = asset.disposal_cases.filter(status__in=(
+        AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
+        AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED)).exists()
     return render(request, "inventory/asset_detail.html", {
         "asset": asset,
         "events": asset.audit_events.all() if can_view_audit(request.user) else (),
-        "can_change": can(request.user, "change"),
+        "can_change": can(request.user, "change") and not open_maintenance,
+        "maintenance_history": asset.maintenance_cases.all() if can_view_maintenance(request.user) else (),
+        "can_start_maintenance": can_manage_maintenance(request.user, asset) and not open_maintenance
+        and not open_disposal and pending_transfer is None and asset.status != Asset.RETIRED,
         "can_retire": can(request.user, "delete"),
         "can_view_audit": can_view_audit(request.user),
-        "can_transfer": can_transfer_asset(request.user) and pending_transfer is None and asset.status != Asset.RETIRED,
+        "can_transfer": can_transfer_asset(request.user) and pending_transfer is None and asset.status != Asset.RETIRED and not open_maintenance,
         "pending_transfer": pending_transfer,
         "transfer_history": asset.transfers.all() if can_view_audit(request.user) else (),
         "can_request_disposal": can_request_asset_disposal(request.user, asset)
+        and not open_maintenance
         and not asset.transfers.filter(status=AssetTransfer.PENDING).exists()
         and not asset.disposal_cases.filter(status__in=(
             AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,

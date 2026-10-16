@@ -295,3 +295,87 @@ PASS: full standalone suite49 discovered/43 executed/six native skips,3.370s.
 Actual GRAND `check` and `makemigrations inventory inventory_finance --check --dry-run`
 passed; no migration drift. Pip check and whitespace check passed. GitHub reports no
 rulesets and no master branch protection; use branchCI before integration regardless.
+
+## Maintenance development checks - 2026-10-17
+
+Fresh `git fetch origin` on `codex/asset-maintenance` showed HEAD/origin/master 0/0
+at28da3f1; only the prior release handoff was dirty before new feature work.
+Migration0016, operational services, staff screens and private evidence are in
+development. These results do not establish release or production readiness.
+
+PASS: `python manage.py test inventory --noinput`: 60 discovered, 54 executed,
+six native-only skips,4.192s before adding three native maintenance races. Eleven
+maintenance service/HTTP tests exercise authorization, lifecycle exclusion, stale
+writes, validation, event rollback, custody/cost preservation, evidence corruption,
+download scope/headers, CSRF and open/work/close rendering. Model drift check and
+`git diff --check` passed.
+
+FAIL - CAUSED BY CURRENT WORK: first `python scripts/run_mysql_tests.py inventory`
+had six errors in63 tests,12.096s. The new download test called `response.close()`
+directly, emitting request_finished outside Django test client's streaming wrapper
+and closing the enclosing MySQL test transaction. Later errors cascaded from that
+closed connection. Corrected the test to consume `response.streaming_content`
+through the wrapper and assert the actual downloaded bytes. No product workaround
+or transaction-validation bypass was introduced. First log `.tmp/maintenance-native.log`.
+
+PASS: reran the full native command on a new random schema: 63/63,12.802s, no skips
+and no system-check issues. Log `.tmp/maintenance-native-corrected.log`. Added races
+cover competing maintenance starts, maintenance versus asset handoff and duplicate
+completion, asserting one retained result. Historical lifecycle migration tests now
+restore graph leaves rather than leaving the database at0015. MySQL8.4.11 used only
+owned loopback33317; verified no `gso_test_` schemas remain and normal shutdown.
+
+NOT RUN - OUT OF SCOPE of this checkpoint: actual-GRAND maintenance authorization,
+browser review, populated0016 upgrade and evidence backup/restore/reconciliation.
+These remain required before release. No operator migration, grant, deployment,
+Finance code edit, vm-commit, integration or push occurred for this feature yet.
+
+## Maintenance final validation and recovery - 2026-10-17
+
+PASS: targeted `manage.py test inventory.test_maintenance inventory.test_maintenance_migration
+inventory.test_receiving --noinput`:33 tests,2.011s. New maintenance evidence checker
+reuses the receiving checker's namespace-safe local inspection, detecting corruption,
+missing files and orphan uploads without modifying them. Populated0015-to0016 replay
+compares every pre-existing inventory table and preserves the legacy maintenance
+status without inventing cases. Full native `scripts/run_mysql_tests.py inventory`
+then passed65/65,15.703s, including the populated migration and three races.
+Log `.tmp/maintenance-final-native.log`.
+
+PASS: actual GRAND32ab046 SQLite integration29 discovered/24 executed/five native
+skips,2.777s, log `.tmp/grand-maintenance-sqlite.log`. Real employee profiles and
+GRAND explicit grants/UAT controls were used. An ungranted superuser cannot manage
+maintenance; another owner cannot read the case; repair operations issue no queries
+to the Finance store. The existing claim source/attribution/HTTP checks also passed.
+Actual GRAND model checks and `makemigrations inventory inventory_finance --check
+--dry-run` passed in isolated settings; no schema drift. No GRAND source edits.
+
+PASS: real browser login, asset navigation, opening a case, saving work/cost/reference,
+uploading a private bill and completing with a returned-to-service outcome. Screens
+visually checked at1440x1000 and390x844: `output/playwright/maintenance-open-desktop.png`,
+`maintenance-open-mobile.png`, `maintenance-completed-mobile.png`. Completed mobile
+has viewport/scroll width390 and no duplicate IDs. Initial favicon404 is the only
+observed browser console resource error. Browser closed; preview port8019 stopped.
+
+PASS: stopped synthetic SQLite/private-file recovery at
+`C:/Users/Administrator/.codex/backups/gsov2-maintenance-recovery-20261017-nzu80ff7`.
+Backed up, restored and reconciled all37 tables using row counts/content SHA-256;
+integrity/FKs valid. Completed case and all four events preserved. Reconciliation
+checked the retained bill, detected deliberate corruption and loss in the restored
+copy, then passed after copying back the backup evidence. Source database hash
+unchanged. Manifest records table/file hashes. This is not an online MySQL or
+operator-data restoration claim. Synthetic source retained in
+`.tmp/maintenance-preview-_g03g7vp`; no live preview/browser process remains.
+
+PASS: full shell `manage.py test --noinput`:65 discovered/56 executed/nine native
+skips,7.048s; `.tmp/maintenance-release-shell.log`. Migration drift, `pip check`
+and whitespace checks pass. GitHub API shows no rulesets or master protection.
+External Version Manager README reviewed, inspect/preview proposes minor0.6.0
+updating only VERSION/CHANGELOG.
+
+PASS: final actual-GRAND native command `scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`:29/29,
+8.430s, no skips. Log `.tmp/grand-maintenance-native.log`. The same23 existing GRAND
+W036 warnings remain, none in inventory/inventory_finance. Both disposable schemas
+removed; no `gso_test_` or `gso_grand_test_` schema remains. Owned MySQL stopped
+normally. Canonical master remains28da3f1 and operator DB hash matches preservation
+checkpoint before release. External vm-commit and branch/primary CI are next.
