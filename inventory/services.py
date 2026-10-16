@@ -3,6 +3,7 @@ from datetime import date
 import csv
 import hashlib
 from io import StringIO
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
@@ -43,6 +44,8 @@ def asset_snapshot(asset):
         elif isinstance(value, Decimal):
             value = str(value)
         result[name] = value
+    result["custodian_user_local_id"] = asset.custodian_user_id
+    result["custodian_source"] = asset.custodian_snapshot
     return result
 
 
@@ -123,12 +126,18 @@ def update_asset(*, actor, asset, data):
         raise PermissionDenied("Retired asset records are read-only.")
     data = _editable_data(data, ASSET_INPUT_FIELDS)
     validate_asset_identifiers(asset.department_id, data, existing=asset)
-    assigned_department_pk = data.pop("assigned_department", None)
-    assigned_department = _resolve_assigned_department(assigned_department_pk)
+    has_department = "assigned_department" in data
+    assigned_department = _resolve_assigned_department(data.pop("assigned_department", None)) if has_department else None
+    if asset.custodian_user_id and (
+        (has_department and (assigned_department.pk if assigned_department else None) != asset.assigned_department_id)
+        or ("assigned_office" in data and data["assigned_office"] != asset.assigned_office)
+    ):
+        raise ValidationError("Use an acknowledged handoff to change named employee custody.")
     for field, value in data.items():
         setattr(asset, field, value)
-    asset.assigned_department_id = assigned_department.pk if assigned_department else None
-    asset.assigned_department_label = assigned_department.name if assigned_department else ""
+    if has_department:
+        asset.assigned_department_id = assigned_department.pk if assigned_department else None
+        asset.assigned_department_label = assigned_department.name if assigned_department else ""
     asset.updated_by = actor
     asset.save()
     AssetAuditEvent.objects.create(
@@ -154,10 +163,34 @@ def _resolve_assigned_department(pk):
 
 
 @transaction.atomic
-def create_asset_transfer(*, actor, asset, data):
+def create_asset_transfer(*, actor, asset, data, request_id=None, expected_custody=None):
+    asset = Asset.objects.select_for_update().get(pk=asset.pk)
     if not can_transfer_asset(actor) or not asset_in_scope(actor, asset):
         raise PermissionDenied
-    asset = Asset.objects.select_for_update().get(pk=asset.pk)
+    data = _editable_data(data, {"destination_department", "destination_custodian", "transfer_date", "reason", "reference",
+                                 "destination_employee_id", "employee_source_checksum"})
+    if data.get("destination_employee_id") is not None:
+        from .employee_sources import require_employee_custody_manager
+        require_employee_custody_manager(actor)
+    if request_id is not None:
+        try:
+            request_id = UUID(str(request_id))
+        except (ValueError, TypeError, AttributeError):
+            raise ValidationError("Invalid handoff request identity.")
+        if not data.get("destination_employee_id"):
+            raise ValidationError("A named handoff request must select an employee.")
+        existing = AssetTransfer.objects.filter(public_id=request_id).first()
+        if existing:
+            if (existing.asset_id != asset.pk or existing.requested_by_id != actor.pk
+                    or str(existing.destination_custodian_user_id) != str(data.get("destination_employee_id"))
+                    or existing.destination_employee_checksum != data.get("employee_source_checksum")
+                    or existing.reference != data.get("reference", "").strip()
+                    or existing.reason != data.get("reason", "").strip()
+                    or existing.transfer_date.isoformat() != str(data.get("transfer_date"))):
+                raise ValidationError("This handoff request identity already belongs to different recorded content.")
+            return existing
+    if expected_custody is not None and expected_custody != custody_source(asset):
+        raise ValidationError("The asset custody changed after this preview. Review the handoff again.")
     from .maintenance import require_no_open_maintenance
     require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
@@ -169,39 +202,78 @@ def create_asset_transfer(*, actor, asset, data):
         AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
     )).exists():
         raise ValidationError("This asset has an open disposal case and cannot be transferred.")
-    destination = _resolve_assigned_department(data["destination_department"])
-    if destination.pk == asset.assigned_department_id and data["destination_custodian"].strip() == asset.assigned_office.strip():
+    employee = None
+    if data.get("destination_employee_id") is not None:
+        from .employee_sources import resolve_employee_custodian
+        employee = resolve_employee_custodian(actor=actor, user_id=data["destination_employee_id"])
+        if employee["sha256"] != data.get("employee_source_checksum"):
+            raise ValidationError("The selected employee record changed. Review the current identity and department.")
+        if not data.get("reference", "").strip():
+            raise ValidationError("Named custody needs a documented handoff reference.")
+        destination = _resolve_assigned_department(employee["source"]["department_local_id"])
+        custodian = employee["source"]["display_name"] or employee["source"]["username"]
+    else:
+        if asset.custodian_user_id:
+            raise ValidationError("Select a named employee to hand off existing employee custody.")
+        destination = _resolve_assigned_department(data["destination_department"])
+        custodian = data["destination_custodian"].strip()
+    same_identity = asset.custodian_user_id == (employee["source"]["user_local_id"] if employee else None)
+    if same_identity and destination.pk == asset.assigned_department_id and custodian == asset.assigned_office.strip():
         raise ValidationError("Choose a different department or custodian.")
-    return AssetTransfer.objects.create(
+    transfer = AssetTransfer(
         asset=asset,
+        source_custodian_user_id=asset.custodian_user_id, source_employee_snapshot=asset.custodian_snapshot,
+        destination_custodian_user_id=employee["source"]["user_local_id"] if employee else None,
+        destination_employee_snapshot=employee["source"] if employee else {},
+        destination_employee_checksum=employee["sha256"] if employee else "",
         source_department_id=asset.assigned_department_id,
         source_department_label=asset.assigned_department_label,
         source_custodian=asset.assigned_office,
         destination_department_id=destination.pk,
         destination_department_label=destination.name,
-        destination_custodian=data["destination_custodian"].strip(),
+        destination_custodian=custodian,
         transfer_date=data["transfer_date"], reason=data["reason"].strip(),
         reference=data.get("reference", "").strip(), requested_by=actor,
     )
+    if request_id is not None:
+        transfer.public_id = request_id
+    transfer.full_clean()
+    transfer.save()
+    return transfer
+
+
+def custody_source(asset):
+    return {"department_id": asset.assigned_department_id, "custodian": asset.assigned_office,
+            "employee_id": asset.custodian_user_id, "employee_source": asset.custodian_snapshot}
 
 
 @transaction.atomic
 def acknowledge_asset_transfer(*, actor, transfer):
-    transfer = AssetTransfer.objects.select_for_update().select_related("asset").get(pk=transfer.pk)
+    asset = Asset.objects.select_for_update().get(pk=transfer.asset_id)
+    transfer = AssetTransfer.objects.select_for_update().get(pk=transfer.pk, asset=asset)
     if not can_acknowledge_asset_transfer(actor, transfer):
         raise PermissionDenied
     if transfer.status != AssetTransfer.PENDING:
         raise ValidationError("This handoff has already been processed.")
-    asset = Asset.objects.select_for_update().get(pk=transfer.asset_id)
     if (asset.assigned_department_id != transfer.source_department_id
-            or asset.assigned_office != transfer.source_custodian):
+            or asset.assigned_office != transfer.source_custodian
+            or asset.custodian_user_id != transfer.source_custodian_user_id
+            or asset.custodian_snapshot != transfer.source_employee_snapshot):
         raise ValidationError("The asset assignment changed after this handoff was started. Ask GSO to review it.")
+    if transfer.destination_custodian_user_id:
+        from .employee_sources import resolve_own_custodian
+        employee = resolve_own_custodian(actor=actor)
+        if employee["sha256"] != transfer.destination_employee_checksum:
+            raise ValidationError("Your employee identity or department changed. Ask GSO to review this handoff.")
+    asset.custodian_user_id = transfer.destination_custodian_user_id
+    asset.custodian_snapshot = transfer.destination_employee_snapshot
     asset.assigned_department_id = transfer.destination_department_id
     asset.assigned_department_label = transfer.destination_department_label
     asset.assigned_office = transfer.destination_custodian
     asset.updated_by = actor
     asset.save(update_fields=(
         "assigned_department_id", "assigned_department_label", "assigned_office", "updated_by", "updated_at",
+        "custodian_user", "custodian_snapshot",
     ))
     transfer.status = AssetTransfer.ACCEPTED
     transfer.acknowledged_by = actor
@@ -216,11 +288,17 @@ def acknowledge_asset_transfer(*, actor, transfer):
 
 @transaction.atomic
 def cancel_asset_transfer(*, actor, transfer, reason):
-    transfer = AssetTransfer.objects.select_for_update().select_related("asset").get(pk=transfer.pk)
+    asset = Asset.objects.select_for_update().get(pk=transfer.asset_id)
+    transfer = AssetTransfer.objects.select_for_update().get(pk=transfer.pk, asset=asset)
     if not can_transfer_asset(actor) or not asset_in_scope(actor, transfer.asset):
         raise PermissionDenied
+    if transfer.destination_custodian_user_id:
+        from .employee_sources import require_employee_custody_manager
+        require_employee_custody_manager(actor)
     if transfer.status != AssetTransfer.PENDING:
         raise ValidationError("Only a pending handoff can be cancelled.")
+    if not reason.strip() or len(reason.strip()) > 240:
+        raise ValidationError("Explain cancellation in 1 to 240 characters.")
     transfer.status = AssetTransfer.CANCELLED
     transfer.cancelled_by = actor
     transfer.cancelled_at = timezone.now()

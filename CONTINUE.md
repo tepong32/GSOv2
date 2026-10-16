@@ -28,10 +28,52 @@ canonical master fast-forward/push; primaryCI38941747339 passed at the same comm
 Remote master/tag verified and operator DB hash unchanged. No operator migration,
 permissions grant or deployment. Finance coordination note updated only.
 
-Current documentation branch `codex/maintenance-release-notes` in
-`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`; based on3905a74 after
-fresh fetch0/0. Publish this release-result update through the documentation-only
-Version Manager workflow, then fetch again and create a separate next-feature branch.
+Documentation releases f6ea69e and60d12af are published; final branchCI38942013769 and
+primaryCI38942094327 passed. Remote master/tag verified, operator hash unchanged.
+
+## Current employee custody work
+
+Fresh fetch0/0 and clean tree at60d12af, then branch `codex/employee-custody` in
+`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`. Read
+[employee custody design](docs/employee-custody-design.md). Actual GRAND profiles,
+permissions and HR source were inspected. No structured separation/clearance model
+was found; disabled login is not employment termination. A minimal read-only
+employee-source resolver and migration0017/custody services are written. New nullable
+protected employee links/snapshots retain legacy text; transfer UUID migration uses
+per-row backfill. Named recipient must personally acknowledge a different initiator's
+handoff with unchanged identity/department. Generic edits and office-only handoffs
+cannot erase named custody. Partial register edits no longer clear an omitted office.
+Asset-first locks unify transfer start/ack/cancel; start checks current locked owner.
+
+Initial source run PASS33 discovered/28 executed/five native skips3.727s (intermediate
+source). Expanded actual-GRAND SQLite run60414 ended with one test expectation
+error: after HR moved the employee, existing department scope correctly denied
+acknowledgment with PermissionDenied before snapshot comparison. Corrected that
+expectation and added same-office name-change rejection. Corrected run86403 completed39 discovered/34 executed/five native skips PASS2.927s.
+Signed employee search/review/confirm screens and links are now written. Tokens bind
+actor, asset, source custody and employee fingerprint; request UUID makes retries
+idempotent even after closure. Incoming named handoffs are visible across GSO offices
+without granting owner write authority. All three transfer actor FKs now PROTECT.
+
+Latest standalone SQLite69 discovered/60 executed/nine native skips PASS9.882s;
+native MySQL69/69 PASS28.912s; drift/dependency checks clear. Logs
+`.tmp/custody-shell-release.log` and `.tmp/custody-native-shell.log`.
+Actual GRAND HTTP run87126 found three query errors (`__pk` in nested `.only`);
+fixed to concrete GRAND `id` and retained profile visibility filtering. Native
+run60476 PASS44/44 in12.481s, including the two new races. Final native run35547
+PASS44/44 in11.095s after tightened actor/asset binding assertions and UI wording;
+log `.tmp/grand-custody-native-final.log`. Both disposable schemas removed; owned
+MySQL33317 session88427 shut down normally. No preview/browser/server remains.
+
+Browser requester/recipient handoff passed, desktop1440x1000/mobile390x844 inspected.
+Sessions closed and preview8020 stopped. Synthetic paired source remains
+`.tmp/grand-source-tests-nhoggi1i`. Recovery PASS:196 default/83 finance tables,
+identity snapshot/accepted actor/audit retained, injected loss detected/restored;
+source unchanged. Backup `.codex/backups/gsov2-custody-recovery-20261017-nj9xiahl`.
+Not online MySQL/private-upload/operator recovery. External VM README/inspect/preview
+complete; preview plans v0.7.0 and updates only VERSION/CHANGELOG. No release yet.
+Next: VM release, branchCI, primary integration/push and remote verification.
+Clearance/HR separation remain unimplemented. Overall goal is incomplete.
 
 ## Published reviewed claim support
 

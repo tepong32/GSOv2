@@ -1,5 +1,7 @@
 import csv
 
+from .employee_sources import can_manage_employee_custody
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -175,6 +177,7 @@ def asset_detail(request, pk):
         "can_retire": can(request.user, "delete"),
         "can_view_audit": can_view_audit(request.user),
         "can_transfer": can_transfer_asset(request.user) and pending_transfer is None and asset.status != Asset.RETIRED and not open_maintenance,
+        "can_employee_handoff": can_manage_employee_custody(request.user),
         "pending_transfer": pending_transfer,
         "transfer_history": asset.transfers.all() if can_view_audit(request.user) else (),
         "can_request_disposal": can_request_asset_disposal(request.user, asset)
@@ -246,8 +249,8 @@ def _transfer_queryset(user):
     if not department:
         return transfers.none()
     if _is_gso_department(department):
-        return transfers.filter(asset__department_id=department.pk)
-    return transfers.filter(destination_department_id=department.pk)
+        return transfers.filter(Q(asset__department_id=department.pk) | Q(destination_custodian_user=user))
+    return transfers.filter(Q(destination_department_id=department.pk) | Q(destination_custodian_user=user))
 
 
 @asset_access_required("view")
@@ -258,6 +261,8 @@ def asset_transfer_list(request):
     for transfer in rows:
         transfer.user_can_acknowledge = can_acknowledge_asset_transfer(request.user, transfer)
         transfer.user_can_view_asset = asset_in_scope(request.user, transfer.asset)
+        transfer.user_can_cancel = (can_transfer_asset(request.user) and asset_in_scope(request.user, transfer.asset)
+            and (not transfer.destination_custodian_user_id or can_manage_employee_custody(request.user)))
     return render(request, "inventory/asset_transfer_list.html", {
         "transfers": rows,
         "is_gso": can_transfer_asset(request.user),
@@ -271,6 +276,8 @@ def asset_transfer_create(request, pk):
     if not can_transfer_asset(request.user):
         raise PermissionDenied
     asset = get_object_or_404(_scoped_assets(request.user), pk=pk)
+    if asset.custodian_user_id:
+        return redirect("inventory:employee-handoff", pk=asset.pk)
     if asset.status == Asset.RETIRED or asset.transfers.filter(status=AssetTransfer.PENDING).exists():
         messages.error(request, "This asset cannot start another handoff right now.")
         return redirect("inventory:asset-detail", pk=asset.pk)
@@ -283,7 +290,8 @@ def asset_transfer_create(request, pk):
         else:
             messages.success(request, "Handoff sent. The receiving department must acknowledge it before the assignment changes.")
             return redirect("inventory:asset-detail", pk=transfer.asset_id)
-    return render(request, "inventory/asset_transfer_form.html", {"form": form, "asset": asset})
+    return render(request, "inventory/asset_transfer_form.html", {"form": form, "asset": asset,
+        "can_employee_handoff": can_manage_employee_custody(request.user)})
 
 
 @asset_access_required("view")
@@ -295,7 +303,8 @@ def asset_transfer_acknowledge(request, pk):
     except (PermissionDenied, ValidationError) as error:
         messages.error(request, str(error))
     else:
-        messages.success(request, "Handoff acknowledged. The asset is now assigned to your department.")
+        messages.success(request, "Handoff acknowledged. The asset is now recorded in your custody."
+            if transfer.destination_custodian_user_id else "Handoff acknowledged. The asset is now assigned to your department.")
     return redirect("inventory:asset-transfer-list")
 
 

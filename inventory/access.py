@@ -95,6 +95,16 @@ def can_acknowledge_asset_transfer(user, transfer=None):
     if not can(user, "view") or not user.has_perm("inventory.acknowledge_asset_transfer"):
         return False
     department = department_for_user(user)
+    if transfer is not None and transfer.destination_custodian_user_id:
+        if transfer.destination_custodian_user_id != user.pk or transfer.requested_by_id == user.pk:
+            return False
+        from django.apps import apps
+        if not apps.is_installed("vouchers"):
+            return False
+        from vouchers.access import has_explicit_permission
+        from vouchers.roles import is_finance_uat_viewer
+        if is_finance_uat_viewer(user) or not has_explicit_permission(user, "inventory.acknowledge_asset_transfer"):
+            return False
     return bool(department and (transfer is None or transfer.destination_department_id == department.pk))
 
 

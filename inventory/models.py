@@ -112,6 +112,9 @@ class Asset(models.Model):
     assigned_department_id = models.PositiveBigIntegerField(null=True, blank=True, db_index=True)
     assigned_department_label = models.CharField(max_length=160, blank=True)
     assigned_office = models.CharField(max_length=160, blank=True, verbose_name="Assigned office / custodian")
+    custodian_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        null=True, blank=True, related_name="gso_custodied_assets")
+    custodian_snapshot = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
     returned_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True)
@@ -197,7 +200,15 @@ class AssetTransfer(models.Model):
         (CANCELLED, "Cancelled"),
     )
 
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="transfers")
+    source_custodian_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        null=True, blank=True, related_name="gso_custody_handoffs_from")
+    source_employee_snapshot = models.JSONField(default=dict, blank=True)
+    destination_custodian_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        null=True, blank=True, related_name="gso_custody_handoffs_to")
+    destination_employee_snapshot = models.JSONField(default=dict, blank=True)
+    destination_employee_checksum = models.CharField(max_length=64, blank=True)
     source_department_id = models.PositiveBigIntegerField(null=True, blank=True)
     source_department_label = models.CharField(max_length=160, blank=True)
     source_custodian = models.CharField(max_length=160, blank=True)
@@ -209,17 +220,17 @@ class AssetTransfer(models.Model):
     reference = models.CharField(max_length=120, blank=True, verbose_name="PAR / ICS / other reference")
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=PENDING, db_index=True)
     requested_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
         related_name="gso_asset_transfers_requested",
     )
     requested_at = models.DateTimeField(auto_now_add=True)
     acknowledged_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
         related_name="gso_asset_transfers_acknowledged",
     )
     acknowledged_at = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
         related_name="gso_asset_transfers_cancelled",
     )
     cancelled_at = models.DateTimeField(null=True, blank=True)

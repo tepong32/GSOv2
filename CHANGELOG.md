@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0] - 2026-10-17
+### Added
+- Add reviewed employee custody handoffs using GRAND identities
+
 ## [0.6.2] - 2026-10-17
 ### Documentation
 - Preserve historical maintenance validation references

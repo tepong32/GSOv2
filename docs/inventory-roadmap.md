@@ -62,6 +62,12 @@ Add a simple repair/work record attached to an asset: reported problem, date, se
 
 ### 4. Employee movement and exit clearance
 
+Source/design work is underway on `codex/employee-custody`; see
+[verified HR boundary and selected relationships](employee-custody-design.md).
+GRAND currently provides employee identity/current department, but no verified
+separation event. Named-custody migration, services and signed staff screens are in validation;
+clearance workflows remain unimplemented. No release or operator migration yet.
+
 After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
 
 ### 5. Consumable stock counts and low-stock reminders

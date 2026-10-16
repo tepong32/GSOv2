@@ -3,7 +3,9 @@
 Design checkpoint: 2026-10-16, Asia/Singapore. Recommended approach selected under
 the user's instruction to align the projects and avoid speculative architecture.
 Receiving is published through `7d3547f` with documentation at `9ae80c0`.
-Finance attribution remains under development, not available functionality.
+Reviewed claim support is published at28da3f1; see [claim support](claim-attribution.md).
+Maintenance is published at3905a74. [Employee custody](employee-custody-design.md)
+is the next integration design in progress; its relationships are not implemented.
 
 ## Source of truth inspected
 

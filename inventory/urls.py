@@ -3,10 +3,12 @@ from django.urls import path
 from . import views
 from . import receiving_views
 from . import maintenance_views
+from . import employee_custody_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("<int:pk>/employee-handoff/", employee_custody_views.employee_handoff, name="employee-handoff"),
     path("maintenance/", maintenance_views.maintenance_list, name="maintenance-list"),
     path("<int:pk>/maintenance/new/", maintenance_views.maintenance_open, name="maintenance-open"),
     path("maintenance/<int:pk>/", maintenance_views.maintenance_detail, name="maintenance-detail"),

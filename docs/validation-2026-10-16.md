@@ -391,3 +391,79 @@ Operator database SHA-256 remains
 No deployment or operator migration. Parallel Finance note updated without changing
 its source/migrations/shared handoff. Release-result documentation uses separate
 `codex/maintenance-release-notes`, created after fresh fetch0/0 with clean worktree.
+
+## Employee custody development checkpoint - 2026-10-17
+
+Fresh fetch on clean GSO60d12af showed0/0 before `codex/employee-custody` creation.
+Parallel GRAND remains32ab046 with unpublished Form1 work; inspected identity/profile
+files have no local differences. Source adapter and migration0017/custody services
+are under development, not released. No operator migrations or permission grants.
+
+PASS: initial actual-GRAND source integration33 discovered/28 executed/five native
+skips,3.727s; `.tmp/grand-employee-source-sqlite.log`. This preceded source refinements
+and custody service changes, so does not validate the final implementation.
+PASS: `manage.py test inventory.test_employee_custody_migration --noinput`, one test,
+0.815s: historical transfer fields/asset data preserved, distinct per-row public UUIDs,
+employee references remain null. No guessed identities from legacy labels.
+PASS: `manage.py test inventory --noinput`,67 discovered/58 executed/nine native skips,
+9.973s; `.tmp/employee-custody-shell-migration.log`. Migration drift and whitespace
+checks passed. Later owner-check ordering adjustment covered by
+`manage.py test inventory.test_employee_sources --noinput`:2/2 PASS0.012s, including
+rejection of a caller object with a forged owner in favor of the locked database row.
+
+RUNNING: expanded actual-GRAND SQLite integration, log
+`.tmp/grand-employee-custody-sqlite.log`, session60414. Poll the confirmed handle;
+do not infer failure/restart from a quiet schema-creation phase. Six custody tests
+are added alongside the four source tests. Final native races, UI, recovery and
+actor-retention review remain before release. No native server or browser is running.
+
+FAIL - CAUSED BY CURRENT WORK: run60414 finished39 discovered with one test error
+and five native skips,3.146s. New changed-department test expected ValidationError,
+but the existing department-scope check correctly raised PermissionDenied first.
+Corrected the test to assert that denial after a fresh user load; separately restore
+the department, change the identity name and assert stale-snapshot ValidationError.
+No product authority check was loosened. Prior run's disposable databases removed.
+Corrected full integration run86403 is live, log
+`.tmp/grand-employee-custody-sqlite-corrected.log`; poll before any restart.
+
+Corrected run86403 PASS39 discovered/34 executed/five native skips2.927s. The
+subsequent signed HTTP workflow is under validation in `.tmp/grand-custody-http.log`.
+PASS: latest shell `manage.py test inventory --noinput`,69 discovered/60 executed/
+nine native skips9.666s; `manage.py makemigrations --check --dry-run` clear.
+PASS: `scripts/run_mysql_tests.py`, native MySQL8.4.11,69/69 in28.912s; log
+`.tmp/custody-native-shell.log`. Includes populated0017 replay and protection of
+requested_by/acknowledged_by/cancelled_by historical actors. No operator data used.
+
+FAIL - CAUSED BY CURRENT WORK: new HTTP run42 tests, three errors/five native
+skips3.435s. The minimal joined directory query used nested `__pk` in `.only`,
+which Django does not resolve as a concrete field in its nested select mask. Fixed
+the query to GRAND's concrete `id` fields and retained the minimal column boundary.
+Search results also apply GRAND's existing profile-view predicate. Full native
+GRAND run is in progress at `.tmp/grand-custody-native.log` (session60476).
+
+PASS: actual GRAND native44/44 in12.481s, `.tmp/grand-custody-native.log`.
+Includes duplicate-request and acknowledgment/cancellation races. Existing23 GRAND
+W036 warnings remain; none from inventory/inventory_finance. Subsequent final run
+covers tighter actor/asset token binding assertions and final UI wording.
+PASS: final standalone SQLite69 discovered/60 executed/nine native skips9.882s,
+`.tmp/custody-shell-release.log`. Both environments' pip checks clear. Actual GRAND
+`check` and `makemigrations inventory inventory_finance --check --dry-run` pass via
+isolated harness settings (no operator environment or databases).
+PASS: browser search/review/submit then separate recipient acknowledgment. No owner
+cancel action offered to incoming recipient from another GSO office. Desktop1440x1000
+and mobile390x844 inspected; no page overflow or duplicate IDs; tables scroll inside
+panel. Screenshots `output/playwright/custody-*.png`. Missing synthetic logo/avatar
+404s only. Sessions and preview8020 stopped; no operator deployment.
+PASS: stopped paired SQLite recovery196 default/83 finance tables, retained named
+custody/snapshot/accepted actor/audit. Injected loss detected and restored; source
+hashes unchanged. Backup `C:/Users/Administrator/.codex/backups/gsov2-custody-recovery-20261017-nj9xiahl`.
+Not online MySQL/private-upload/operator recovery. Canonical operator DB hash unchanged.
+Parallel Finance fresh fetch0/0; its unpublished Form1 role additions do not change
+the UAT predicate used here. Only the separate GSO integration note was edited there.
+
+PASS: final actual-GRAND native44/44 in11.095s, no skips,
+`.tmp/grand-custody-native-final.log`, including tightened actor/asset token binding.
+Both schemas removed; verified no GSO test schemas remain on owned33317, followed by
+normal SQL SHUTDOWN and process completion. No preview/browser/test server remains.
+VM inspect/preview plans the custody minor release, updates only VERSION/CHANGELOG.
+Repository has no rulesets or master protection; branchCI remains the release gate.
