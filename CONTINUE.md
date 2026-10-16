@@ -5,7 +5,7 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Current work: supplies ledger validation
+## Published supplies ledger validation
 
 Previous turn published return notes v0.9.1/e7483a6; branchCI38951646913 and primary
 CI38951773610 PASS. Fresh fetch and clean0/0 preceded `codex/stock-ledger-validation`.
@@ -21,6 +21,12 @@ and owned MySQL33317 session61913 shut down normally. See
 [stock-count design](docs/stock-counts.md). No schema or operator
 data changes. Complete this integrity prerequisite before reviewed physical counts;
 HR-reference clearance and financial relationships remain in scope.
+
+Actual VM patch releasecbece6c, tagv0.9.2, is integrated/pushed to master after
+branchCI38952776429 PASS31s. Remote master/tag matchcbece6c9d2875d1b255be29c03ac29ce72ae23ba.
+PrimaryCI38952884082 PASS41s. Documentation follow-up uses separate
+`codex/stock-ledger-release-notes`, created after clean fetch0/0. Next implement
+the documented reviewed physical-count workflow; it is not implemented by this fix.
 
 ## Published witnessed returns
 

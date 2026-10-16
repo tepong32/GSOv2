@@ -595,3 +595,10 @@ file format, migration or backup boundary changed. The shared service path and a
 permission helper are tested; prior paired recovery evidence remains applicable.
 No operator migration, permission grant, deployment, Finance posting or official
 supplies form is claimed. Physical-count workflow remains next work.
+
+Actual VM patch releasecbece6c integrated/pushed to canonical master after
+branchCI38952776429 PASS31s; remote master/tag match
+cbece6c9d2875d1b255be29c03ac29ce72ae23ba. PrimaryCI38952884082 PASS41s.
+Operator DB SHA-256 unchanged at5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Documentation follow-up uses separate `codex/stock-ledger-release-notes` after
+clean fetch0/0, with no code, schema or storage changes.

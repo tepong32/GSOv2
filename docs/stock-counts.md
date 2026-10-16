@@ -1,7 +1,7 @@
 # Supplies ledger and physical counts
 
-Current development branch: `codex/stock-ledger-validation`. See [CONTINUE](../CONTINUE.md)
-for publication and validation evidence. Counts and independently reviewed count
+Ledger prerequisite published atcbece6c. See [CONTINUE](../CONTINUE.md)
+for release and validation evidence. Counts and independently reviewed count
 adjustments remain unimplemented; this prerequisite hardens their underlying ledger.
 
 ## Existing ledger controls

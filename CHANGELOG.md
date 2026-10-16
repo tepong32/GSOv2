@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.3] - 2026-10-17
+### Documentation
+- Record stock integrity validation and next count workflow
+
 ## [0.9.2] - 2026-10-17
 ### Fixed
 - Validate supply ledger inputs and GRAND stock authority
