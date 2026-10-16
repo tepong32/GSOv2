@@ -93,7 +93,7 @@ def propose(request, case_id):
                 "receipt_basis": receipt_basis(data["receipt_line"])}
             confirmation = ConfirmProposalForm(initial={"proposal_token": signing.dumps(payload, salt=TOKEN_SALT)})
             preview = {"source": source["source"], "amount": data["amount"], "basis": data["basis"],
-                       "receipt_line": data["receipt_line"]}
+                       "receipt_line": data["receipt_line"], "receipt_basis": payload["receipt_basis"]}
         except ValidationError as exc:
             form.add_error(None, exc)
     return render(request, "inventory_finance/propose.html", {

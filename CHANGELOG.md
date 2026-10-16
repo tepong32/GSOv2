@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.12.0] - 2026-10-17
+### Added
+- Add independently reviewed documentary receipt cost amendments
+
 ## [0.11.3] - 2026-10-17
 ### Fixed
 - Align legacy inventory authority with GRAND explicit grants

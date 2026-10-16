@@ -802,3 +802,51 @@ Both aliases destroyed; owned MySQL33317 stopped normally after confirming no
 remaining GSO test schemas. Finance33308 untouched. Operator DB hash unchanged:
 5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 VM README, inspect and patch preview checked; release contains intended changes.
+
+## Reviewed documentary receipt cost amendments — 2026-10-17
+
+Fresh fetch clean0/0 at83570a2, branch `codex/receipt-cost-amendments`; GRAND32ab046
+fetched0/0 with active Form1 changes preserved. Implementation: inventory0020 adds
+amendments/events; optional adapter0003 declares dependency, no operations. No
+operator grants/migration/deployment. Original accepted receipt, asset and stock
+values retained; new claim support uses reviewed documentary cost, not valuation.
+
+PASS commands and scope:
+- standalone `manage.py test inventory.test_receipt_amendments --verbosity 1`:
+  5/5,0.485s, `.tmp/receipt-amendments-focused.log`.
+- standalone `manage.py test --verbosity 1`:99 discovered/85 executed/14 native
+  skips,28.913s, `.tmp/receipt-amendments-shell-sqlite.log`.
+- `python scripts/run_mysql_tests.py`:99/99,86.671s, zero skips,
+  `.tmp/receipt-amendments-shell-native.log`. Includes populated receiving migration
+  and native duplicate-record/review races; all existing dependent regressions.
+- actual GRAND focused SQLite adapter tests:2/2,0.441s,
+  `.tmp/receipt-amendments-grand-focused.log` (fixture runner uses production harness).
+- `python scripts/run_grand_source_tests.py --grand-root <pinned32ab046> --mysql`:
+  83/83,27.208s, `.tmp/receipt-amendments-grand-native.log`. Includes actual amendment
+  commit while claim approval demonstrably waits on receipt lock; stale approval
+  rejected after commit. Existing23 non-GSO W036 warnings remain, no new GSO warning.
+- copied actual-GRAND fixture targeted `migrate inventory_finance` applies prerequisite
+  inventory0020 and adapter0003, preserves receipt/asset row snapshots; both-app
+  `makemigrations --check --dry-run` PASS. Dependency-only0003 was added during
+  native setup and separately exercised by this focused migration-graph check;
+  `.tmp/receipt-amendments-migration-graph.log`. No added DDL beyond tested0020.
+- standalone migration drift and `python -m pip check`: PASS.
+
+PASS browser: actual GRAND record75.00 against accepted100.00, upload private source,
+review as different explicitly granted GSO user, approved history retains both.
+Desktop/mobile screenshots visually inspected at `output/playwright/receipt-amendment-approved-{desktop,mobile}.png`.
+Mobile390 viewport/client375/scroll375, no duplicate IDs. Preview8027 and browser
+stopped; no human/legal acceptance claimed.
+
+PASS stopped paired recovery:203 default/83 finance tables and3 private files;
+original asset/receipt100/effective75 and both events retained. Missing file, changed
+file and removed approval event detected and recovered only in restored copy.
+Source unchanged. Backup
+`C:/Users/Administrator/.codex/backups/gsov2-receipt-amendments-recovery-20261017-g1qxchpl`;
+manifest records hashes/table reconciliation. `.tmp/receipt-amendments-recovery.log`.
+Both native schemas destroyed and owned33317 shut down normally; Finance33308
+untouched. Canonical operator DB SHA256 remains
+5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+NOT RUN - OUT OF SCOPE: online/operator recovery, deployment/grants, quantity
+reversal, Accounting valuation/JEV changes, official-form or LGU acceptance.
+Actual external VM README/inspect/minor preview checked before publication.

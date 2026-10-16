@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from . import receiving_views
+from . import receipt_amendment_views
 from . import maintenance_views
 from . import employee_custody_views
 from . import custody_review
@@ -11,6 +12,9 @@ from . import stock_count_views
 app_name = "inventory"
 
 urlpatterns = [
+    path("receiving/lines/<int:pk>/cost-amendments/", receipt_amendment_views.amendments, name="receipt-amendments"),
+    path("receiving/cost-amendments/<int:pk>/", receipt_amendment_views.amendment_detail, name="receipt-amendment-detail"),
+    path("receiving/cost-amendments/<int:pk>/evidence/", receipt_amendment_views.amendment_evidence, name="receipt-amendment-evidence"),
     path("stock-counts/", stock_count_views.count_list, name="stock-count-list"),
     path("consumables/<int:pk>/count/", stock_count_views.count_start, name="stock-count-start"),
     path("stock-counts/<int:pk>/", stock_count_views.count_detail, name="stock-count-detail"),

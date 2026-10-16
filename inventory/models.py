@@ -1,3 +1,4 @@
+from pathlib import Path
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.core.files.storage import FileSystemStorage
@@ -1180,3 +1181,52 @@ class StockCountEvidence(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Count evidence is retained.")
+
+
+def receipt_amendment_path(instance, filename):
+    return f"inventory/receipt-amendments/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class ReceiptCostAmendment(models.Model):
+    """Reviewed documentary cost; original inventory/Accounting values stay intact."""
+    PENDING, APPROVED, REJECTED = "pending", "approved", "rejected"
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    line = models.ForeignKey(ReceivingLine, on_delete=models.PROTECT, related_name="cost_amendments")
+    predecessor = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True, related_name="successors")
+    basis = models.JSONField()
+    unit_cost = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+    reference = models.CharField(max_length=180)
+    reason = models.TextField(max_length=4000)
+    file = models.FileField(storage=disposal_private_storage, upload_to=receipt_amendment_path, max_length=255)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    content_checksum = models.CharField(max_length=64)
+    status = models.CharField(max_length=12, choices=((PENDING,"For review"),(APPROVED,"Approved"),(REJECTED,"Rejected")), default=PENDING)
+    state_version = models.PositiveIntegerField(default=1)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_cost_amendments_recorded")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_cost_amendments_reviewed")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.TextField(blank=True, max_length=4000)
+    pending_line = models.GeneratedField(expression=models.Case(
+        models.When(status="pending", then=models.F("line")), default=None,
+        output_field=models.BigIntegerField()), output_field=models.BigIntegerField(), db_persist=False, null=True)
+
+    class Meta:
+        ordering = ("-pk",)
+        permissions = (("record_receiptcostamendment", "Can record documentary receipt cost amendments"),
+                       ("review_receiptcostamendment", "Can independently review documentary receipt cost amendments"))
+        constraints = [models.UniqueConstraint(fields=("pending_line",), name="gso_one_pending_cost_amendment"),
+            models.CheckConstraint(condition=models.Q(unit_cost__isnull=True) | models.Q(unit_cost__gte=0), name="gso_amendment_nonnegative_cost")]
+
+
+class ReceiptCostAmendmentEvent(models.Model):
+    amendment = models.ForeignKey(ReceiptCostAmendment, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    action = models.CharField(max_length=16)
+    snapshot = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("pk",)

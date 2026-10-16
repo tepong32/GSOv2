@@ -10,6 +10,7 @@ from django.utils import timezone
 from inventory.access import department_for_user, gso_department_for_user
 from inventory.finance_sources import resolve_claim_line
 from inventory.models import ReceivingLine, ReceivingReceipt
+from inventory.receipt_amendments import latest_amendment, verify_amendment_evidence
 from vouchers.access import can_manage_owned_case_artifact, has_explicit_permission
 from vouchers.roles import is_finance_uat_viewer
 
@@ -65,10 +66,14 @@ def _accepted_line(pk, *, owner_id=None):
 
 
 def _receipt_support_limit(line):
-    if line.unit_cost is None or line.unit_cost <= 0:
+    amendment = latest_amendment(line)
+    if amendment:
+        verify_amendment_evidence(amendment)
+    cost = amendment.unit_cost if amendment else line.unit_cost
+    if cost is None or cost <= 0:
         raise ValidationError("This receipt needs a positive documented unit cost before claim support can be recorded.")
     # Documentary ceiling, not an Accounting acquisition-cost determination.
-    return line.accepted_quantity * line.unit_cost
+    return line.accepted_quantity * cost
 
 
 @transaction.atomic(using="default")

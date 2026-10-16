@@ -227,3 +227,14 @@ pattern when a real cross-store write becomes necessary. No new sync framework.
 
 Production remains unaccepted. Human legal/accounting acceptance cannot be supplied
 by choosing the recommended engineering approach.
+
+## Reviewed documentary cost amendments
+
+See [cost corrections](receipt-cost-corrections.md). Inventory0020 is operational
+`default` data only; optional adapter0003 declares that prerequisite. Preserve
+amendment UUID, receipt-line mapping, predecessor, original/effective basis, source
+hash/size, native actors and decision events when merging/importing. Local foreign
+keys are not portable identifiers. No asset/stock/FIFO value or Finance posting is
+rewritten. New claim support pins the accepted amendment identity/checksum and uses
+its documentary cost ceiling; stale approved support requires explicit withdrawal.
+No new Finance party, ledger, posting or cross-store relationship is introduced.

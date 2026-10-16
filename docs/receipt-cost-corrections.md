@@ -10,7 +10,8 @@ Accepted receiving records cannot be edited through the receiving service.
 Acceptance copies documented unit cost into an asset acquisition-cost field or a
 stock receipt and optional FIFO lot. Those materialized facts are not a safe target
 for a later invoice correction: stock may have been issued and asset custody may
-already have changed. No current correction or revaluation workflow is claimed.
+already have changed. A separate reviewed documentary amendment now records corrected source cost;
+no financial revaluation workflow is claimed.
 
 Claim support previously retained the Finance claim source but used the receipt's
 live quantity and cost. Its signed preview also omitted receipt facts, and the
@@ -42,7 +43,7 @@ not silently erased or retargeted, and withdrawal retains its original approval.
 Evidence metadata snapshots do not establish file authenticity or replace the
 receiving private-file integrity checker and coordinated backup.
 
-## Recommended next workflow — not implemented
+## Implemented documentary amendment workflow
 
 1. Retain an explicit amendment to a selected accepted receipt line, with its own
    UUID, original/effective documented unit cost, reason, source document, actor,
@@ -62,10 +63,44 @@ receiving private-file integrity checker and coordinated backup.
    value does not retrospectively change an approval or authorize a journal reversal.
 5. Validate retained predecessor facts, duplicate submission, concurrent amendment
    and approval, evidence loss/corruption, populated upgrades and paired recovery.
-   Deliver the record/upload/review/history screens with the service, not merely tables.
+   Record/upload/review/history screens and private downloads accompany the service.
 
 These are engineering decisions, not asserted COA valuation rules. Before financial
 allocation or official output, verify applicable primary texts and the LGU's actual
 Accounting workflow. See [GRAND design](grand-integration-design.md),
 [claim support](claim-attribution.md), [COA sources](coa-requirements.md) and
 [validation](validation-2026-10-16.md).
+
+## Storage and integration details
+
+Inventory migration0020 adds ReceiptCostAmendment and retained decision events in
+`default`, with protected native actors/line/predecessor links, public UUID and a
+virtual pending-line marker with an ordinary unique constraint. It creates no
+historical amendments and changes no existing rows. Optional adapter migration0003
+has no operations: it declares the inventory0020 prerequisite for adapter-only
+migration targets. Existing migration history is unchanged.
+
+The first version retains one required private correcting document per proposal
+(max15 MB, existing PDF/image validation). Submitted content has no edit route;
+reject and submit a replacement to correct it. One pending amendment per line,
+request identity replay checks, receipt locking, content checksum and source-file
+checks protect normal service writes. Checksum evidence detects changes; it does
+not authenticate documents or defeat privileged database/file administrators.
+Pending and rejected amendments do not change the effective cost. Unknown remains
+NULL and zero remains zero; neither establishes positive claim-support capacity.
+
+Recording/review require separate explicit `record_receiptcostamendment` /
+`review_receiptcostamendment` grants, existing receiving view permission and the
+owning GSO department. No grants are installed automatically. GRAND UAT users
+cannot mutate. A proposer cannot review their correction. Approved documentary
+costs may differ from stored asset/stock values, visibly and deliberately; Accounting
+must resolve financial treatment separately. Receipt version changes conservatively
+invalidate older support bases, including other lines on that receipt.
+
+Backup both stores and all private evidence. Run
+`python manage.py check_receipt_amendment_evidence` alongside receiving evidence
+checks on a stopped-write backup or isolated restore. The checker changes nothing
+and reports missing/changed/unsafe/unreferenced files. See CONTINUE and validation
+for native, browser, migration and recovery outcomes. Operator installation, local
+legal/Accounting acceptance, quantity correction/reversal, taxes/freight allocation
+and financial revaluation remain outside this implemented slice.

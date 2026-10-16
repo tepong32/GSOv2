@@ -31,7 +31,9 @@ do not grant roles or migrate operator data.
 
 Unaccepted quantities never enter stock. Accepted receipts are read-only. Later
 deliveries need their own records and source evidence. Incremental acceptance of
-pending remainders and accepted-receipt correction/reversal are not yet implemented.
+pending remainders and accepted quantity correction/reversal are not yet implemented.
+[Reviewed documentary cost amendments](receipt-cost-corrections.md) preserve the
+original accepted facts and separately record a corrected source cost.
 Investigate mistaken acceptance before using existing adjustment routes; never
 rewrite retained source links/history. Separate drafts with the same source-reference
 text are not automatically deduplicated; reviewers must check the source packet.

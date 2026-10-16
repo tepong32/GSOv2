@@ -86,6 +86,13 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   taking receipt locks, keep case → receipt → attribution order, and retain original
   approvals when stale links are withdrawn. See [cost correction design](docs/receipt-cost-corrections.md).
 
+- Receipt cost amendments retain original accepted line/asset/stock values. Require
+  private correcting evidence, exact nullable cost and independent GSO review.
+  Serialize on receipt before amendment; never lock Finance cases from that path.
+  Approval bumps receipt version and makes older claim support stale. New support
+  uses the reviewed documentary ceiling, not an Accounting valuation. Include
+  `inventory/receipt-amendments` in paired recovery and run its evidence checker.
+
 ## Validation
 
 Start with affected tests; expand for model, migration, auth, shared service and

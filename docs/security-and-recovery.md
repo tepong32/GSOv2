@@ -134,3 +134,10 @@ The internal read_only argument is only for read routes/navigation; it must neve
 be derived from request input or passed by mutation services. Department/owner,
 independent review and lifecycle checks still apply separately. No data migration,
 public service, authentication backend or Finance posting path is introduced.
+
+Receipt amendment evidence is private under `inventory/receipt-amendments` and must
+be included with the database pair in recovery. Use the read-only
+`check_receipt_amendment_evidence` command alongside existing evidence checks.
+Amendment review checks retained bytes and content/predecessor basis; unknown/zero
+cost never creates positive claim-support capacity. No amendment or recovery
+fixture authorizes an operator migration, grant or deployment.

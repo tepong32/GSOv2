@@ -5,6 +5,43 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Reviewed documentary cost amendments
+
+Started `codex/receipt-cost-amendments` after fresh clean fetch0/0 at83570a2.
+Previous releasev0.11.3 integrated/pushed; branchCI38960485867 and primary
+CI38960603192 PASS. GRAND fetched0/0 at32ab046; active Form1 handoff inspected,
+all parallel implementation preserved. Only its GSO coordination note is updated.
+
+Inventory0020 adds amendments/events with private correcting source, exact nullable
+cost, protected predecessor/actors and one pending line constraint. Signed record
+screen, independent decision, scoped download and history retain original/effective
+facts. Original receipt/asset/stock/FIFO values remain unchanged. Approval increments
+receipt version, invalidating prior claim support; new support pins amendment and
+uses its documentary ceiling. No Accounting entry, valuation decision or quantity
+correction. Optional adapter0003 declares inventory0020 dependency, no operations.
+
+Focused standalone5/5 PASS0.485s; full SQLite99/85 executed/14 native skips
+PASS28.913s; native99/99 PASS86.671s. Actual GRAND focused SQLite2/2 PASS0.441s;
+full native83/83 PASS27.208s, including actual amendment/claim-approval lock wait.
+Populated migration, idempotent submission/review races, scoped HTTP, corrupted
+source denial and stale support withdrawal pass. Existing23 non-GSO W036 warnings
+remain. Adapter-only migration target and both-app drift checks pass on copied
+fixture; no existing receipt/asset rows changed. Dependency check passes.
+
+Browser record/upload then different reviewer approval100→75 passes; desktop/mobile
+screens inspected, mobile width375 equals scroll375, no duplicate IDs. Preview8027
+and browser stopped. Stopped paired recovery preserves203 default/83 finance tables
+and3 private files; original asset100/effective75 and approval history retained.
+Missing/changed evidence and removed approval event detected/restored. Backup:
+`C:/Users/Administrator/.codex/backups/gsov2-receipt-amendments-recovery-20261017-g1qxchpl`.
+Source/operator DB unchanged. Native schemas removed and owned MySQL33317 stopped.
+VM minor preview inspected; publication follows branch CI. See validation record.
+
+Next: financial quantity/cost allocation and journal relationships using GRAND's
+existing authorities; HR-reference clearance and official outputs remain incomplete.
+Quantity correction/reversal and financial revaluation are not implemented. Overall
+goal stays active; code release does not install migrations/grants in GRAND/operator stores.
+
 ## Legacy asset authority alignment
 
 Fresh GSO fetch clean0/0 atb232924, branch `codex/asset-authority`. Prior receiving
@@ -25,8 +62,8 @@ PASS25.996s including added same-office UAT handoff denial. Existing23 non-GSO
 W036 warnings remain. Browser scoped UAT disposal/count history verified without
 write controls; mobile count no page overflow. No schema/storage changes.
 Preview8026/browser stopped, both native test schemas removed, owned MySQL33317
-shut down normally. Operator DB unchanged. VM patch preview inspected; publication
-follows branch CI. Next: reviewed documentary cost amendments and Finance
+shut down normally. Operator DB unchanged. VM release83570a2/v0.11.3 integrated/pushed;
+branch and primary CI passed. Next: reviewed documentary cost amendments and Finance
 quantity/cost/JEV relationships. HR-reference clearance and official outputs remain incomplete.
 
 ## Receiving authority correction
