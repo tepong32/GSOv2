@@ -1,0 +1,4 @@
+# Optional native validation dependencies; the standalone runtime remains SQLite.
+-r requirements.txt
+PyMySQL==1.1.1
+cryptography==50.0.2

@@ -1,6 +1,7 @@
 import csv
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -57,8 +58,12 @@ def _scoped_assets(user):
     return Asset.objects.filter(assigned_department_id=department.pk)
 
 
-@asset_access_required("view")
+@login_required
 def dashboard(request):
+    if not can(request.user, "view"):
+        from .receiving import require_receiving
+        require_receiving(request.user, "view")
+        return redirect("inventory:receiving-list")
     assets = _scoped_assets(request.user)
     return render(request, "inventory/dashboard.html", {
         "department": department_for_user(request.user) or gso_department_for_user(request.user),
@@ -175,9 +180,13 @@ def asset_detail(request, pk):
 def asset_create(request):
     form = AssetForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        asset = create_asset(actor=request.user, data=form.cleaned_data)
-        messages.success(request, "Asset added to the register.")
-        return redirect("inventory:asset-detail", pk=asset.pk)
+        try:
+            asset = create_asset(actor=request.user, data=form.cleaned_data)
+        except ValidationError as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Asset added to the register.")
+            return redirect("inventory:asset-detail", pk=asset.pk)
     return render(request, "inventory/asset_form.html", {"form": form, "heading": "Add an asset"})
 
 
@@ -197,9 +206,13 @@ def asset_edit(request, pk):
         return redirect("inventory:asset-detail", pk=asset.pk)
     form = AssetForm(request.POST or None, instance=asset)
     if request.method == "POST" and form.is_valid():
-        asset = update_asset(actor=request.user, asset=asset, data=form.cleaned_data)
-        messages.success(request, "Asset record updated.")
-        return redirect("inventory:asset-detail", pk=asset.pk)
+        try:
+            asset = update_asset(actor=request.user, asset=asset, data=form.cleaned_data)
+        except ValidationError as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Asset record updated.")
+            return redirect("inventory:asset-detail", pk=asset.pk)
     return render(request, "inventory/asset_form.html", {"form": form, "asset": asset, "heading": "Edit asset"})
 
 

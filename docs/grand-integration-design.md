@@ -120,10 +120,10 @@ pattern when a real cross-store write becomes necessary. No new sync framework.
    row counts, quantities, money and evidence checksums before accepting a batch.
    This importer is planned, not implemented. Do not import standalone passwords
    or grant privileges merely because a source user had them.
-5. Native MySQL validation is required before GRAND merge: the current GSO app
-   already uses conditional unique constraints that MySQL ignores. Resolve those
-   existing open-transfer/disposal identities with GRAND's supported generated-key
-   approach and duplicate preflights. SQLite tests cannot close this gate.
+5. Native MySQL validation is required before GRAND merge. GSO0015 replaces inherited
+   conditional uniqueness with generated markers and duplicate preflights, following
+   GRAND's pattern. Standalone MySQL tests pass, including races and populated upgrades;
+   GRAND router/two-store integration is still unverified. See [native tests](native-testing.md).
 6. Use GRAND's coordinated default/finance backup and restore procedure, separately
    capturing private uploads and exports. Keep pre-import backup, source package,
    import mapping and reconciliation receipt. Rehearse restore before cutover.

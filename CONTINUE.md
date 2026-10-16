@@ -1,82 +1,69 @@
 # GSO continuation
 
-Checkpoint: 2026-10-16 (Asia/Singapore). The active goal is a practical, secure LGU
-inventory/general-services system integrated with GRAND; it is **not complete**.
+Checkpoint: 2026-10-17, Asia/Singapore. Overall goal remains active and incomplete.
+Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-design.md),
+[COA sources](docs/coa-requirements.md), [receiving](docs/receiving.md) and
+[validation](docs/validation-2026-10-16.md).
 
-## Current work
+## Receiving release candidate
 
-Feature branch `codex/receiving-safety`, worktree
-`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, from fetched
-`origin/master` `64e458a`. At initial inspection local and remote commits matched;
-the canonical `db.sqlite3` was modified and has been preserved, not migrated.
+Branch `codex/receiving-inspection`, worktree
+`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on `405f360`.
+Fresh fetch: HEAD/master 0/0; all listed local changes belong to this feature.
+Version Manager inspect and minor preview completed: only VERSION/CHANGELOG updated
+by the tool. Release/integration/push pending. Recheck live Git/CI before resuming.
+No required PR/protection/ruleset found in the release check.
 
-This checkpoint adds portable asset/supply/movement UUIDs and export columns,
-GRAND-matched dependencies, production-setting checks, corrected stock ownership
-and service input boundaries. Runtime SQLite and the tracked user image are
-removed from the new Git tree while local files/history are retained. Existing
-count/reconciliation, disposal and handoff capabilities remain the prior baseline.
+Implemented migrations 0013/0014: receipt/line/evidence/history, draft corrections,
+retained voids, protected uploads/downloads, submission and independent review.
+Acceptance atomically materializes accepted assets/supply quantities. Version checks
+prevent replay; owner locking protects identifier allocation. No automatic financial
+posting/classification, role grants, operator migration or production deployment.
+See receiving guide for accepted-receipt reversal and remainder limitations.
 
-User direction: spend time on actual Finance data relationships, avoid invented
-requirements/over-engineering, and record notes for the parallel Finance work.
-[Data design](docs/grand-integration-design.md) maps inspected GRAND models and
-sets the small receiving/inspection workflow before financial attribution.
-[COA evidence](docs/coa-requirements.md) explicitly distinguishes source metadata,
-verified text and outstanding annex/transition review. No official-form compliance,
-automatic accounting, production readiness or complete inventory system is claimed.
+0015 replaces transfer/disposal conditional uniqueness with GRAND's nullable generated
+marker pattern. Virtual markers permit populated SQLite upgrades; STORED additions
+failed in rehearsal. Duplicate preflight stops before DDL without rewriting history.
+Native tests cover direct/concurrent inserts, close/reopen and populated upgrades.
 
-A separate integration note was written at
-`C:/Users/Administrator/.codex/worktrees/finance-form1-treatments/grand/docs/GSO_INTEGRATION_REVIEW.md`.
-It is an **unpublished local note only**, preserving GRAND's current no-publication
-boundary and concurrent code/CONTINUE edits. Do not stage or release the Finance work
-from this task. Do not change its current Form 1 priority just to add inventory hooks.
+Validation: MySQL 45/45 PASS (9.867s), no warnings/skips; SQLite 39 executed plus six
+native-only skips PASS (4.943s). Migration drift and pip check PASS; runtime/optional
+native dependency audit found no known vulnerabilities. Browser draft creation/list/
+draft and accepted detail inspected at 1440x1000 and 390x844; no phone overflow or
+nonempty duplicate IDs. Enforced-CSRF HTTP tests cover the complete clerk/reviewer flow.
 
-## Validation and preservation
+Read-only evidence check reports missing/changed/unsafe/unreferenced files. Synthetic
+SQLite DB+evidence restore passed including corruption recovery. Populated 0012-to-0014
+copy preserved 42 rows across 37 tables; 0015 tests preserve lifecycle history.
+Rehearsal artifacts: `.codex/backups/gsov2-receiving-rehearsal-20261017-001404`.
+Owned MySQL fixture on port 33317 stopped; random test schemas verified removed.
+No actual GRAND router/two-store or human acceptance is claimed.
 
-[Validation log](docs/validation-2026-10-16.md) records scope and exact commands.
-Full shell suite: 16/16 pass. Migration drift, system checks, pip consistency and
-dependency audit pass. Production system check has only the documented HSTS
-subdomain/preload warnings. No native MySQL, real GRAND merge, official-form replay,
-internet deployment or full recovery acceptance has occurred.
+## Preservation and parallel work
 
-Operator preservation material is outside Git at
-`C:/Users/Administrator/.codex/backups/gsov2-20261016-before-untracking`:
-exact database copy, SQLite backup API snapshot, tracked user image, hash manifest.
-The snapshot passed integrity_check. This is not a complete evidence backup.
-The canonical operator database must retain its original hash throughout release.
+Canonical repo: `C:/Users/Administrator/Desktop/GH/GSOv2`, primary `master`.
+Operator DB/photo are ignored and must not be migrated by code release. Backup:
+`.codex/backups/gsov2-20261016-before-untracking` (raw DB, backup snapshot, image,
+manifest and stash reference). Operator DB SHA-256:
+`5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
+Preserve ignored files and historical evidence. This is not complete operator recovery.
+Previous published foundation: `e642d9e`, documentation `405f360`; primary CI
+38928123403 and 38928528769 passed.
 
-## Published prerequisite
-
-Version Manager created `v0.3.0` at `e642d9edc0c8f98c2cc9b01dcb900c776d0385f2`.
-Feature branch and tag were pushed and verified. The feature
-[CI run](https://github.com/tepong32/GSOv2/actions/runs/38927980234) passed before
-fast-forward integration. Canonical `master` and remote `master` were verified at
-the same commit (0 ahead / 0 behind); its
-[primary run](https://github.com/tepong32/GSOv2/actions/runs/38928123403) also passed.
-Recheck current remote state before the next feature. No branch protection/ruleset required
-a PR at this checkpoint; no review policy was bypassed.
-
-The canonical database's local changes were retained in a named Git stash and the
-external backup before integration, then its original bytes and the user image
-were restored and re-hashed. The files now remain local/ignored. No operator
-migration occurred. A separate restored **copy** successfully migrated through 0012;
-all original table row counts, stock links, UUID uniqueness and SQLite integrity
-passed. The source database's hash still matches the preservation manifest.
-
-Only completed GSO work belongs in this release. Never commit preserved runtime
-files or publish GRAND's parallel changes. Check live Git/CI before resuming;
-the documentation follow-up may advance primary beyond this feature checkpoint.
+GRAND active worktree: `.codex/worktrees/finance-form1-treatments/grand`, branch
+`codex/finance-form1-print-evidence`. Form1 work remains unpublished. Separate
+`docs/GSO_INTEGRATION_REVIEW.md` holds GSO notes and populated generated-column
+upgrade advice. No Finance code/migrations/shared handoff changed. Do not publish its
+parallel work; fetch and inspect its current source before adapter work.
 
 ## Next work
 
-1. Verify the primary check and any documentation follow-up against live Git/CI.
-2. Fetch/check sync again, then use a new feature branch for the receipt header/
-   line workflow in the design: inspection evidence, partial/rejected quantities,
-   independently accepted serialized assets/supply movements and retry protection.
-3. Retrieve the full official COA 2024-006 text and relevant 2002-003/2023-004 annexes;
-   retain exact applicable sections before official treatment/form implementation.
-4. Follow with reviewed source allocations using existing GRAND Finance identities
-   and policies. Recheck its active worktree, avoid code dependency on local paths,
-   and implement only concrete adapters needed by the tested flow.
-5. Continue maintenance, stock counts/requisitions, employee custody/clearance,
-   general-office records and accepted outputs as [roadmapped](docs/inventory-roadmap.md).
-   Native MySQL constraint/race checks and coordinated recovery remain integration gates.
+1. Complete final release checks and actual VM release/integrate/push; verify remote
+   tag/primary and CI, and preserve operator hash. Update this checkpoint.
+2. On a new feature branch after fresh sync, implement concrete reviewed Finance
+   attribution using existing parties/claims/posting identities, without duplicating
+   authority. Recheck actual GRAND state first.
+3. Complete COA source/annex review: 2024-006 main four pages verified, remaining
+   annexes and relevant 2002-003/2023-004 text need review before official outputs.
+4. Continue maintenance, stock counts, custody/clearance, general-office records,
+   accepted outputs, GRAND import/router and coordinated recovery work per roadmap.

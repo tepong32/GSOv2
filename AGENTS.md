@@ -38,6 +38,10 @@ is retained legacy evidence, not an active application.
   procedure is the integration target; a CSV or Git tag is not a data backup.
 - Prefer the smallest vertical workflow using established services. No generic
   synchronization bus, duplicate ERP, speculative schema, or automatic accounting.
+- Lifecycle uniqueness uses GRAND's generated nullable-marker pattern with ordinary
+  unique constraints. GSO markers are virtual so populated SQLite upgrades work;
+  test populated migrations as well as fresh MySQL schemas. Never auto-deduplicate
+  historical cases to make a migration pass.
 
 ## Validation
 

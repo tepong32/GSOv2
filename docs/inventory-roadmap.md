@@ -17,8 +17,9 @@ owns immediate state; [validation](validation-2026-10-16.md) owns test evidence.
 
 The first prerequisite supplies portable inventory UUIDs, GRAND-matched runtime
 versions, production settings checks, stock-owner enforcement and runtime-data
-exclusion from Git. It does not yet implement receiving or a Finance adapter.
-Next implement receiving/inspection before financial attribution, then the existing
+exclusion from Git. A Finance adapter remains planned.
+Receiving/inspection is now implemented as described in [receiving operations](receiving.md).
+Next implement reviewed financial attribution, then the existing
 maintenance/clearance/stock-count sequence. Later general-office records should use
 GRAND's records/custody/HR capabilities where available instead of duplicating them.
 
@@ -32,7 +33,12 @@ The working comparison distinguishes found and matched, differences in serial/de
 
 COA's published guidance describes an annual PPE physical count presented on RPCPPE (Appendix 71) as of December 31 and submitted to the auditor by January 31. DBM's LGU Internal Audit Manual also recommends periodic physical counts reconciled with Accounting and GSO records. The local process and current form instructions must be confirmed before relying on an app-generated report.
 
-### 2. Asset receiving and tagging
+### 2. Asset receiving and tagging — initial workflow implemented
+
+Draft/returned corrections, protected evidence, independent acceptance, stock/asset
+materialization and native duplicate protection are implemented. Official forms,
+accepted-receipt reversals and incremental remainder acceptance remain future work.
+Finance integration has not been installed.
 
 Add a guided GSO intake for newly delivered equipment and vehicles. Capture delivery/inspection date, quantity accepted, supplier and purchase references, the receiving/inspection reference, and the person or office taking custody. Assign or record a property tag and check for possible duplicates by tag, serial, or chassis number before the asset becomes part of the active register. Keep Accounting's official classification and account mapping reviewable; the intake flow must not invent those values.
 

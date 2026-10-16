@@ -6,13 +6,19 @@ Start continuation at [CONTINUE.md](CONTINUE.md). Read the
 [GRAND data design](docs/grand-integration-design.md),
 [COA source matrix](docs/coa-requirements.md), and
 [security/recovery boundary](docs/security-and-recovery.md) before integration.
-Receipt/inspection and Finance allocation workflows are planned, not implemented.
+Receipt/inspection is implemented; Finance allocation and GRAND installation remain
+planned. See [receiving operations](docs/receiving.md) for permissions and boundaries.
 Assets, supply items and stock movements have public UUIDs for portable references;
 CSV exports include these IDs. Local integer keys and historical links are retained.
 
 This repository is a standalone development shell for the GSO asset inventory module intended for integration into the municipal GRAND application. The active product code lives in `inventory/`. Its local `user` app and Django project settings exist only to make the concept runnable; GRAND integration should use GRAND's existing `users.User`, `profiles.EmployeeProfile`, and `departments.Department` records.
 
 ## Current workflow
+
+- GSO records delivery lines and retained inspection evidence, submits for independent
+  review, and receives only accepted quantities into inventory. Corrections and review
+  history are retained. Stale acceptance cannot create stock twice. No Finance posting
+  or approval is inferred.
 
 - The department dashboard links to an asset register and shows live counts by status.
 - Employees search and filter records, open an asset detail page, and add or update records according to their granted permissions.

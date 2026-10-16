@@ -168,4 +168,7 @@ media/users/
 .env.*
 !.env.example
 backups/
+.playwright-cli/
+output/playwright/
+.tmp/
 

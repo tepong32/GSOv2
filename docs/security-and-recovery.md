@@ -55,6 +55,28 @@ matched the original hash. This is **not** a complete backup/restore acceptance:
 private evidence, restore drills, encryption, offsite retention, RPO/RTO and
 production operating procedures remain to be established and verified.
 
+### Receiving evidence under development
+
+The receiving feature retains files before committing their database metadata.
+An injected audit-write failure verifies that metadata/version changes roll back,
+but the file survives. Database transactions cannot roll back filesystem writes.
+Include these unreferenced files in protected backup and investigate them during
+maintenance reconciliation; do not automatically delete them or attach them to a
+receipt based on filenames. Compare stored file paths, hashes and sizes to committed
+evidence records. Missing or changed referenced files block submission/acceptance.
+Run `python manage.py check_receiving_evidence` with the intended database and private
+storage configuration during a maintenance window with writes paused, or against an
+isolated restored copy. It prints a JSON report and exits nonzero for missing/changed,
+unsafe-path or unreferenced files. It never repairs, deletes or attaches files.
+Restrict the report like other operational records. Only receiving evidence is
+covered; disposal attachments and Accounting import snapshots still require checks.
+Do not run against a changing live store and interpret transient results as a verified
+backup. Symlink/junction redirection and paths outside receiving storage are rejected.
+
+A synthetic SQLite receipt/evidence restore and deliberate-corruption drill passed
+on 2026-10-17; see the validation record. This is not proof of source-document
+authenticity, malware scanning, complete operator recovery, or GRAND two-store recovery.
+
 ## Gates still open
 
 - Use GRAND's authentication, permissions and source-visibility checks during merge,

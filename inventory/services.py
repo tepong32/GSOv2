@@ -7,6 +7,7 @@ from io import StringIO
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Sum
+from django.db.models.functions import Lower, Trim
 from django.utils import timezone
 
 from .access import (
@@ -63,6 +64,24 @@ ASSET_INPUT_FIELDS = (set(SNAPSHOT_FIELDS) - {"assigned_department_id", "assigne
 CONSUMABLE_INPUT_FIELDS = {"name", "category", "unit", "use_fifo", "minimum_stock", "is_active", "notes"}
 
 
+def validate_asset_identifiers(department_id, data, existing=None):
+    # All normal asset create/edit paths serialize identifier allocation per owner.
+    model = department_model()
+    model.objects.select_for_update().get(pk=department_id)
+    for field in ("property_tag", "serial_number", "chassis_number"):
+        if field not in data:
+            continue
+        value = data[field].strip()
+        data[field] = value
+        if not value or (existing and value == getattr(existing, field)):
+            continue
+        candidates = Asset.objects.filter(department_id=department_id)
+        if existing:
+            candidates = candidates.exclude(pk=existing.pk)
+        if candidates.annotate(identity=Lower(Trim(field))).filter(identity=value.lower()).exists():
+            raise ValidationError({field: "This identifier already exists in the register. Review the existing record before proceeding."})
+
+
 @transaction.atomic
 def create_asset(*, actor, data):
     _require(actor, "add")
@@ -70,6 +89,7 @@ def create_asset(*, actor, data):
     if department is None:
         raise PermissionDenied
     data = _editable_data(data, ASSET_INPUT_FIELDS)
+    validate_asset_identifiers(department.pk, data)
     assigned_department_pk = data.pop("assigned_department", None)
     assigned_department = _resolve_assigned_department(assigned_department_pk)
     asset = Asset.objects.create(
@@ -100,6 +120,7 @@ def update_asset(*, actor, asset, data):
     if asset.status == Asset.RETIRED:
         raise PermissionDenied("Retired asset records are read-only.")
     data = _editable_data(data, ASSET_INPUT_FIELDS)
+    validate_asset_identifiers(asset.department_id, data, existing=asset)
     assigned_department_pk = data.pop("assigned_department", None)
     assigned_department = _resolve_assigned_department(assigned_department_pk)
     for field, value in data.items():

@@ -1,10 +1,15 @@
 from django.urls import path
 
 from . import views
+from . import receiving_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("receiving/", receiving_views.receipt_list, name="receiving-list"),
+    path("receiving/new/", receiving_views.receipt_create, name="receiving-create"),
+    path("receiving/<int:pk>/", receiving_views.receipt_detail, name="receiving-detail"),
+    path("receiving/evidence/<int:pk>/", receiving_views.evidence_download, name="receiving-evidence"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("", views.asset_list, name="asset-list"),
     path("add/", views.asset_create, name="asset-create"),

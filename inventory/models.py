@@ -224,12 +224,16 @@ class AssetTransfer(models.Model):
     )
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancellation_reason = models.CharField(max_length=240, blank=True)
+    pending_identity_marker = models.GeneratedField(
+        expression=models.Case(models.When(status="pending", then=models.Value(1)), default=models.Value(None)),
+        output_field=models.PositiveSmallIntegerField(), db_persist=False, null=True,
+    )
 
     class Meta:
         ordering = ("-requested_at", "-pk")
         constraints = (
             models.UniqueConstraint(
-                fields=("asset",), condition=models.Q(status="pending"),
+                fields=("asset", "pending_identity_marker"),
                 name="gso_one_pending_asset_transfer",
             ),
         )
@@ -517,13 +521,18 @@ class AssetDisposalCase(models.Model):
         related_name="gso_asset_disposals_completed",
     )
     completed_at = models.DateTimeField(null=True, blank=True)
+    open_identity_marker = models.GeneratedField(
+        expression=models.Case(models.When(
+            status__in=("submitted", "under_review", "needs_information", "authorized"),
+            then=models.Value(1)), default=models.Value(None)),
+        output_field=models.PositiveSmallIntegerField(), db_persist=False, null=True,
+    )
 
     class Meta:
         ordering = ("-submitted_at", "-pk")
         constraints = (
             models.UniqueConstraint(
-                fields=("asset",),
-                condition=models.Q(status__in=("submitted", "under_review", "needs_information", "authorized")),
+                fields=("asset", "open_identity_marker"),
                 name="gso_one_open_disposal_case",
             ),
         )
@@ -781,3 +790,144 @@ class StockLotAllocation(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("FIFO allocations are retained and cannot be deleted.")
+
+
+class ReceivingReceipt(models.Model):
+    """Physical delivery and inspection evidence; never a Finance approval."""
+
+    DRAFT, SUBMITTED, ACCEPTED, RETURNED = "draft", "submitted", "accepted", "returned"
+    STATUS_CHOICES = ((DRAFT, "Draft"), (SUBMITTED, "For review"),
+                      (ACCEPTED, "Accepted into inventory"), (RETURNED, "Returned for correction"))
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    department_id = models.PositiveBigIntegerField(db_index=True)
+    department_label = models.CharField(max_length=160)
+    supplier = models.CharField(max_length=160)
+    delivery_reference = models.CharField(max_length=180)
+    delivery_date = models.DateField()
+    purchase_order_reference = models.CharField(max_length=100, blank=True)
+    inspection_reference = models.CharField(max_length=180)
+    inspection_date = models.DateField()
+    inspector_label = models.CharField(max_length=160)
+    evidence_reference = models.TextField(help_text="Location/reference of the retained delivery and inspection documents.")
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=DRAFT)
+    state_version = models.PositiveIntegerField(default=1)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_receipts_created")
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_receipts_reviewed")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+        permissions = (("submit_receivingreceipt", "Can submit GSO receiving records"),
+                       ("review_receivingreceipt", "Can independently review GSO receiving records"))
+
+    def clean(self):
+        if self.delivery_date and self.delivery_date > timezone.localdate():
+            raise ValidationError({"delivery_date": "Delivery cannot be in the future."})
+        if self.inspection_date and (self.inspection_date > timezone.localdate() or
+                                    self.delivery_date and self.inspection_date < self.delivery_date):
+            raise ValidationError({"inspection_date": "Inspection must be on or after delivery and not in the future."})
+
+
+class ReceivingLine(models.Model):
+    ASSET, SUPPLY = "asset", "supply"
+    receipt = models.ForeignKey(ReceivingReceipt, on_delete=models.PROTECT, related_name="lines")
+    sequence = models.PositiveSmallIntegerField()
+    kind = models.CharField(max_length=12, choices=((ASSET, "Individually tracked asset"), (SUPPLY, "Consumable supply")))
+    description = models.CharField(max_length=180)
+    unit = models.CharField(max_length=40)
+    delivered_quantity = models.DecimalField(max_digits=12, decimal_places=3)
+    accepted_quantity = models.DecimalField(max_digits=12, decimal_places=3)
+    rejected_quantity = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+    rejection_reason = models.CharField(max_length=240, blank=True)
+    unit_cost = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True)
+    supply_item = models.ForeignKey(ConsumableItem, on_delete=models.PROTECT, null=True, blank=True, related_name="receiving_lines")
+    asset_kind = models.CharField(max_length=20, choices=Asset.KIND_CHOICES, default=Asset.EQUIPMENT)
+    property_tag = models.CharField(max_length=100, blank=True)
+    serial_number = models.CharField(max_length=120, blank=True)
+    chassis_number = models.CharField(max_length=80, blank=True)
+    is_void = models.BooleanField(default=False)
+    registered_asset = models.OneToOneField(Asset, on_delete=models.PROTECT, null=True, blank=True, related_name="receiving_line")
+    stock_movement = models.OneToOneField(StockMovement, on_delete=models.PROTECT, null=True, blank=True, related_name="receiving_line")
+
+    class Meta:
+        ordering = ("sequence",)
+        constraints = [
+            models.UniqueConstraint(fields=("receipt", "sequence"), name="gso_receipt_line_sequence"),
+            models.CheckConstraint(condition=models.Q(delivered_quantity__gt=0, accepted_quantity__gte=0, rejected_quantity__gte=0), name="gso_receipt_nonnegative_qty"),
+            models.CheckConstraint(condition=models.Q(delivered_quantity__gte=models.F("accepted_quantity") + models.F("rejected_quantity")), name="gso_receipt_quantity_capacity"),
+        ]
+
+    def clean(self):
+        if self.accepted_quantity is not None and self.rejected_quantity is not None and self.delivered_quantity is not None:
+            if self.accepted_quantity + self.rejected_quantity > self.delivered_quantity:
+                raise ValidationError("Accepted and rejected quantities exceed the delivery.")
+        if self.rejected_quantity and not self.rejection_reason.strip():
+            raise ValidationError({"rejection_reason": "Explain the rejected quantity."})
+        if self.unit_cost is not None and self.unit_cost < 0:
+            raise ValidationError({"unit_cost": "Cost cannot be negative."})
+        if self.kind == self.ASSET:
+            if self.delivered_quantity != 1 or self.accepted_quantity not in (0, 1) or self.rejected_quantity not in (0, 1):
+                raise ValidationError("Use one line per individually tracked asset.")
+            if self.accepted_quantity and not self.property_tag.strip():
+                raise ValidationError({"property_tag": "Record the property tag before accepting this asset."})
+            if self.supply_item_id:
+                raise ValidationError("An asset line cannot select a supply item.")
+        elif self.kind == self.SUPPLY:
+            if not self.supply_item_id:
+                raise ValidationError({"supply_item": "Select an existing supply item."})
+            if self.property_tag or self.serial_number or self.chassis_number:
+                raise ValidationError("Use an individually tracked asset line for tagged or serialized property.")
+            if self.supply_item_id and (self.supply_item.department_id != self.receipt.department_id or
+                                       self.unit != self.supply_item.unit or not self.supply_item.is_active):
+                raise ValidationError("Select an active supply in this office and use its registered unit.")
+
+
+class ReceivingEvent(models.Model):
+    receipt = models.ForeignKey(ReceivingReceipt, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_receiving_events")
+    action = models.CharField(max_length=32)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Receiving history cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Receiving history is retained.")
+
+
+def receiving_evidence_path(instance, filename):
+    extension = filename.rsplit(".", 1)[-1].lower()
+    return f"inventory/receiving/{instance.receipt.public_id}/{instance.kind}-{uuid4().hex}.{extension}"
+
+
+class ReceivingEvidence(models.Model):
+    KIND_CHOICES = (("delivery", "Delivery document"), ("inspection", "Inspection / acceptance document"),
+                    ("supporting", "Supporting record"))
+    receipt = models.ForeignKey(ReceivingReceipt, on_delete=models.PROTECT, related_name="evidence")
+    kind = models.CharField(max_length=16, choices=KIND_CHOICES)
+    file = models.FileField(upload_to=receiving_evidence_path, storage=disposal_private_storage, max_length=255)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    note = models.CharField(max_length=240)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_receiving_uploads")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("uploaded_at", "pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Receiving evidence cannot be replaced. Append a correction document.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Receiving evidence is retained.")
