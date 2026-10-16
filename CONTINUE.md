@@ -31,7 +31,7 @@ permissions grant or deployment. Finance coordination note updated only.
 Documentation releases f6ea69e and60d12af are published; final branchCI38942013769 and
 primaryCI38942094327 passed. Remote master/tag verified, operator hash unchanged.
 
-## Current employee custody work
+## Published employee custody milestone
 
 Fresh fetch0/0 and clean tree at60d12af, then branch `codex/employee-custody` in
 `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`. Read
@@ -70,9 +70,11 @@ Sessions closed and preview8020 stopped. Synthetic paired source remains
 `.tmp/grand-source-tests-nhoggi1i`. Recovery PASS:196 default/83 finance tables,
 identity snapshot/accepted actor/audit retained, injected loss detected/restored;
 source unchanged. Backup `.codex/backups/gsov2-custody-recovery-20261017-nj9xiahl`.
-Not online MySQL/private-upload/operator recovery. External VM README/inspect/preview
-complete; preview plans v0.7.0 and updates only VERSION/CHANGELOG. No release yet.
-Next: VM release, branchCI, primary integration/push and remote verification.
+Not online MySQL/private-upload/operator recovery. External VM minor release236c5e1 (v0.7.0) is published. BranchCI38945305792 passed
+before canonical master fast-forward/push. Remote master/tag match
+`236c5e1e265bc1a63b97a9d3271133e94b598f10`. PrimaryCI38945433056 PASS.
+No operator migration, grants or deployment. Release notes follow on separate
+`codex/custody-release-notes`, created from a clean fetch0/0 checkpoint.
 Clearance/HR separation remain unimplemented. Overall goal is incomplete.
 
 ## Published reviewed claim support

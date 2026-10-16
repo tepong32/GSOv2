@@ -5,7 +5,8 @@ the user's instruction to align the projects and avoid speculative architecture.
 Receiving is published through `7d3547f` with documentation at `9ae80c0`.
 Reviewed claim support is published at28da3f1; see [claim support](claim-attribution.md).
 Maintenance is published at3905a74. [Employee custody](employee-custody-design.md)
-is the next integration design in progress; its relationships are not implemented.
+is published at236c5e1 with protected user relationships and signed handoffs.
+Employee movement/exit clearance remains unimplemented.
 
 ## Source of truth inspected
 

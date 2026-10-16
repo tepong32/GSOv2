@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.1] - 2026-10-17
+### Documentation
+- Record verified custody release and recovery results
+
 ## [0.7.0] - 2026-10-17
 ### Added
 - Add reviewed employee custody handoffs using GRAND identities

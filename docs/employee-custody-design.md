@@ -1,7 +1,7 @@
 # Employee custody and clearance design
 
-Work in progress on `codex/employee-custody`; migration0017 and custody services are
-written and validated but unreleased. Named-custody search/review screens are implemented. Clearance is not implemented.
+Published at236c5e1: migration0017, custody services and signed employee
+search/review screens are implemented and validated. Clearance is not implemented.
 This continues roadmap item4, rather than replacing
 GRAND HR with an inventory-owned employee register.
 
@@ -108,7 +108,8 @@ employee snapshot/accepted actor/audit history, detected injected custody/audit 
 and restored it without changing the source. Evidence is under
 `C:/Users/Administrator/.codex/backups/gsov2-custody-recovery-20261017-nj9xiahl`.
 This is not private-upload, online MySQL or operator recovery. No operator migration,
-permission grant or installation in GRAND occurred. Release gates remain.
+permission grant or installation in GRAND occurred. BranchCI38945305792 passed before master fast-forward/push; remote master/tag
+match236c5e1. See the handoff for primary CI status.
 
 ## Staff handoff review
 

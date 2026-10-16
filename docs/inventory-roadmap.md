@@ -17,7 +17,8 @@ owns immediate state; [validation](validation-2026-10-16.md) owns test evidence.
 
 The first prerequisite supplies portable inventory UUIDs, GRAND-matched runtime
 versions, production settings checks, stock-owner enforcement and runtime-data
-exclusion from Git. A Finance adapter remains planned.
+exclusion from Git. The optional GRAND Finance adapter and reviewed claim-support
+workflow are implemented; operator installation remains pending.
 Receiving/inspection is now implemented as described in [receiving operations](receiving.md).
 An optional GRAND claim-support workflow now provides reviewed amount attribution;
 see [claim support and limits](claim-attribution.md). Accepted-receipt cost correction,
@@ -62,11 +63,11 @@ Add a simple repair/work record attached to an asset: reported problem, date, se
 
 ### 4. Employee movement and exit clearance
 
-Source/design work is underway on `codex/employee-custody`; see
+Named employee custody is published at236c5e1; see
 [verified HR boundary and selected relationships](employee-custody-design.md).
 GRAND currently provides employee identity/current department, but no verified
-separation event. Named-custody migration, services and signed staff screens are in validation;
-clearance workflows remain unimplemented. No release or operator migration yet.
+separation event. Named-custody migration, services and signed staff screens are implemented;
+clearance workflows remain unimplemented. No operator migration or deployment.
 
 After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
 

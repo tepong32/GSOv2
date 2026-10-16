@@ -6,8 +6,11 @@ Start continuation at [CONTINUE.md](CONTINUE.md). Read the
 [GRAND data design](docs/grand-integration-design.md),
 [COA source matrix](docs/coa-requirements.md), and
 [security/recovery boundary](docs/security-and-recovery.md) before integration.
-Receipt/inspection is implemented; Finance allocation and GRAND installation remain
-planned. See [receiving operations](docs/receiving.md) for permissions and boundaries.
+Receipt/inspection, maintenance and named custody are implemented. The optional
+GRAND [claim-support workflow](docs/claim-attribution.md) supports reviewed amount
+attribution; quantity/cost allocation and GRAND installation remain pending. See
+[receiving operations](docs/receiving.md), [maintenance](docs/maintenance.md) and
+[employee custody](docs/employee-custody-design.md) for permissions and boundaries.
 Assets, supply items and stock movements have public UUIDs for portable references;
 CSV exports include these IDs. Local integer keys and historical links are retained.
 
@@ -101,4 +104,6 @@ Integration should:
 5. Route `inventory` migrations to the default database. Finance's database separation remains unchanged.
 6. Import and reconcile legacy data before the new register becomes authoritative. The former `home.Item` schema is preserved under `home/` as a reference and is no longer installed or routed. Its fields map to the new asset form as follows: date → purchase date; OBR number → OBR/reference; category and subcategory → additional item description; brand/supplier/price/quantity/status/return date/notes → corresponding asset fields. Existing rows require later selection of an inventory class and item type. Derive the asset name from the old category/brand after review, and confirm whether each row represents one item or a pooled quantity. Review old status values before mapping them to the new in-service, maintenance, transferred, and retired states.
 
-Maintenance work orders, employee exit clearance, official COA report generation, and automatic journal posting remain future work. Supply movements, acknowledged custody handoffs, disposal case evidence, physical verification history, and asset references provide traceable source data for later GRAND integration and reconciliation.
+Basic maintenance history and named employee handoffs are implemented. Employee exit
+clearance and official COA report generation remain future work; automatic journal
+posting is outside the current GSO workflow. Supply movements, acknowledged custody handoffs, disposal case evidence, physical verification history, and asset references provide traceable source data for later GRAND integration and reconciliation.

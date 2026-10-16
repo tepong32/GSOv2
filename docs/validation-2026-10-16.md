@@ -467,3 +467,10 @@ Both schemas removed; verified no GSO test schemas remain on owned33317, followe
 normal SQL SHUTDOWN and process completion. No preview/browser/test server remains.
 VM inspect/preview plans the custody minor release, updates only VERSION/CHANGELOG.
 Repository has no rulesets or master protection; branchCI remains the release gate.
+
+Published custody commit236c5e1 through the actual external Version Manager.
+BranchCI38945305792 PASS before canonical master fast-forward/push; remote master
+and tag match236c5e1e265bc1a63b97a9d3271133e94b598f10. Final release diff changed
+only intended feature/docs and generated VERSION/CHANGELOG. PrimaryCI38945433056
+PASS. No operator migration/grants/deployment. Release-result documentation
+uses separate `codex/custody-release-notes`, created after clean fetch0/0.
