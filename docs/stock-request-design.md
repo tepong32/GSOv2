@@ -2,7 +2,8 @@
 
 Implementation checkpoint2026-10-17. Supplied requisition entry, independent
 document review, partial issues, unavailable observations and remainder closure
-are implemented. Original-issue return lineage remains next. This operational
+are implemented. [Original-issue supply returns](supply-returns.md) are implemented
+with independent usable-stock acceptance and retained known/unknown cost. This operational
 trail does not establish official RIS compliance.
 
 ## Verified source boundary
@@ -39,8 +40,8 @@ case/line version checks and retained outcomes for unavailable and partial items
 Never deduct requested quantities merely because a requisition was entered. A
 reviewed remaining quantity is not reserved stock unless a reservation workflow is
 separately designed. Cancelled remainders do not undo completed physical issues.
-The next return workflow needs explicit original-issue lineage and reviewed quantities,
-not an unrelated positive movement or an inferred reversal of Accounting expense.
+The return workflow retains explicit original-issue lineage and reviewed quantities;
+it does not infer reversal of Accounting expense or reopen requested quantities.
 
 Keep all physical records in GRAND default. Native users/departments and public
 inventory UUIDs remain authorities. Do not duplicate GRAND Records, procurement,
@@ -85,7 +86,8 @@ rewrites both data and checksums. Storage is not transactional: orphan uploads
 after a database failure remain for investigation, never silently deleted.
 Missing/changed evidence blocks review and issue; a reasoned closure remains
 possible if history itself is intact. Official outputs, digital requesting-office
-approval, returns and Accounting expense recognition remain separate work.
+approval and Accounting expense recognition remain separate work. Supply return
+acceptance now has its own [evidenced workflow](supply-returns.md).
 
 ## Published retry prerequisite
 

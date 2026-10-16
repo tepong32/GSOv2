@@ -1435,3 +1435,67 @@ class SupplyRequisitionEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Requisition history is retained.")
+
+
+def supply_return_path(instance, filename):
+    return f"inventory/supply-returns/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class SupplyReturn(models.Model):
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    issue = models.ForeignKey(StockMovement, on_delete=models.PROTECT, related_name="supply_returns")
+    source_allocation = models.ForeignKey(StockLotAllocation, on_delete=models.PROTECT, null=True, blank=True, related_name="supply_returns")
+    quantity = models.DecimalField(max_digits=12, decimal_places=3, validators=[MinValueValidator(Decimal("0.001"))])
+    reference = models.CharField(max_length=120)
+    returned_by = models.CharField(max_length=160)
+    observed_on = models.DateField()
+    condition_note = models.CharField(max_length=240)
+    cost_basis_note = models.CharField(max_length=240)
+    source_snapshot = models.JSONField()
+    file = models.FileField(upload_to=supply_return_path, storage=disposal_private_storage, max_length=500)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    status = models.CharField(max_length=12, default="pending", choices=(("pending", "Awaiting stock acceptance"),
+        ("accepted", "Accepted into stock"), ("declined", "Not accepted into stock"), ("cancelled", "Cancelled")))
+    state_version = models.PositiveIntegerField(default=1)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_supply_returns_recorded")
+    created_at = models.DateTimeField(auto_now_add=True)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_supply_returns_decided")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.CharField(max_length=240, blank=True)
+    movement = models.OneToOneField(StockMovement, on_delete=models.PROTECT, null=True, blank=True, related_name="supply_return_case")
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+        default_permissions = ()
+        permissions = (("view_supply_return", "Can view documented supply returns"),
+            ("record_supply_return", "Can record documented supply returns"),
+            ("review_supply_return", "Can independently accept supplies returned to stock"))
+        constraints = (models.CheckConstraint(condition=models.Q(quantity__gt=0), name="gso_supply_return_positive"),
+            models.CheckConstraint(condition=(models.Q(status="accepted", movement__isnull=False)
+                | models.Q(status__in=("pending", "declined", "cancelled"), movement__isnull=True)), name="gso_supply_return_state"))
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Supply return records are retained.")
+
+
+class SupplyReturnEvent(models.Model):
+    case = models.ForeignKey(SupplyReturn, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_supply_return_events")
+    action = models.CharField(max_length=24)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Supply return history cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Supply return history is retained.")

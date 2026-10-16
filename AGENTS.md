@@ -84,6 +84,11 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   protected fulfillment links. Closure never reverses physical issues. Include
   private requisition evidence in paired recovery; no stock reservation or Finance
   posting is implied. See [request design](docs/stock-request-design.md).
+- Supply returns retain original issue/optional lot lineage and private evidence.
+  Lock item before case; independently accept only observed usable quantities,
+  capped at original issue/allocation less accepted returns. Never guess cost,
+  reopen original allocations or erase issues. Unlinked legacy returns require
+  reconciliation. No Finance reversal follows acceptance. See [return workflow](docs/supply-returns.md).
 - Supply counts pin today's item/ledger basis and require private evidence plus an
   independent non-uploader's review. Lock item before count; stale bases require
   cancellation/recount. Apply differences through the existing movement service,

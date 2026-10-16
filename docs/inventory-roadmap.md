@@ -35,8 +35,9 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 Supplies follow-up: [request and issue design](stock-request-design.md) records
 implemented supplied-approved-requisition entry, independent document review,
 partial issues, unavailable observations and remainder closure. Migration0022
-links explicit request lines to existing stock movements in default. Original-issue
-return lineage and accepted official outputs remain future work; no Finance posting
+links explicit request lines to existing stock movements in default. Migration0023
+adds [reviewed original-issue returns](supply-returns.md) without erasing fulfillment.
+Accepted official outputs and legacy return reconciliation remain future work; no Finance posting
 or reservation is inferred. Stock form retry protection remains in place.
 
 ### 1. Annual physical count reporting and reconciliation — implemented

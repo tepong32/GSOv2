@@ -154,3 +154,9 @@ Include this namespace with both databases and run `check_requisition_evidence`
 on restored copies. Retain request/line/fulfillment UUIDs, linked stock movements,
 FIFO allocations and review/event history together. See [request design](stock-request-design.md)
 for permissions, lock order, retry and evidence-integrity boundaries.
+
+Supply return evidence adds `inventory/supply-returns`; run
+`check_supply_return_evidence` on coordinated restored copies. Preserve original
+issue/allocation, return case/event, new stock movement and optional FIFO lot as
+one trail. Accepted returns never remove the original requisition fulfillment.
+See [return boundaries](supply-returns.md), including unknown costs and legacy gaps.

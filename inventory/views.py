@@ -852,6 +852,7 @@ def consumable_edit(request, pk):
 @stock_access_required()
 def consumable_detail(request, pk):
     from .stock_counts import can_manage_count
+    from .supply_returns import can_act as can_return
     item = get_object_or_404(_stock_items(request.user), pk=pk)
     movements = item.movements.all()
     department = department_for_user(request.user)
@@ -863,6 +864,8 @@ def consumable_detail(request, pk):
     return render(request, "inventory/consumable_detail.html", {
         "item": item, "page": page, "is_gso": is_gso, "audit_events": audit_events,
         "can_record_count": can_manage_count(request.user, "record", item) and item.is_active,
+        "can_record_return": can_return(request.user, "record"),
+        "can_view_returns": can_return(request.user, "view"),
         "can_receive": can_stock(request.user, "receive"),
         "can_issue": can_stock(request.user, "issue"),
         "can_adjust": can_stock(request.user, "adjust"),

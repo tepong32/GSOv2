@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.17.0] - 2026-10-17
+### Added
+- Add reviewed supply returns linked to original issues
+
 ## [0.16.0] - 2026-10-17
 ### Added
 - Add supplied requisition review and partial stock fulfillment

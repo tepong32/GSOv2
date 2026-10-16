@@ -5,6 +5,39 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Original-issue supply returns — validated checkpoint
+
+Branch `codex/supply-return-lineage` started from2ae5a9e after fresh clean0/0 sync.
+Prior requisition milestone2ae5a9e is published; branchCI38972044163 and
+primaryCI38972168264 PASS, remote master/tag verified. Finance32ab046 fetched0/0
+with96 dirty/untracked files preserved; only the authorized coordination note
+was appended there.
+
+Migration0023 adds default SupplyReturn/Event records. Original issue/optional
+documented FIFO allocation, condition, quantity, source snapshot and private
+evidence now support independent stock acceptance, decline and cancellation.
+Acceptance locks item before case, rechecks issue/allocation capacity and creates
+a return movement/new FIFO lot atomically with history. Unknown cost stays NULL;
+original issue/allocations and requisition fulfillment remain intact. Unlinked
+legacy returns require reconciliation. See [workflow](docs/supply-returns.md).
+
+Shell116 discovered/99 executed/17 skips PASS32.523s; native shell116/116
+PASS109.832s; actual GRAND114/114 PASS39.941s. Check/drift/diff pass. Populated
+upgrade preserves existing operational rows and Finance bytes. Browser recorder
+and separate reviewer accept1 unit, stock7 becomes8 at retained cost30; desktop/
+mobile inspected,390px page/scroll, no duplicate IDs. Preview8030/browser stopped.
+Stopped paired recovery213 default/83 finance tables and5 files PASS; original
+issue/requisition retained, stale replay denied, changed return lot/missing source
+detected. Backup `.codex/backups/gsov2-supply-return-recovery-20261017-kpt5jkgy`.
+Native schemas removed, owned33317 shut down normally; operator DB unchanged.
+
+Next: assess physical receipt cost-component allocation and semi-expendable
+property-record gaps against current Finance sources and verified COA annexes.
+Official outputs, legacy reconciliation, loss cases and operational acceptance
+remain gaps in the full goal. Do not declare the overall system complete or
+production-ready. No operator migration/grant/deployment occurred. Release identity
+is in VERSION/CHANGELOG/history; remote CI gates primary integration.
+
 ## Supplied requisitions and partial issues — validated checkpoint
 
 Branch `codex/supplies-requisition-workflow` started from58f7cfa after fresh clean0/0

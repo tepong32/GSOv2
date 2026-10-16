@@ -1154,3 +1154,53 @@ appropriate for schema, shared stock and authorization impact. Start fetch: GSO
 
 Version Manager README/inspect/preview reviewed; minor release gates primary
 integration on successful branch CI, then verifies remote/tag and primary CI.
+
+## Original-issue supply returns — 2026-10-17
+
+Scope: two default operational models/migration0023, original issue/allocation
+capacity, stock/FIFO transactions, explicit grants and private evidence/screens.
+Full shell and actual-GRAND native suites selected for schema/auth/shared stock
+impact. Start sync: GSO2ae5a9e clean0/0; Finance32ab046 fetched0/0 with96 parallel
+changes preserved. Working branch codex/supply-return-lineage.
+
+- PASS: `python manage.py test inventory.test_supply_returns`:7 discovered,
+  6 executed,1 native skip,0.938s before the added prior-history/source checks.
+- PASS: final `python manage.py test`:116 discovered,99 executed,17 native skips,
+  32.523s. Covers exact decimals, partial/known-lot/unknown-cost/quantity-only returns,
+  independent review, suitability confirmation, unchanged original issue, decline,
+  cancellation, rollback, request retry, duplicate acceptance, missing/changed
+  evidence, changed source/history and blocking unlinked legacy returns.
+- PASS: final `python scripts/run_mysql_tests.py`:116/116,109.832s; includes two
+  competing4-unit return cases against an original5-unit issue: exactly one is
+  accepted, one fails capacity, one return movement/lot results. Schema removed.
+- PASS: `python manage.py check`, `python manage.py makemigrations --check --dry-run`
+  and `git diff --check`. Actual GRAND router restricts non-Finance models to default.
+- PASS: `.tmp/preview_supply_return.py` on copied populated paired fixture:0023
+  preserves existing inventory/claim/mapping/requisition rows and Finance bytes.
+  Real browser follows original issue, records1-unit return with documented source
+  lot, separate reviewer confirms usable stock and accepts; stock7 becomes8,
+  source cost30 retained. Desktop/mobile screenshots inspected;390px page/scroll,
+  no duplicate IDs. Browser and preview8030 stopped. Existing synthetic logo/avatar
+  missing-file404s are fixture limitations, not a product regression.
+- PASS: `.tmp/rehearse_supply_return_recovery.py`: stopped paired recovery of213
+  default/83 finance tables and5 files, backup
+  `.codex/backups/gsov2-supply-return-recovery-20261017-kpt5jkgy`. Original3-unit issue,
+  original requisition issued quantity/status and new1-unit cost30 return lot remain
+  intact. Stale acceptance rejected; altered returned lot and missing file detected;
+  restored table rows/files match backup and original sources remain unchanged.
+  `check_supply_return_evidence` reports1 checked, zero discrepancies. This is not
+  live MySQL/operator recovery acceptance.
+- NOT RUN - OUT OF SCOPE: operator migrations/grants, deployment, official-form/
+  costing acceptance, legacy return repair and Finance production scrutiny.
+
+VM README/inspect/preview reviewed; proposed minor updates only VERSION/CHANGELOG.
+Native GRAND completion and release evidence follow the same primary CI gate.
+
+Final local gate: `grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py
+--grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation
+--mysql` PASS114/114,39.941s. Native identities, explicit receive/review grants,
+UAT/owner/ungranted-superuser controls, revoked permission and zero Finance queries
+are covered. Both aliases removed; owned33317 normal shutdown exit0. Operator DB
+SHA256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Source research found a dated PHALGA presentation as a corroborating deferment
+lead, not current return-costing authority; the feature document records that limit.

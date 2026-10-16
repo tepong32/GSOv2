@@ -274,3 +274,10 @@ snapshots also contain source-local IDs. Any later import must preserve original
 snapshots and document reviewed identity mappings, rather than silently rewriting
 history/checksums. Code/migration integration into GRAND is tested separately from
 that unimplemented data-import operation.
+
+Inventory0023 supplies reviewed return lineage in default: original issue UUID,
+optional original allocation identified through its source receipt UUID, return
+UUID, new movement and optional return lot. The cost is retained only from an
+explicit documented allocation; otherwise it stays NULL. This is operational
+stock history, not a Finance expense reversal or a replacement valuation policy.
+Both requisition fulfillment and original issue remain unchanged after a return.

@@ -9,11 +9,16 @@ from . import custody_review
 from . import custody_return_views
 from . import stock_count_views
 from . import requisition_views
+from . import supply_return_views
 from . import hr_custody_review_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("supply-returns/", supply_return_views.return_list, name="supply-return-list"),
+    path("stock-issues/<int:pk>/return/", supply_return_views.return_start, name="supply-return-start"),
+    path("supply-returns/<int:pk>/", supply_return_views.return_detail, name="supply-return-detail"),
+    path("supply-returns/<int:pk>/evidence/", supply_return_views.return_evidence, name="supply-return-evidence"),
     path("requisitions/", requisition_views.request_list, name="requisition-list"),
     path("requisitions/new/", requisition_views.request_create, name="requisition-create"),
     path("requisitions/<int:pk>/", requisition_views.request_detail, name="requisition-detail"),
