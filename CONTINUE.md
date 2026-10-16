@@ -5,7 +5,7 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Current custody review work
+## Published custody review milestone
 
 Previous goal turn made verified progress: custody236c5e1 and release notes55fc7bf
 are published. Final documentation branchCI38945566281 and primaryCI38945701870
@@ -31,7 +31,14 @@ MySQL33317 session82727 shut down normally.
 Browser office/legacy and moved-employee personal views inspected on isolated
 `.tmp/custody-review-preview-6ypwa4un`, port8021 and browser sessions are now stopped. Mobile390 client/scroll widths match; no overflow
 elements or duplicate IDs. Screenshots output/playwright/custody-review-*.png.
-Next: VM release and CI/integration/remote verification. Overall goal remains incomplete.
+Published through the actual VM minor releasefb2eae2, tagv0.8.0. BranchCI38947590308
+passed before canonical master fast-forward/push. Remote master/tag match
+`fb2eae2c59df7669cb228eb344bc3f1521f1469a`; operator DB hash unchanged.
+PrimaryCI38947689210 PASS. Release notes use separate
+`codex/custody-review-release-notes`, created after clean fetch0/0.
+Next: design and implement witnessed, independently confirmed returns with retained
+evidence, then HR-reference review cases and unresolved-item decisions. Neither
+returns nor clearance conclusions are implemented yet. Overall goal remains incomplete.
 
 ## Published maintenance milestone
 

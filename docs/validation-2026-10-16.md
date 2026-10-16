@@ -503,3 +503,11 @@ suite. This slice changes only GRAND read queries/screens and a dashboard link;
 no models, services, file formats or writes changed. Existing populated/recovery
 proof remains applicable. Full shell SQLite70 and actual-GRAND native50 cover the
 impacted behavior; tests explicitly preserve inventory state and avoid Finance queries.
+
+Release completed through actual Version Manager minor commitfb2eae2. Branch
+CI38947590308 PASS before canonical master fast-forward/push. Remote master/tag
+matchfb2eae2c59df7669cb228eb344bc3f1521f1469a. Operator hash remains
+5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+No installation, operator migration or grants. PrimaryCI38947689210 PASS.
+Documentation follow-up uses separate `codex/custody-review-release-notes`, created
+from a clean fetch0/0 checkpoint. No source/schema changes in this follow-up.

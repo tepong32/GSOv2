@@ -1,6 +1,6 @@
 # Custody review workbench
 
-Implemented and validated on `codex/custody-review`; release pending. This is a necessary working
+Published atfb2eae2 after validation on `codex/custody-review`. This is a necessary working
 view for the employee movement/exit workflow; it does not complete clearance.
 See [custody relationships](employee-custody-design.md), [roadmap](inventory-roadmap.md)
 and [handoff](../CONTINUE.md).
@@ -68,3 +68,5 @@ Browser office/legacy and moved-employee personal views inspected at1440x1000 an
 390x844; no overflow or duplicate IDs. Private synthetic logo/avatar assets are absent
 (404s). Browsers/preview and owned native server stopped after schema cleanup. No schema or recovery-format change is introduced;
 existing custody recovery remains applicable, with GET mutation checks added here.
+BranchCI38947590308 passed before canonical master fast-forward/push; remote
+master/tag verified. See the handoff for primary CI status.
