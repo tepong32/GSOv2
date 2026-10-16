@@ -5,14 +5,20 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
-from .access import asset_in_scope, can, department_model, gso_department_for_user
+from .access import (
+    asset_in_scope, can, can_acknowledge_asset_transfer, can_request_asset_disposal,
+    can_review_asset_disposal, can_transfer_asset,
+    department_model, department_for_user, gso_department_for_user,
+)
 from .models import (
-    Asset, AssetAuditEvent, ConsumableAuditEvent, ConsumableItem, StockLot, StockLotAllocation, StockMovement,
+    Asset, AssetAuditEvent, AssetDisposalAttachment, AssetDisposalCase,
+    AssetDisposalEvent, AssetTransfer, ConsumableAuditEvent, ConsumableItem,
+    StockLot, StockLotAllocation, StockMovement,
 )
 
 
 SNAPSHOT_FIELDS = (
-    "asset_kind", "asset_name", "category", "property_tag", "brand", "model_number", "serial_number",
+    "asset_kind", "inventory_class", "item_type", "asset_name", "category", "property_tag", "brand", "model_number", "serial_number",
     "plate_number", "engine_number", "chassis_number", "registration_due", "obr_reference",
     "purchase_order_reference", "voucher_reference", "journal_reference", "fund_code",
     "coa_account_code", "coa_account_title", "coa_basis", "purchase_date", "supplier", "unit_cost",
@@ -66,6 +72,13 @@ def create_asset(*, actor, data):
 @transaction.atomic
 def update_asset(*, actor, asset, data):
     _require(actor, "change", asset)
+    if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
+        raise PermissionDenied("This asset has a handoff waiting for acknowledgment.")
+    if asset.disposal_cases.filter(status__in=(
+        AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
+        AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
+    )).exists():
+        raise PermissionDenied("This asset has an open disposal case and cannot be edited.")
     if asset.status == Asset.RETIRED:
         raise PermissionDenied("Retired asset records are read-only.")
     data = dict(data)
@@ -86,18 +99,7 @@ def update_asset(*, actor, asset, data):
 
 @transaction.atomic
 def retire_asset(*, actor, asset):
-    _require(actor, "delete", asset)
-    if asset.status == Asset.RETIRED:
-        raise PermissionDenied("This asset has already been retired.")
-    asset.status = Asset.RETIRED
-    asset.returned_date = asset.returned_date or timezone.localdate()
-    asset.updated_by = actor
-    asset.save(update_fields=("status", "returned_date", "updated_by", "updated_at"))
-    AssetAuditEvent.objects.create(
-        asset=asset, department_id=asset.department_id, actor=actor,
-        action=AssetAuditEvent.RETIRED, snapshot=asset_snapshot(asset),
-    )
-    return asset
+    raise PermissionDenied("Use the documented disposal case workflow to retire an asset.")
 
 
 def _resolve_assigned_department(pk):
@@ -108,6 +110,244 @@ def _resolve_assigned_department(pk):
     if department is None:
         raise PermissionDenied("The selected department is no longer available.")
     return department
+
+
+@transaction.atomic
+def create_asset_transfer(*, actor, asset, data):
+    if not can_transfer_asset(actor) or not asset_in_scope(actor, asset):
+        raise PermissionDenied
+    asset = Asset.objects.select_for_update().get(pk=asset.pk)
+    if asset.status == Asset.RETIRED:
+        raise ValidationError("Retired assets cannot be handed off.")
+    if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
+        raise ValidationError("This asset already has a handoff waiting for acknowledgment.")
+    if asset.disposal_cases.filter(status__in=(
+        AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
+        AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
+    )).exists():
+        raise ValidationError("This asset has an open disposal case and cannot be transferred.")
+    destination = _resolve_assigned_department(data["destination_department"])
+    if destination.pk == asset.assigned_department_id and data["destination_custodian"].strip() == asset.assigned_office.strip():
+        raise ValidationError("Choose a different department or custodian.")
+    return AssetTransfer.objects.create(
+        asset=asset,
+        source_department_id=asset.assigned_department_id,
+        source_department_label=asset.assigned_department_label,
+        source_custodian=asset.assigned_office,
+        destination_department_id=destination.pk,
+        destination_department_label=destination.name,
+        destination_custodian=data["destination_custodian"].strip(),
+        transfer_date=data["transfer_date"], reason=data["reason"].strip(),
+        reference=data.get("reference", "").strip(), requested_by=actor,
+    )
+
+
+@transaction.atomic
+def acknowledge_asset_transfer(*, actor, transfer):
+    transfer = AssetTransfer.objects.select_for_update().select_related("asset").get(pk=transfer.pk)
+    if not can_acknowledge_asset_transfer(actor, transfer):
+        raise PermissionDenied
+    if transfer.status != AssetTransfer.PENDING:
+        raise ValidationError("This handoff has already been processed.")
+    asset = Asset.objects.select_for_update().get(pk=transfer.asset_id)
+    if (asset.assigned_department_id != transfer.source_department_id
+            or asset.assigned_office != transfer.source_custodian):
+        raise ValidationError("The asset assignment changed after this handoff was started. Ask GSO to review it.")
+    asset.assigned_department_id = transfer.destination_department_id
+    asset.assigned_department_label = transfer.destination_department_label
+    asset.assigned_office = transfer.destination_custodian
+    asset.updated_by = actor
+    asset.save(update_fields=(
+        "assigned_department_id", "assigned_department_label", "assigned_office", "updated_by", "updated_at",
+    ))
+    transfer.status = AssetTransfer.ACCEPTED
+    transfer.acknowledged_by = actor
+    transfer.acknowledged_at = timezone.now()
+    transfer.save(update_fields=("status", "acknowledged_by", "acknowledged_at"))
+    AssetAuditEvent.objects.create(
+        asset=asset, department_id=asset.department_id, actor=actor,
+        action=AssetAuditEvent.TRANSFERRED, snapshot=asset_snapshot(asset),
+    )
+    return transfer
+
+
+@transaction.atomic
+def cancel_asset_transfer(*, actor, transfer, reason):
+    transfer = AssetTransfer.objects.select_for_update().select_related("asset").get(pk=transfer.pk)
+    if not can_transfer_asset(actor) or not asset_in_scope(actor, transfer.asset):
+        raise PermissionDenied
+    if transfer.status != AssetTransfer.PENDING:
+        raise ValidationError("Only a pending handoff can be cancelled.")
+    transfer.status = AssetTransfer.CANCELLED
+    transfer.cancelled_by = actor
+    transfer.cancelled_at = timezone.now()
+    transfer.cancellation_reason = reason.strip()
+    transfer.save(update_fields=("status", "cancelled_by", "cancelled_at", "cancellation_reason"))
+    return transfer
+
+
+def _disposal_snapshot(case, note=""):
+    return {
+        "asset_id": case.asset_id,
+        "asset_tag": case.asset.property_tag,
+        "asset_name": case.asset.asset_name,
+        "status": case.status,
+        "reason": case.reason,
+        "condition_details": case.condition_details,
+        "review_note": case.review_note,
+        "authority_reference": case.authority_reference,
+        "disposal_method": case.disposal_method,
+        "disposal_date": case.disposal_date.isoformat() if case.disposal_date else None,
+        "completion_reference": case.completion_reference,
+        "note": note,
+        "attachments": list(case.attachments.values_list("original_filename", flat=True)),
+    }
+
+
+def _record_disposal_event(case, actor, action, note=""):
+    AssetDisposalEvent.objects.create(
+        disposal_case=case, actor=actor, action=action,
+        snapshot=_disposal_snapshot(case, note),
+    )
+
+
+def _save_disposal_attachments(*, case, actor, uploads, kind):
+    attachments = []
+    mime_types = {
+        ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+        ".webp": "image/webp", ".pdf": "application/pdf",
+    }
+    for upload in uploads:
+        extension = "." + upload.name.rsplit(".", 1)[-1].lower() if "." in upload.name else ""
+        attachment = AssetDisposalAttachment(
+            disposal_case=case, kind=kind, original_filename=upload.name[:255],
+            content_type=mime_types.get(extension, "application/octet-stream"),
+            size=upload.size, uploaded_by=actor,
+        )
+        attachment.file.save(upload.name, upload, save=False)
+        attachment.save()
+        attachments.append(attachment)
+    return attachments
+
+
+@transaction.atomic
+def submit_asset_disposal_request(*, actor, asset, data):
+    if not can_request_asset_disposal(actor, asset):
+        raise PermissionDenied
+    if not data.get("photos") or not data.get("signed_request"):
+        raise ValidationError("Attach at least one condition photo and the signed request form.")
+    asset = Asset.objects.select_for_update().get(pk=asset.pk)
+    if asset.status == Asset.RETIRED:
+        raise ValidationError("This asset is already retired.")
+    if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
+        raise ValidationError("Finish or cancel the pending handoff before requesting disposal review.")
+    open_statuses = (
+        AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
+        AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
+    )
+    if asset.disposal_cases.filter(status__in=open_statuses).exists():
+        raise ValidationError("This asset already has an open disposal request.")
+    case = AssetDisposalCase.objects.create(
+        asset=asset, reason=data["reason"].strip(),
+        condition_details=data["condition_details"].strip(), submitted_by=actor,
+    )
+    _save_disposal_attachments(case=case, actor=actor, uploads=data["photos"], kind=AssetDisposalAttachment.PHOTO)
+    _save_disposal_attachments(case=case, actor=actor, uploads=[data["signed_request"]], kind=AssetDisposalAttachment.REQUEST_FORM)
+    _save_disposal_attachments(case=case, actor=actor, uploads=data.get("supporting_documents", []), kind=AssetDisposalAttachment.SUPPORTING)
+    _record_disposal_event(case, actor, "submitted")
+    return case
+
+
+@transaction.atomic
+def review_asset_disposal_case(*, actor, case, data):
+    if not can_review_asset_disposal(actor) or not asset_in_scope(actor, case.asset):
+        raise PermissionDenied
+    case = AssetDisposalCase.objects.select_for_update().select_related("asset").get(pk=case.pk)
+    allowed = {
+        AssetDisposalCase.SUBMITTED: {AssetDisposalCase.UNDER_REVIEW, AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.REJECTED},
+        AssetDisposalCase.UNDER_REVIEW: {AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED, AssetDisposalCase.REJECTED},
+        AssetDisposalCase.NEEDS_INFORMATION: {AssetDisposalCase.UNDER_REVIEW, AssetDisposalCase.REJECTED},
+        AssetDisposalCase.AUTHORIZED: {AssetDisposalCase.DISPOSED},
+    }
+    action = data["action"]
+    if action not in allowed.get(case.status, set()):
+        raise ValidationError("This case cannot move to that status. Refresh the page and review its current status.")
+    note = data.get("note", "").strip()
+    if action in (AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.REJECTED) and not note:
+        raise ValidationError("Add a note explaining the request for information or rejection.")
+    authority_reference = data.get("authority_reference", "").strip()
+    authority_document = data.get("authority_document")
+    disposal_method = data.get("disposal_method")
+    disposal_date = data.get("disposal_date")
+    completion_reference = data.get("completion_reference", "").strip()
+    completion_document = data.get("completion_document")
+    if action == AssetDisposalCase.AUTHORIZED:
+        if not authority_reference:
+            raise ValidationError("Record the approval or authority reference before authorizing disposal.")
+        if not authority_document and not case.attachments.filter(kind="authority").exists():
+            raise ValidationError("Attach the approval or authority document before authorizing disposal.")
+    if action == AssetDisposalCase.DISPOSED:
+        if not disposal_method or not disposal_date or not completion_reference:
+            raise ValidationError("Record the disposal method, completion date, and completion reference.")
+        if not completion_document and not case.attachments.filter(kind="completion").exists():
+            raise ValidationError("Attach evidence that the disposal was completed.")
+        if case.asset.status == Asset.RETIRED:
+            raise ValidationError("This asset is already retired; ask an administrator to review the record.")
+    _save_disposal_attachments(
+        case=case, actor=actor, uploads=data.get("supporting_documents", []),
+        kind=AssetDisposalAttachment.SUPPORTING,
+    )
+    if authority_document:
+        _save_disposal_attachments(case=case, actor=actor, uploads=[authority_document], kind="authority")
+    if completion_document:
+        _save_disposal_attachments(case=case, actor=actor, uploads=[completion_document], kind="completion")
+    case.status = action
+    case.review_note = note
+    case.reviewed_by = actor
+    case.reviewed_at = timezone.now()
+    fields = ["status", "review_note", "reviewed_by", "reviewed_at"]
+    if action == AssetDisposalCase.AUTHORIZED:
+        case.authority_reference = authority_reference
+        fields.append("authority_reference")
+    if action == AssetDisposalCase.DISPOSED:
+        case.disposal_method = disposal_method
+        case.disposal_date = disposal_date
+        case.completion_reference = completion_reference
+        case.completed_by = actor
+        case.completed_at = timezone.now()
+        fields.extend(("disposal_method", "disposal_date", "completion_reference", "completed_by", "completed_at"))
+    case.save(update_fields=fields)
+    _record_disposal_event(case, actor, action, note)
+    if action == AssetDisposalCase.DISPOSED:
+        asset = Asset.objects.select_for_update().get(pk=case.asset_id)
+        asset.status = Asset.RETIRED
+        asset.updated_by = actor
+        asset.save(update_fields=("status", "updated_by", "updated_at"))
+        AssetAuditEvent.objects.create(
+            asset=asset, department_id=asset.department_id, actor=actor,
+            action=AssetAuditEvent.DISPOSED, snapshot=asset_snapshot(asset),
+        )
+    return case
+
+
+@transaction.atomic
+def respond_to_disposal_case(*, actor, case, data):
+    case = AssetDisposalCase.objects.select_for_update().select_related("asset").get(pk=case.pk)
+    if case.status != AssetDisposalCase.NEEDS_INFORMATION:
+        raise ValidationError("This case is not waiting for more information.")
+    if case.submitted_by_id != actor.pk or not can_request_asset_disposal(actor, case.asset):
+        raise PermissionDenied
+    note = data["response"].strip()
+    if not note:
+        raise ValidationError("Add a short response for GSO.")
+    uploads = data.get("supporting_documents", [])
+    _save_disposal_attachments(case=case, actor=actor, uploads=uploads, kind=AssetDisposalAttachment.SUPPORTING)
+    case.status = AssetDisposalCase.SUBMITTED
+    case.review_note = note
+    case.submitted_at = timezone.now()
+    case.save(update_fields=("status", "review_note", "submitted_at"))
+    _record_disposal_event(case, actor, "resubmitted", note)
+    return case
 
 
 def _stock_permission(actor, action):

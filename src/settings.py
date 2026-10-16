@@ -71,6 +71,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+DISPOSAL_PRIVATE_ROOT = Path(os.environ.get("DISPOSAL_PRIVATE_ROOT", BASE_DIR / "private_uploads"))
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "inventory:dashboard"

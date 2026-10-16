@@ -87,6 +87,29 @@ def can_view_audit(user):
     return bool(in_gso_scope(user) and user.has_perm("inventory.view_asset_audit"))
 
 
+def can_transfer_asset(user):
+    return bool(in_gso_scope(user) and user.has_perm("inventory.transfer_asset"))
+
+
+def can_acknowledge_asset_transfer(user, transfer=None):
+    if not can(user, "view") or not user.has_perm("inventory.acknowledge_asset_transfer"):
+        return False
+    department = department_for_user(user)
+    return bool(department and (transfer is None or transfer.destination_department_id == department.pk))
+
+
+def can_request_asset_disposal(user, asset=None):
+    return bool(
+        can(user, "view")
+        and (user.has_perm("inventory.request_asset_disposal") or can_review_asset_disposal(user))
+        and (asset is None or asset_in_scope(user, asset))
+    )
+
+
+def can_review_asset_disposal(user):
+    return bool(in_gso_scope(user) and user.has_perm("inventory.review_asset_disposal"))
+
+
 def can_stock(user, action):
     """GSO controls stock; department users may see only their own issue history."""
     if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):

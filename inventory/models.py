@@ -1,7 +1,14 @@
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
+from uuid import uuid4
+
+
+def disposal_private_storage():
+    return FileSystemStorage(location=settings.DISPOSAL_PRIVATE_ROOT, base_url=None)
 
 
 class Asset(models.Model):
@@ -13,7 +20,53 @@ class Asset(models.Model):
     RETIRED = "retired"
     EQUIPMENT = "equipment"
     VEHICLE = "vehicle"
-    KIND_CHOICES = ((EQUIPMENT, "Office equipment"), (VEHICLE, "Transport vehicle"))
+    KIND_CHOICES = ((EQUIPMENT, "Equipment / furniture"), (VEHICLE, "Transport vehicle"))
+    CLASS_PENDING = "pending_review"
+    CLASS_ICT = "ict_equipment"
+    CLASS_OFFICE = "office_equipment"
+    CLASS_PRINTING = "printing_equipment"
+    CLASS_COMMUNICATIONS = "communications_equipment"
+    CLASS_MACHINERY = "other_machinery_equipment"
+    CLASS_FURNITURE = "furniture_fixtures"
+    CLASS_TRANSPORT = "transportation_equipment"
+    CLASS_OTHER = "other_equipment"
+    INVENTORY_CLASS_CHOICES = (
+        (CLASS_PENDING, "Needs Accounting review"),
+        (CLASS_ICT, "ICT equipment"),
+        (CLASS_OFFICE, "Office equipment"),
+        (CLASS_PRINTING, "Printing equipment"),
+        (CLASS_COMMUNICATIONS, "Communications equipment"),
+        (CLASS_MACHINERY, "Other machinery and equipment"),
+        (CLASS_FURNITURE, "Furniture and fixtures"),
+        (CLASS_TRANSPORT, "Transportation equipment"),
+        (CLASS_OTHER, "Other equipment"),
+    )
+    ITEM_TYPE_CHOICES = (
+        ("desktop", "Desktop computer"),
+        ("laptop", "Laptop computer"),
+        ("monitor", "Monitor"),
+        ("printer", "Printer"),
+        ("photocopier", "Photocopier"),
+        ("scanner", "Scanner"),
+        ("shredder", "Paper shredder"),
+        ("bookbinding_machine", "Bookbinding machine"),
+        ("ups", "UPS / backup power unit"),
+        ("external_drive", "External storage drive"),
+        ("camera", "Camera"),
+        ("walkie_talkie", "Walkie-talkie / radio"),
+        ("sound_system", "Sound / public-address system"),
+        ("projector", "Projector"),
+        ("network_equipment", "Network equipment"),
+        ("desk", "Desk"),
+        ("chair", "Chair"),
+        ("table", "Table"),
+        ("cabinet", "Cabinet"),
+        ("shelving", "Shelf / shelving"),
+        ("fixture", "Other furniture or fixture"),
+        ("motor_vehicle", "Motor vehicle"),
+        ("other", "Other / describe below"),
+    )
+    FURNITURE_ITEM_TYPES = {"desk", "chair", "table", "cabinet", "shelving", "fixture"}
     STATUS_CHOICES = (
         (ACTIVE, "In service"),
         (MAINTENANCE, "Under maintenance"),
@@ -25,7 +78,15 @@ class Asset(models.Model):
     department_label = models.CharField(max_length=160, default="General Services")
     asset_name = models.CharField(max_length=180, verbose_name="Asset name")
     asset_kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=EQUIPMENT)
-    category = models.CharField(max_length=100, blank=True)
+    inventory_class = models.CharField(
+        max_length=32, choices=INVENTORY_CLASS_CHOICES, default=CLASS_PENDING,
+        verbose_name="Inventory class",
+    )
+    item_type = models.CharField(max_length=32, choices=ITEM_TYPE_CHOICES, default="other")
+    category = models.CharField(
+        max_length=100, blank=True, verbose_name="Additional item description",
+        help_text="Optional legacy category or detail. Use the class and item type fields for consistent reporting.",
+    )
     property_tag = models.CharField(max_length=100, blank=True, verbose_name="Property tag / asset number")
     brand = models.CharField(max_length=100, blank=True)
     model_number = models.CharField(max_length=100, blank=True, verbose_name="Model")
@@ -68,6 +129,10 @@ class Asset(models.Model):
         permissions = (
             ("view_asset_audit", "Can view GSO asset change history"),
             ("export_asset_register", "Can export the scoped GSO asset register"),
+            ("transfer_asset", "Can initiate GSO asset handoffs"),
+            ("acknowledge_asset_transfer", "Can acknowledge asset handoffs to the assigned department"),
+            ("request_asset_disposal", "Can request assessment for disposal of an assigned asset"),
+            ("review_asset_disposal", "Can review and record GSO asset disposal cases"),
         )
         indexes = (
             models.Index(fields=("department_id", "status"), name="gso_asset_dept_status"),
@@ -82,7 +147,12 @@ class AssetAuditEvent(models.Model):
     CREATED = "created"
     UPDATED = "updated"
     RETIRED = "retired"
-    ACTION_CHOICES = ((CREATED, "Created"), (UPDATED, "Updated"), (RETIRED, "Retired"))
+    TRANSFERRED = "transferred"
+    DISPOSED = "disposed"
+    ACTION_CHOICES = (
+        (CREATED, "Created"), (UPDATED, "Updated"), (TRANSFERRED, "Transferred"),
+        (RETIRED, "Retired"), (DISPOSED, "Disposed"),
+    )
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="audit_events")
     department_id = models.PositiveBigIntegerField(db_index=True)
@@ -107,6 +177,195 @@ class AssetAuditEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Asset audit events are retained and cannot be deleted.")
+
+
+class AssetTransfer(models.Model):
+    """A simple, acknowledged custody handoff for one registered asset."""
+
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    CANCELLED = "cancelled"
+    STATUS_CHOICES = (
+        (PENDING, "Waiting for acknowledgment"),
+        (ACCEPTED, "Acknowledged"),
+        (CANCELLED, "Cancelled"),
+    )
+
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="transfers")
+    source_department_id = models.PositiveBigIntegerField(null=True, blank=True)
+    source_department_label = models.CharField(max_length=160, blank=True)
+    source_custodian = models.CharField(max_length=160, blank=True)
+    destination_department_id = models.PositiveBigIntegerField(db_index=True)
+    destination_department_label = models.CharField(max_length=160)
+    destination_custodian = models.CharField(max_length=160)
+    transfer_date = models.DateField()
+    reason = models.CharField(max_length=240)
+    reference = models.CharField(max_length=120, blank=True, verbose_name="PAR / ICS / other reference")
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=PENDING, db_index=True)
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_transfers_requested",
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    acknowledged_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_transfers_acknowledged",
+    )
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_transfers_cancelled",
+    )
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancellation_reason = models.CharField(max_length=240, blank=True)
+
+    class Meta:
+        ordering = ("-requested_at", "-pk")
+        constraints = (
+            models.UniqueConstraint(
+                fields=("asset",), condition=models.Q(status="pending"),
+                name="gso_one_pending_asset_transfer",
+            ),
+        )
+
+    def __str__(self):
+        return f"{self.asset.asset_name}: {self.source_department_label or 'Unassigned'} to {self.destination_department_label}"
+
+
+class AssetDisposalCase(models.Model):
+    SUBMITTED = "submitted"
+    UNDER_REVIEW = "under_review"
+    NEEDS_INFORMATION = "needs_information"
+    AUTHORIZED = "authorized"
+    DISPOSED = "disposed"
+    REJECTED = "rejected"
+    STATUS_CHOICES = (
+        (SUBMITTED, "Submitted to GSO"),
+        (UNDER_REVIEW, "Under GSO review"),
+        (NEEDS_INFORMATION, "More information needed"),
+        (AUTHORIZED, "Authorized for disposal"),
+        (DISPOSED, "Disposal completed"),
+        (REJECTED, "Request rejected"),
+    )
+    DISPOSAL_METHOD_CHOICES = (
+        ("", "Select after authorization"),
+        ("sale", "Sale"),
+        ("donation", "Donation"),
+        ("transfer", "Transfer"),
+        ("barter", "Barter"),
+        ("destruction", "Condemnation / destruction"),
+    )
+
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="disposal_cases")
+    status = models.CharField(max_length=24, choices=STATUS_CHOICES, default=SUBMITTED, db_index=True)
+    reason = models.CharField(max_length=240)
+    condition_details = models.TextField()
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_disposal_requests",
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    review_note = models.TextField(blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_disposal_cases_reviewed",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    authority_reference = models.CharField(max_length=160, blank=True)
+    disposal_method = models.CharField(max_length=20, choices=DISPOSAL_METHOD_CHOICES, blank=True)
+    disposal_date = models.DateField(null=True, blank=True)
+    completion_reference = models.CharField(max_length=160, blank=True)
+    completed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_disposals_completed",
+    )
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-submitted_at", "-pk")
+        constraints = (
+            models.UniqueConstraint(
+                fields=("asset",),
+                condition=models.Q(status__in=("submitted", "under_review", "needs_information", "authorized")),
+                name="gso_one_open_disposal_case",
+            ),
+        )
+
+    def __str__(self):
+        return f"Disposal request for {self.asset.asset_name} ({self.get_status_display()})"
+
+
+def disposal_attachment_path(instance, filename):
+    tag = slugify(instance.disposal_case.asset.property_tag or f"asset-{instance.disposal_case.asset_id}")[:70]
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else "bin"
+    return f"inventory/disposal/{instance.disposal_case.asset_id}/{tag}-case-{instance.disposal_case_id}-{instance.kind}-{uuid4().hex[:10]}.{extension}"
+
+
+class AssetDisposalAttachment(models.Model):
+    PHOTO = "photo"
+    REQUEST_FORM = "request_form"
+    SUPPORTING = "supporting"
+    KIND_CHOICES = (
+        (PHOTO, "Asset condition photo"),
+        (REQUEST_FORM, "Signed disposal request form"),
+        (SUPPORTING, "Supporting document"),
+        ("authority", "Approval / authority document"),
+        ("completion", "Disposal completion evidence"),
+    )
+
+    disposal_case = models.ForeignKey(AssetDisposalCase, on_delete=models.PROTECT, related_name="attachments")
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES)
+    file = models.FileField(upload_to=disposal_attachment_path, storage=disposal_private_storage)
+    original_filename = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=100)
+    size = models.PositiveBigIntegerField()
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_disposal_attachments_uploaded",
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("kind", "uploaded_at", "pk")
+
+    def __str__(self):
+        return f"{self.get_kind_display()} for case {self.disposal_case_id}"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Disposal evidence is retained and cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Disposal evidence is retained and cannot be deleted.")
+
+
+class AssetDisposalEvent(models.Model):
+    ACTION_CHOICES = (
+        ("submitted", "Submitted"), ("under_review", "Under review"),
+        ("needs_information", "More information requested"),
+        ("authorized", "Authorized for disposal"), ("disposed", "Disposal completed"),
+        ("rejected", "Rejected"), ("resubmitted", "Resubmitted"),
+    )
+    disposal_case = models.ForeignKey(AssetDisposalCase, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="gso_asset_disposal_events",
+    )
+    action = models.CharField(max_length=32, choices=ACTION_CHOICES)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Disposal case history is immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Disposal case history is retained and cannot be deleted.")
 
 
 class ConsumableItem(models.Model):

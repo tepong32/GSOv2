@@ -12,6 +12,8 @@
 <nav class="quick-links" aria-label="Everyday tasks">
   <a href="{% url 'inventory:asset-list' %}">Open asset register</a>
   {% if can_view_stock %}<a href="{% url 'inventory:consumable-list' %}">Open consumables</a>{% endif %}
+  {% if can_view_transfers %}<a href="{% url 'inventory:asset-transfer-list' %}">Asset handoffs{% if pending_transfer_count %} ({{ pending_transfer_count }} pending){% endif %}</a>{% endif %}
+  {% if can_view_disposals %}<a href="{% url 'inventory:asset-disposal-list' %}">Disposal requests{% if open_disposal_count %} ({{ open_disposal_count }} open){% endif %}</a>{% endif %}
   {% if can_add %}<a class="button primary" href="{% url 'inventory:asset-create' %}">Add an asset</a>{% endif %}
 </nav>
 <section class="metrics" aria-label="Asset overview">
@@ -24,7 +26,8 @@
 <section class="workspace-grid" aria-label="GSO workspaces">
   <article class="module"><span class="pill available">Available</span><h3>Inventory register</h3><p>Search assets, review assigned office and custodian, and check acquisition and status details.</p><a class="button primary" href="{% url 'inventory:asset-list' %}">Open register</a></article>
   {% if can_view_stock %}<article class="module"><span class="pill available">Available</span><h3>Consumable supplies</h3><p>Record stock received and issued by department. FIFO lot tracking is optional per item.</p><a class="button primary" href="{% url 'inventory:consumable-list' %}">Open consumables</a></article>{% endif %}
-  <article class="module"><span class="pill">Planned</span><h3>Property issuance and transfers</h3><p>Track custody handoffs, receiving acknowledgements, and return records.</p><span class="muted">Planned workflow</span></article>
+  {% if can_view_transfers %}<article class="module"><span class="pill available">Available</span><h3>Asset handoffs</h3><p>Send an asset to another department and record its receipt.</p><a class="button primary" href="{% url 'inventory:asset-transfer-list' %}">Review handoffs{% if pending_transfer_count %} ({{ pending_transfer_count }} pending){% endif %}</a></article>{% endif %}
+  {% if can_view_disposals %}<article class="module"><span class="pill available">Available</span><h3>Disposal requests</h3><p>Send asset condition photos and a signed form to GSO for review.</p><a class="button primary" href="{% url 'inventory:asset-disposal-list' %}">Open requests{% if open_disposal_count %} ({{ open_disposal_count }} open){% endif %}</a></article>{% endif %}
   <article class="module"><span class="pill">Planned</span><h3>Procurement and suppliers</h3><p>Follow purchase references, delivery details, and supplier information.</p><span class="muted">Planned workspace · not connected yet</span></article>
   <article class="module"><span class="pill">Planned</span><h3>Maintenance requests</h3><p>Coordinate equipment concerns and retain repair history against an asset.</p><span class="muted">Planned workspace · not connected yet</span></article>
 </section>
