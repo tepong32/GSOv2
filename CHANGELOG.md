@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.2] - 2026-10-17
+### Fixed
+- Enforce GRAND receiving grants and read-only UAT access
+
 ## [0.11.1] - 2026-10-17
 ### Documentation
 - Record receipt basis release and recovery validation

@@ -4,10 +4,11 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 
 from .models import ReceivingReceipt, ReceivingEvidence
-from .receiving import (require_receiving, create_receipt, update_receipt, save_receipt_line,
+from .receiving import (can_receiving, require_receiving, create_receipt, update_receipt, save_receipt_line,
     void_receipt_line, attach_receipt_evidence, submit_receipt, accept_receipt, return_receipt,
     PREPARATION_ACTIONS)
 from .receiving_forms import ReceiptForm, ReceiptLineForm, EvidenceForm, ReceiptActionForm
@@ -19,14 +20,17 @@ def scoped(actor):
     return rows if actor.is_superuser else rows.filter(department_id=department.pk)
 
 
+@never_cache
 @login_required
 @require_http_methods(["GET"])
 def receipt_list(request):
     return render(request, "inventory/receiving_list.html", {
         "page": Paginator(scoped(request.user), 25).get_page(request.GET.get("page")),
+        "can_add": can_receiving(request.user, "add"),
     })
 
 
+@never_cache
 @login_required
 @require_http_methods(["GET", "POST"])
 def receipt_create(request):
@@ -42,11 +46,15 @@ def receipt_create(request):
     return render(request, "inventory/receiving_form.html", {"form": form, "heading": "Record a delivery"})
 
 
+@never_cache
 @login_required
 @require_http_methods(["GET", "POST"])
 def receipt_detail(request, pk):
     receipt = get_object_or_404(scoped(request.user), pk=pk)
     action = request.POST.get("action", "") if request.method == "POST" else ""
+    if request.method == "POST":
+        authority = {"submit": "submit", "accept": "review", "return": "review"}.get(action, "change")
+        require_receiving(request.user, authority, receipt)
     header_form = ReceiptForm(request.POST if action == "header" else None, instance=receipt, auto_id="header_%s")
     line_form = ReceiptLineForm(request.POST if action == "line" else None, receipt=receipt, auto_id="line_%s")
     evidence_form = EvidenceForm(request.POST if action == "evidence" else None, request.FILES if action == "evidence" else None, auto_id="evidence_%s")
@@ -84,10 +92,14 @@ def receipt_detail(request, pk):
         "receipt": receipt, "header_form": header_form, "line_form": line_form,
         "evidence_form": evidence_form, "control": control,
         "editable": receipt.status in (receipt.DRAFT, receipt.RETURNED),
+        "can_change": can_receiving(request.user, "change", receipt),
+        "can_submit": can_receiving(request.user, "submit", receipt),
+        "can_review": can_receiving(request.user, "review", receipt),
         "is_preparer": receipt.events.filter(actor=request.user, action__in=PREPARATION_ACTIONS).exists(),
     })
 
 
+@never_cache
 @login_required
 @require_http_methods(["GET"])
 def evidence_download(request, pk):

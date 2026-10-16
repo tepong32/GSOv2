@@ -49,3 +49,13 @@ logical pattern. It refuses duplicate open historical cases before DDL. Apply wi
 a verified backup during maintenance; never auto-deduplicate. [Native tests](native-testing.md)
 cover populated upgrades and races. GRAND integration remains separate; operational
 tables belong in `default`, with no cross-store Finance FK or automatic posting.
+
+## GRAND receiving authority
+
+GRAND receiving uses its explicit user/group grant helper for each action, even
+for superusers. GSO-assigned Finance UAT viewers with an explicit view grant can
+read their scoped receipts and private documents, but cannot create, change,
+submit or review them. Services and POST entry points enforce this independently
+of hidden controls. Independent review and asset/stock acceptance permissions
+remain required. Receiving responses prohibit caching. No existing role grants
+are changed by this code; standalone Django permissions remain supported.

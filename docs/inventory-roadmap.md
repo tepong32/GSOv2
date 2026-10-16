@@ -92,6 +92,14 @@ clearance remains separate; never derive employment status from account activati
 
 Let GSO record a dated physical count for consumables, compare counted quantity with the movement-ledger balance, and record a reasoned adjustment after review. Add a clear low-stock indicator using the existing minimum-stock value. Keep ordinary supplies quantity-only by default; FIFO remains optional per item. Validate any official supplies count report with the LGU Accountant before adding a form export.
 
+## Receiving authority alignment
+
+Receiving now shares GRAND explicit action grants and read-only UAT restrictions,
+with service/HTTP/control parity and no caching. This prerequisite precedes reviewed
+cost amendments. Audit remaining legacy asset, transfer, disposal and verification
+checks before claiming uniform GRAND authorization across the module. See CONTINUE
+for current validation and publication status.
+
 ## Deliberate boundaries
 
 - Use GRAND's shared users, departments, and Finance interfaces when integrating; do not create duplicate user or finance systems in this module.

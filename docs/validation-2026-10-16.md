@@ -722,3 +722,45 @@ branch CI38957280486 PASS36s; remote master/tag match
 543fef8d72a30783923984c02fa4ea71157ba6bd. Primary CI38957393614 PASS42s.
 Release notes use separate `codex/receipt-basis-release-notes`, fresh clean fetch0/0;
 no code/schema/storage changes in that follow-up.
+
+## Receiving authority correction — 2026-10-17
+
+Fresh GSO fetch clean0/0 atcbdd0d1, new `codex/receiving-authority`. GRAND source
+32ab046 fetched0/0; parallel dirty Form1 work preserved. Before/after probes on
+copied, disposable actual-GRAND SQLite stores confirmed the gap: all five actions
+were allowed for an ungranted superuser; all four writes allowed for GSO UAT.
+After correction superuser actions deny without explicit grants, UAT writes deny,
+and granted scoped UAT view remains. Logs`.tmp/receiving-authority-{before,after}.log`.
+
+Initial full standalone SQLite/native: FAIL - CAUSED BY CURRENT WORK, exact cache
+header assertion expected only private/no-store, but never_cache safely adds
+max-age/no-cache/must-revalidate. Early assertion left the file stream open and
+caused Windows cleanup error. Test now exhausts download before assertions and
+checks required cache directives. Final SQLite91 discovered/79 executed/12 native
+skips PASS28.340s; `manage.py makemigrations --check --dry-run` PASS no changes.
+
+Actual GRAND browser login as GSO UAT: scoped receiving list/detail visible with
+no creation/edit/upload/submit/review controls. Screenshot visually inspected:
+`output/playwright/receiving-authority-uat.png`. Browser and preview8025 stopped.
+Native integration tests also exercise direct POST denial, service denial, owner
+isolation, authorized independent acceptance, private file read and zero Finance
+queries. Their final outcomes are recorded below once available.
+
+NOT RUN - OUT OF SCOPE: new recovery drill (no schema/storage format changes),
+operator grants/migrations, deployment and human acceptance. Prior paired recovery
+evidence remains applicable. Canonical operator database SHA-256 unchanged.
+
+Final standalone native91/91 PASS72.475s, log
+`.tmp/receiving-authority-shell-native-final.log`. Initial GRAND75 run:
+FAIL - CAUSED BY CURRENT WORK (test assertion matched explanatory prose
+"Record delivery facts" instead of the create link). Browser and response proved
+no create control; changed assertion to the create URL, preserving application
+behavior. Final native rerun pending; no production-policy exemption is involved.
+
+Final actual GRAND native75/75 PASS25.703s, log
+`.tmp/receiving-authority-grand-native-final.log`; both disposable schemas removed.
+Existing23 GRAND W036 warnings remain outside GSO. No new GSO warning.
+No extra SQLite integration rerun: native full suite covers changed integration
+and shared dependencies; standalone SQLite checks shell portability. Actual VM
+README/inspect/patch preview reviewed; intended changes only. Remote rulesets empty,
+master unprotected. Publication gated on branch CI, then primary CI verification.

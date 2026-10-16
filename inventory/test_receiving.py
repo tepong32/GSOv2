@@ -241,10 +241,12 @@ class ReceivingPreparationTests(TestCase):
             self.assertEqual(self.client.get(reverse(f"inventory:{route}", args=args)).status_code, 200)
         download = reverse("inventory:receiving-evidence", args=[document.pk])
         response = self.client.get(download)
+        body = b"".join(response.streaming_content)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Cache-Control"], "private, no-store")
+        directives = {value.strip() for value in response["Cache-Control"].split(",")}
+        self.assertTrue({"private", "no-store", "no-cache"}.issubset(directives))
         self.assertTrue(response["Content-Disposition"].startswith("attachment;"))
-        self.assertEqual(b"".join(response.streaming_content), b"%PDF-1.4\nsynthetic test document\n%%EOF")
+        self.assertEqual(body, b"%PDF-1.4\nsynthetic test document\n%%EOF")
         # Exhausting the test client's streaming iterator already closes it.
         # A second close emits request_finished outside the client's DB guard.
         self.client.force_login(self.outsider)

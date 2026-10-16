@@ -2,6 +2,7 @@
 import hashlib
 from pathlib import Path
 
+from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Sum
@@ -19,13 +20,27 @@ LINE_FIELDS = {"kind", "description", "unit", "delivered_quantity", "accepted_qu
 PREPARATION_ACTIONS = ("created", "header_saved", "line_saved", "line_voided", "submitted", "evidence_added")
 
 
-def require_receiving(actor, action, receipt=None):
-    if not in_gso_scope(actor) or not actor.has_perm(f"inventory.{action}_receivingreceipt"):
-        raise PermissionDenied
+def can_receiving(actor, action, receipt=None):
+    if action not in ("view", "add", "change", "submit", "review") or not in_gso_scope(actor):
+        return False
+    permission = f"inventory.{action}_receivingreceipt"
+    if apps.is_installed("vouchers"):
+        from vouchers.access import has_explicit_permission
+        from vouchers.roles import is_finance_uat_viewer
+        if action != "view" and is_finance_uat_viewer(actor):
+            return False
+        granted = has_explicit_permission(actor, permission)
+    else:
+        granted = actor.has_perm(permission)
     department = gso_department_for_user(actor)
-    if department is None or (receipt and not actor.is_superuser and receipt.department_id != department.pk):
+    return bool(granted and department and
+        (receipt is None or actor.is_superuser or receipt.department_id == department.pk))
+
+
+def require_receiving(actor, action, receipt=None):
+    if not can_receiving(actor, action, receipt):
         raise PermissionDenied
-    return department
+    return gso_department_for_user(actor)
 
 
 def _data(data, fields):

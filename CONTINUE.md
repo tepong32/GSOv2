@@ -5,6 +5,28 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Receiving authority correction
+
+Started `codex/receiving-authority` from cbdd0d1 after clean fetch0/0. Previous
+notes release master CI38957660920 PASS42s. GRAND source remains32ab046;
+parallel Form1 changes are preserved. A copied disposable actual-GRAND fixture
+reproduced implicit-superuser access and GSO-assigned UAT write access in receiving.
+The corrected helper requires explicit GRAND action grants and blocks UAT writes;
+scoped reads/private evidence remain available. POST gates and controls share it,
+and receiving responses prohibit caching. No schema or role changes.
+
+Final standalone SQLite91/79 executed/12 native skips PASS28.340s; native91/91
+PASS72.475s. Actual GRAND native75/75 PASS25.703s; existing23 non-GSO W036
+warnings remain. Initial failures were test assertions (expanded cache header,
+prose matched instead of create link), corrected without weakening protection.
+Browser UAT scoped reads/control absence visually verified; preview8025 stopped.
+No schema/storage change, so prior recovery evidence remains applicable.
+VM patch preview inspected for this correction; publication follows passing checks.
+
+Next: audit legacy asset/transfer/disposal/verification authority before claiming
+consistent GRAND policy across GSO. Documentary cost amendments remain planned;
+receipt-side claim snapshots are already published. Overall goal is incomplete.
+
 ## Published receipt-side claim review basis
 
 Previous turn published counts3ec09d6 and notes217a4d3/v0.10.1. Final notes primary
