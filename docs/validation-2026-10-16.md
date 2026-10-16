@@ -1060,3 +1060,10 @@ Operator db.sqlite3 SHA256 remains
 `5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
 Version Manager README/inspect/preview checked: proposed minor release updates
 only VERSION and CHANGELOG. All local gates now pass; release and remote CI evidence follow below.
+
+Feature publication: VM release204df28, branchCI38969039410 PASS, then canonical
+master fast-forward/push. Remote master/tag verified at
+204df2842f76ef141ad5e3a83646672e1faee4cd; canonical clean0/0. PrimaryCI38969293198
+PASS. The documentation follow-up records that publication. No code changes
+in that follow-up. Owned33317 shutdown exited0; preview8030 stopped. All prior
+migration, recovery, browser and native test evidence above applies to this code.

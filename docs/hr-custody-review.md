@@ -38,15 +38,15 @@ all physical changes. Review services do not update HR, assets or Finance.
 Private sources belong under `inventory/custody-reviews` in the existing private
 storage root and must join coordinated recovery. The new models use protected
 native user relationships, portable case UUIDs, generated nullable open-case
-uniqueness, exact retained snapshots and immutable checksummed events. Validate
-populated migrations, native lock races, independent review, inactive historical
-custody, source-file corruption and recovery before publishing.
+uniqueness, exact retained snapshots and immutable checksummed events. Populated
+migrations, native lock races, independent review, inactive historical
+custody, source-file corruption and recovery are validated; see the handoff.
 
 The implementation includes owner-scoped list/search/create/detail screens,
 actor-bound signed request/submission forms, private downloads, findings/submission,
 independent review/return, cancellation and retained event history. The
 `check_custody_review_evidence` command checks files without modifying them.
-Schema migration0021 adds only default-store case/event tables. It does not install
+Published code204df28 uses migration0021 for default-store case/event tables. It does not install
 roles or permissions onto users. Current tests/release status remain in CONTINUE;
 do not treat this branch as deployed or formally accepted.
 

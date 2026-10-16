@@ -80,8 +80,7 @@ is published atfb2eae2 as the next prerequisite. No operator migration or deploy
 [Witnessed returns](custody-returns.md) are published at2a7bb5f:
 independent GSO confirmation, protected receipt evidence and retained former custody,
 with no HR clearance or Finance decision. See CONTINUE for validation evidence.
-The [HR-reference review case](hr-custody-review.md) is implemented and validated on
-`codex/hr-custody-review`: supplied private request, office findings, retained
+The [HR-reference review case](hr-custody-review.md) is published at204df28: supplied private request, office findings, retained
 as-of custody and independent review. It does not create HR separation events,
 universal clearance, financial holds or duplicate GRAND's general records registry.
 Unresolved-liability decisions and accepted official outputs remain future work.

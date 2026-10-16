@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.15.1] - 2026-10-17
+### Documentation
+- Record verified HR custody review publication and recovery evidence
+
 ## [0.15.0] - 2026-10-17
 ### Added
 - Add documented HR-reference GSO custody reviews

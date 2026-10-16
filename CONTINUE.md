@@ -5,11 +5,12 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## HR-reference custody review — validated; release in progress
+## HR-reference custody review — published
 
 Branch `codex/hr-custody-review` based on676bc29 after fresh fetch clean0/0.
 Previous documentation release676bc29/v0.14.1 is published; branchCI38966229245
-and primaryCI38966414324 PASS. The current HR feature is not yet released.
+and primaryCI38966414324 PASS. HR feature204df28/v0.15.0 is now integrated/pushed
+after branchCI38969039410 PASS. Remote master/tag match204df2842f76ef141ad5e3a83646672e1faee4cd.
 Actual GRAND32ab046 rechecked0/0 with87 parallel changes preserved; only its GSO
 coordination note was appended. No typed separation event exists there, and its
 DepartmentRecord remains the general records authority.
@@ -36,11 +37,14 @@ Recovery found a cached-file reopen error after removing evidence; verification
 now opens the checked private path afresh, and repeated missing-file coverage was
 added. Corrected focused SQLite12 discovered/10 executed/2 native skips PASS1.470s;
 final native GRAND109/109 PASS38.242s includes the file fix and both observed races.
-Both native schemas removed; owned33317 shutdown requested after standalone99/99
+Both native schemas removed; owned33317 normal shutdown confirmed after standalone99/99
 PASS84.119s. Final diff/checks and operator DB hash pass. Version Manager minor
-preview proposes only VERSION/CHANGELOG updates. Next: execute VM release, verify
-branch CI before primary integration/push, then verify remote master/tag and CI.
+release updated only VERSION/CHANGELOG as previewed. PrimaryCI38969293198 PASS.
+This documentation follow-up records the verified feature publication.
 No operator migration, grant or deployment. Overall goal remains incomplete.
+Next: physical quantity/cost-component allocation, Accounting valuation and accepted
+official outputs remain separate gaps. Recheck actual Finance source/handoff before
+designing the next slice; preserve its active uncommitted Form1 work.
 
 ## Reviewed receipt recognition mappings
 
