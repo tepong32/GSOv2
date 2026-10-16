@@ -1465,3 +1465,53 @@ shut down normally. Clean source checkout a533482 is unchanged; canonical GSO
 operator SQLite hash remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 Documentation links/diff checks PASS. VM inspect/preview selects a minor feature
 release touching VERSION/CHANGELOG; actual publication and hosted gates follow.
+
+## Property working register — 2026-10-17
+
+Branch `codex/property-working-register`, baseline6c1ba3e after fresh fetch and
+clean canonical0/0; Finance candidate a533482 unchanged with its GSO note preserved.
+Rechecked ONAR record3842 metadata; no new executable COA rule or official form.
+This is a scoped current preparation view, not a historical SPC balance. It adds
+no models, migrations, write services, Finance queries or permission assignments.
+
+- PASS: standalone affected `manage.py test inventory.test_property_determinations
+  --verbosity 1`:9/9,0.559s. Latest verified filters ignore pending successors,
+  successor verification replaces filters, missing/grouped/retired assets remain,
+  owner/grant boundaries, stale/missing sources and POST denial tested.
+- PASS: full standalone `manage.py test --verbosity 1`:128 discovered,110 run,
+  18 native-only skips,45.688s; `.tmp/property-register-shell.log`, exit0.
+  Full suite selected because the shared navigation helper now calls property access.
+- PASS: `manage.py check`, `manage.py makemigrations --check --dry-run`,
+  `git diff --check` (only Git line-ending notices).
+- Browser PASS: actual GRAND candidate with isolated synthetic copied databases;
+  GSO login, retained source/useful life, class filter, missing-document filter,
+  clear and current custody display. Desktop1280 and mobile390 screenshots visually
+  inspected: `output/playwright/property-register-desktop.png` and `-mobile.png`.
+  Initial manual navigation used an incorrect prefix and returned404; corrected
+  to the harness's actual `/gso/inventory/property-records/`. This was not an app defect.
+  Login's missing default avatar/logo remain existing fixture limitations. Browser
+  and preview server stopped. No operator files or grants touched.
+- NOT RUN - OUT OF SCOPE: repeated populated migration/paired restore rehearsal;
+  no schema, write path or evidence namespace changes. Prior6c1ba3e recovery remains
+  historical evidence, not a new recovery result. Official SPC/form parity and
+  local operational acceptance remain unfinished.
+
+- PASS: actual GRAND candidate a533482, `scripts/run_grand_source_tests.py
+  --grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation`:
+  SQLite132 discovered,111 run/21 native-only skips,32.415s, exit0;
+  `.tmp/property-register-grand.log`. Explicit native owner/UAT/superuser boundaries
+  and zero Finance queries included. No SQLite concurrency claim.
+- PASS: native MySQL8.4.11 focused `gso_integration_tests.grand_property`, same
+  harness with `--mysql`, labels narrowed by ignored
+  `.tmp/test_property_register_native.py`:3/3,1.760s, exit0;
+  `.tmp/property-register-native.log`. Disposable schemas removed; owned
+  MySQL33317 normal shutdown confirmed, exit0. No concurrent mutation changed.
+- Final wording refinement: register cost replaces an unjustified original-cost
+  label for mutable legacy assets; affected9/9 PASS0.566s. Screenshots precede this
+  wording-only refinement; no layout change. Full suites precede this label change.
+  A local documentation update hit the Windows default text encoding; corrected
+  affected files back to UTF-8 and reviewed diffs before release.
+  Source PDF hash matches its receipt; visually revisited AnnexA.2 page8 numbering
+  and balances. Stock balance differs from continuing custody after issue.
+
+Local gates complete; actual VM and hosted release checks follow.

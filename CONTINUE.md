@@ -5,7 +5,29 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Property Finance links — implementation validation
+## Property working register — in validation
+
+Previous goal turn: progress. Actual VM published6c1ba3e/v0.19.0, branch
+CI38980459629 and masterCI38980624675 PASS; remote master/tag verified. Fresh
+fetch this turn: canonical GSO clean0/0 at6c1ba3e; Finance candidate a533482
+unchanged apart from the preserved GSO coordination note. New feature branch:
+`codex/property-working-register` in the existing isolated GSO worktree.
+
+Read-only working register now shows scoped assets, latest verified supplied
+class/fund/treatment, useful life, register cost and current custody. Unknown and
+stale documents stay visible; pending successors do not change verified filters.
+No schema/mutation/Finance-query/role changes. This is preparation for the SPC,
+not its historical quantity ledger or official output. See property-record-design.
+Focused shell9/9 PASS0.559s; full shell128 (110 run/18 native skips) PASS45.688s.
+Full actual-GRAND SQLite132 (111 run/21 native skips) PASS32.415s; focused
+native MySQL3/3 PASS1.760s, both exit0, candidate a533482. Final label refinement
+uses register cost rather than claiming original legacy cost; focused9/9 PASS0.566s.
+Browser desktop/mobile and filters inspected before that wording-only refinement.
+Disposable schemas removed, owned MySQL shut down normally, preview/browser closed.
+Local gates complete; actual VM publication and hosted branch/master checks next.
+Official class/fund SPC, physical cost allocation and operational acceptance remain.
+
+## Property Finance links — published6c1ba3e
 
 Previous turn: progress (design published e9b3c74; branch CI38978070046 and primary
 CI38978241661 PASS). Fresh fetch: GSO clean0/0 at e9b3c74; Finance a533482 candidate,
@@ -38,7 +60,8 @@ recovery retains an approved replacement and withdrawn predecessor,217 default/
 link tampering and stale decision detected. Backup:
 `C:/Users/Administrator/.codex/backups/gsov2-property-link-recovery-20261017-4_u2xo4w`.
 
-Local gates are complete; actual VM publication and hosted checks are next.
+Actual VM publication completed at6c1ba3e; branchCI38980459629 and primary
+CI38980624675 PASS. Master/tag verified; canonical clean0/0, operator DB unchanged.
 All disposable test schemas were removed; owned MySQL33317 shut down normally.
 Official class/fund SPC output and physical cost allocation remain unfinished.
 

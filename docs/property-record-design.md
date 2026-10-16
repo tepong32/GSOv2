@@ -102,6 +102,17 @@ Native race tests must establish the final lock order before this path ships.
 
 ## Output and remaining prerequisites
 
+The property working register (`property-records/`) now provides a paginated,
+owner-scoped preparation view across assets, including retired and undocumented
+items. Filters use only the latest verified supplied treatment/class/fund labels;
+a pending successor never replaces those labels. Missing documents, grouped
+quantities, missing dates/cost/life/class/fund/tag and changed source facts remain
+visible for review. Each displayed determination's history and private file are
+checked on the read. Invalid filters return errors and no records. No totals,
+historical balances, native Finance identity inference or official-form readiness
+are asserted. This view performs no mutations or Finance queries and needs the
+existing property-document view authority. It is a preparation aid, not the SPC.
+
 The eventual SPC is a class/fund working projection of retained item and movement
 facts, not a second quantity ledger. Its property/item numbering must be explicitly
 recorded and checked against the applicable source instructions before official
@@ -109,6 +120,17 @@ output. A one-asset audit list cannot be presented as the completed class/fund S
 Grouping must not net away individual custody. Legacy opening balances, transfers
 between funds/classes, unknown source dates and discrepancies need explicit reviewed
 entries; they cannot be reconstructed from today's labels or created_at timestamps.
+
+Rechecked retained AnnexA.2 instruction page8 during the working-register slice.
+It distinguishes the assigned property number from receipt/issue item numbers.
+The latter examples encode acquisition year, annually renewed acquisition order,
+and item series. Existing Asset.property_tag must not silently double as all three
+identifiers. Next card work must retain explicitly supplied source numbering and
+document dates for acquisitions and acknowledged movements before reconstructing
+balances. The instruction's balance is received quantity less issues/transfers/
+disposals, which is distinct from continuing individual custody after issue.
+Therefore neither active asset count nor total named custody can populate that
+balance. Opening stock and external transfers require documented reconciliation.
 
 Physical receipt cost-component allocation remains a separate unfinished workflow:
 documented allocation targets need exact quantities, source amounts, component

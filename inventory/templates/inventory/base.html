@@ -88,6 +88,7 @@
         {% if inventory_nav.assets %}<a href="{% url 'inventory:asset-list' %}">Asset register</a>{% endif %}
         {% if inventory_nav.stock %}<a href="{% url 'inventory:consumable-list' %}">Consumables</a>{% endif %}
         {% if inventory_nav.receiving %}<a href="{% url 'inventory:receiving-list' %}">Receiving</a>{% endif %}
+        {% if inventory_nav.property %}<a href="{% url 'inventory:property-register' %}">Property</a>{% endif %}
         {% if request.user.is_authenticated %}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="nav-button" type="submit">Sign out</button></form>{% endif %}
       </nav>
     </div>

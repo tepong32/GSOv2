@@ -73,3 +73,19 @@ class GrandPropertyTests(TestCase):
         self.reviewer.user_permissions.remove(Permission.objects.get(content_type__app_label="inventory", codename="review_property_determination"))
         self.client.force_login(self.reviewer)
         self.assertEqual(self.client.post(detail, {"operation": "verify", "expected_version": 1, "verify-note": "Revoked"}).status_code, 403)
+
+    def test_working_register_uses_native_scope_without_finance_queries(self):
+        row = self.record()
+        service.decide(actor=self.reviewer, row=row, expected_version=1, action="verify", note="Checked")
+        url = reverse("inventory:property-register")
+        for actor in (self.clerk, self.viewer):
+            self.client.force_login(actor)
+            with CaptureQueriesContext(connections["finance"]) as queries:
+                response = self.client.get(url)
+            self.assertContains(response, "GRAND-PROPERTY")
+            self.assertEqual(len(queries), 0)
+            self.assertEqual(self.client.post(url).status_code, 405)
+        self.client.force_login(self.outsider)
+        self.assertNotContains(self.client.get(url), "GRAND-PROPERTY")
+        self.client.force_login(self.super_no_grant)
+        self.assertEqual(self.client.get(url).status_code, 403)

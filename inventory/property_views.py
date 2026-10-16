@@ -5,15 +5,92 @@ from django.core import signing
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.http import FileResponse, Http404
+from django import forms
+from django.db.models import OuterRef, Subquery, Exists, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 from . import property_determinations as service
 from .access import gso_department_for_user
-from .models import Asset
+from .models import Asset, PropertyDetermination
 from .property_forms import PropertyForm, PropertyDecisionForm, PropertyVersionForm
 
 SALT = "gso-property-determination-v1"
+
+
+class PropertyRegisterFilter(forms.Form):
+    q = forms.CharField(label="Asset name or tag contains", required=False, max_length=180)
+    property_class = forms.CharField(label="Supplied class contains", required=False, max_length=160)
+    fund = forms.CharField(label="Supplied fund label contains", required=False, max_length=160)
+    treatment = forms.ChoiceField(required=False, choices=(("", "All treatments"),
+        ("ppe", "PPE (as supplied)"), ("semi_expendable", "Semi-expendable (as supplied)"),
+        ("missing", "No verified determination")))
+
+
+@never_cache
+@login_required
+@require_GET
+def property_register(request):
+    if not service.can_act(request.user, "view"):
+        raise PermissionDenied
+    form = PropertyRegisterFilter(request.GET)
+    latest = PropertyDetermination.objects.filter(asset_id=OuterRef("pk"), status="verified").order_by("-decided_at", "-pk")
+    assets = Asset.objects.filter(department_id=gso_department_for_user(request.user).pk).annotate(
+        determination_id=Subquery(latest.values("pk")[:1]),
+        supplied_class=Subquery(latest.values("property_class")[:1]),
+        supplied_fund=Subquery(latest.values("fund_label")[:1]),
+        supplied_treatment=Subquery(latest.values("treatment")[:1]),
+        pending_document=Exists(PropertyDetermination.objects.filter(asset_id=OuterRef("pk"), status="pending")))
+    if form.is_valid():
+        data = form.cleaned_data
+        if data["q"]:
+            assets = assets.filter(Q(asset_name__icontains=data["q"]) | Q(property_tag__icontains=data["q"]))
+        if data["property_class"]:
+            assets = assets.filter(supplied_class__icontains=data["property_class"])
+        if data["fund"]:
+            assets = assets.filter(supplied_fund__icontains=data["fund"])
+        if data["treatment"] == "missing":
+            assets = assets.filter(determination_id__isnull=True)
+        elif data["treatment"]:
+            assets = assets.filter(supplied_treatment=data["treatment"])
+    else:
+        assets = assets.none()
+    page = Paginator(assets.order_by("asset_name", "pk"), 25).get_page(request.GET.get("page"))
+    records = {row.pk: row for row in service.visible(request.user).filter(
+        pk__in=[asset.determination_id for asset in page]).prefetch_related("events")}
+    rows = []
+    for asset in page:
+        record = records.get(asset.determination_id)
+        issues = []
+        if asset.quantity != 1:
+            issues.append("Grouped quantity needs reconciliation.")
+        if not record:
+            issues.append("No verified property determination.")
+        else:
+            try:
+                service.verify_history(record)
+                service.verify_source(record)
+                if service.source_basis(asset) != record.source_snapshot:
+                    issues.append("Asset or receipt facts changed; review the retained determination.")
+            except ValidationError as error:
+                issues.extend(error.messages)
+            for field, label in (("property_class", "Property class"), ("fund_label", "Fund label"),
+                    ("useful_life", "Useful life"), ("expires_on", "Expiry date")):
+                if getattr(record, field) in (None, ""):
+                    issues.append(f"{label} not supplied.")
+        if asset.pending_document:
+            issues.append("A supplied determination is awaiting review.")
+        if not asset.property_tag:
+            issues.append("Property tag not recorded.")
+        if asset.purchase_date is None:
+            issues.append("Acquisition date not recorded.")
+        if asset.unit_cost is None:
+            issues.append("Register unit cost unknown.")
+        rows.append({"asset": asset, "record": record, "issues": issues})
+    query = request.GET.copy()
+    query.pop("page", None)
+    return render(request, "inventory/property_register.html", {"form": form, "page": page,
+        "rows": rows, "filter_query": query.urlencode()})
 
 
 def display_value(model, name, raw):

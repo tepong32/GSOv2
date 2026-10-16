@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.20.0] - 2026-10-17
+### Added
+- Add scoped property working register and source-gap review
+
 ## [0.19.0] - 2026-10-17
 ### Added
 - Add scoped property requests and reviewed native Finance associations

@@ -17,6 +17,7 @@ app_name = "inventory"
 
 urlpatterns = [
     path("assets/<int:pk>/property-records/", property_views.property_records, name="property-records"),
+    path("property-records/", property_views.property_register, name="property-register"),
     path("property-records/<int:pk>/", property_views.property_detail, name="property-detail"),
     path("property-records/<int:pk>/evidence/", property_views.property_evidence, name="property-evidence"),
     path("supply-returns/", supply_return_views.return_list, name="supply-return-list"),
