@@ -55,15 +55,19 @@ def main():
         print(f"MySQL {version}; disposable loopback port {port}; schema prefix {prefix}", flush=True)
     settings.MEDIA_ROOT = runtime / "media"
     settings.DISPOSAL_PRIVATE_ROOT = runtime / "private-evidence"
-    settings.INSTALLED_APPS = [*settings.INSTALLED_APPS, "inventory.apps.InventoryConfig"]
+    settings.INSTALLED_APPS = [*settings.INSTALLED_APPS, "inventory.apps.InventoryConfig",
+                               "inventory_finance.apps.InventoryFinanceConfig"]
     settings.GRAND_EXPORT_ROOT = runtime / "exports"
     settings.GRAND_BACKUP_ROOT = runtime / "backups"
     settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    settings.ROOT_URLCONF = "gso_integration_tests.urls"
     import django
     django.setup()
     from django.core.management import call_command
     print(f"GRAND source: {grand}; isolated runtime: {runtime}", flush=True)
-    call_command("test", "gso_integration_tests.grand_claim_sources", interactive=False, keepdb=False, verbosity=1)
+    call_command("test", "gso_integration_tests.grand_claim_sources", "gso_integration_tests.grand_attribution",
+                 "gso_integration_tests.grand_attribution_http",
+                 interactive=False, keepdb=False, verbosity=1)
 
 
 if __name__ == "__main__":

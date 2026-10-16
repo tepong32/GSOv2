@@ -234,3 +234,64 @@ not establish safety for those unrelated workflows. This is evidenced existing
 GRAND schema behavior, not a new GSO migration regression. The exact model list is
 retained in `.tmp/grand-native-lock-proof.log`, and the parallel Finance review note
 flags the issue. Do not claim the full integrated system is production-ready.
+
+
+## Reviewed attribution draft - 2026-10-17 (unpublished)
+
+PASS: `grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation`, SQLite,
+15 discovered, 14 executed, one native-only skip, 0.581s, exit 0. Actual GRAND
+migration graph plus optional inventory_finance initial migration. Eight new tests
+cover approval/withdrawal history, no Finance queries, scoped reads, retry identity,
+amount precision/capacity, unaccepted receipts, UAT/self-review denial, stale versions,
+replacement requiring withdrawal and stale review replay. Both schemas destroyed.
+Log `.tmp/grand-attribution-validation.log`; source freeze under its recorded runtime.
+Native capacity races, populated upgrades and UI are NOT RUN - pending implementation.
+
+
+PASS: native attribution draft run, 19 tests in 4.128s, MySQL 8.4.11, exit 0.
+Includes separate-connection competing approvals, duplicate approval and identical
+request retries. Both schemas removed, owned server stopped. Log
+`.tmp/grand-attribution-native.log`. Existing GRAND W036 warnings remain as recorded.
+This did not test aggregate support across different claims against one receipt's
+value; code review identified that missing control and it must be fixed before release.
+UI HTTP run is pending; browser verification not performed yet.
+
+
+FAIL - CAUSED BY CURRENT WORK: first HTTP run (23 discovered, four native skips,
+2.573s) failed the expiry fixture because globally mocking signing.loads also broke
+session decoding. Fixed by signing an old-timestamp proposal only. Other tested HTTP
+paths passed; the corrected combined run is pending. Receipt-wide cross-claim capacity
+checks and tests were added after this run and are not credited to its result.
+
+
+PASS: corrected combined MySQL/HTTP run, 26 tests, 7.930s, exit0, no skips.
+Receipt-wide cap across claims and unknown-cost rejection are covered, including
+independent-connection approvals of different cases against the same receipt.
+Log `.tmp/grand-attribution-capacity-http-native.log`. Existing GRAND W036 warnings
+remain documented. Both test schemas removed; owned server stopped normally.
+
+PASS: Playwright actual-browser clerk login, preview, submit, separate reviewer login,
+approve and withdraw. Original approval and all three events remain visible. Screens
+inspected at1440x1000 and390x844; proposed/approved mobile width checks show no
+horizontal overflow or duplicate IDs. Screenshots output/playwright/claim-*.png.
+Preview limitation: isolated media omits GRAND defaults grand-mark.svg and
+ default_user_dp.png, causing image404s. No operator media was copied. Browser sessions
+closed and preview port8018 stopped. Ctrl-C ended preview with exit1 before automatic
+SQLite deletion; its two synthetic databases remain for recovery rehearsal.
+
+
+## Claim support release checks and recovery - 2026-10-17
+
+PASS: stopped synthetic paired SQLite recovery under
+`C:/Users/Administrator/.codex/backups/gsov2-attribution-rehearsal-20261017-011803`.
+All193 default and83 finance tables matched row counts/content hashes after restore;
+integrity and foreign-key checks passed. Deleted a synthetic approval event from the
+restored copy, detected the mismatch, restored again, and verified proposed/approved/
+withdrawn history plus retained withdrawn status. Source hashes unchanged. Manifest
+records per-table hashes. Database-only coverage; no private attachment fixture set.
+
+PASS: full standalone suite49 discovered/43 executed/six native skips,3.370s.
+Actual GRAND `check` and `makemigrations inventory inventory_finance --check --dry-run`
+passed; no migration drift. Pip check and whitespace check passed. GitHub reports no
+rulesets and no master branch protection; use branchCI before integration regardless.

@@ -77,6 +77,14 @@ A synthetic SQLite receipt/evidence restore and deliberate-corruption drill pass
 on 2026-10-17; see the validation record. This is not proof of source-document
 authenticity, malware scanning, complete operator recovery, or GRAND two-store recovery.
 
+A separate stopped synthetic GRAND preview was backed up/restored as a paired
+default/finance SQLite set on 2026-10-17: all 193 default and 83 finance table contents
+matched, both integrity/foreign-key checks passed, and loss of an approval event in
+the restored copy was detected then recovered. Original source hashes were unchanged.
+This database-only rehearsal covers attribution relationships/history; its fixture
+had no private attachment set. It does not establish online MySQL backup consistency,
+offsite retention, operational RPO/RTO or complete GRAND private-file recovery.
+
 ## Gates still open
 
 - Use GRAND's authentication, permissions and source-visibility checks during merge,

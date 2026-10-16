@@ -2,45 +2,51 @@
 
 Checkpoint: 2026-10-17, Asia/Singapore. Overall goal remains active and incomplete.
 Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-design.md),
-[COA sources](docs/coa-requirements.md), [receiving](docs/receiving.md) and
-[validation](docs/validation-2026-10-16.md).
+[claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
+[receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Current source integration checkpoint
+## Current reviewed claim support milestone
 
-Branch `codex/finance-receipt-attribution` in
+Branch `codex/reviewed-receipt-claims`, worktree
 `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on published
-`9ae80c0`. Fresh fetch shows 0/0 against remote master; intended changes are local.
-Optional read-only source resolver uses GRAND's actual workbench/case visibility,
-case lock, owner and party identity. No routes, allocation writes or migrations added.
-GRAND replaces DV lines on re-preparation: retain reviewed case/version/line snapshots;
-do not add a protected line FK that blocks that existing Finance workflow.
+`d13554c`. Fresh fetch showed 0/0 before work. Optional `inventory_finance` includes
+same-store protected receipt/case/owner/actor relationships, source snapshots,
+proposal/independent approval/rejection/withdrawal, immutable event saves and
+scoped GRAND-base screens. Signed previews bind actor/case/content and expire.
 
-PASS: four pure tests; six actual GRAND SQLite integration tests including fresh
-inventory migrations, core users/departments, receipt/audit creation in default,
-no inventory table/queries in finance, and outsider denial. Seven native MySQL
-integration tests PASS (0.953s) with source replacement on separate connections.
-Logs: `.tmp/grand-inventory-validation-latest.log`, `.tmp/grand-native-validation-latest.log`.
-Tests use clean detached GRAND `32ab046` at
-`C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation`.
+Approval locks the case and receipt, caps claim-line totals and receipt-wide totals
+across claims, rejects stale/replaced source evidence, and blocks UAT/self-review.
+Unknown/zero receipt cost cannot create claim support. This does not post accounting,
+reserve Budget capacity, allocate physical quantities or establish acquisition cost.
+Accepted-receipt cost correction and recognized-JEV attribution remain incomplete.
+No automatic grants, operator migrations, deployment or parallel Finance edits.
 
-Stronger native lock-proof PASS: seven tests in 0.925s, exit 0; log
-`.tmp/grand-native-lock-proof.log`. MySQL performance_schema confirmed the reader
-blocked while preparation held the case lock, then rejected the replaced source line.
-Both random schemas were verified removed; owned MySQL server stopped normally.
-Native success does not establish populated import, coordinated recovery, routes/UI
-integration or reviewed financial attribution.
+PASS: 26 MySQL8.4.11 actual-GRAND service/HTTP/race tests (7.930s, no skips), including
+cross-case receipt capacity and CSRF/signed-preview controls. Log
+`.tmp/grand-attribution-capacity-http-native.log`. Existing 23 GRAND W036 conditional
+uniqueness warnings remain; none concern inventory or inventory_finance. Both random
+schemas removed and owned MySQL server stopped normally.
+PASS: standalone49 discovered/43 executed/six native skips (3.370s), actual GRAND
+model checks, both app migration drift, pip check and whitespace check.
 
-Release preparation: Version Manager README/inspect/patch preview completed; only
-VERSION/CHANGELOG would change. No branch protection/rulesets found. Full standalone
-suite PASS (49 discovered, 43 executed, six native skips, 4.124s); migration drift
-and pip check PASS. Operator hash unchanged. Source resolver prerequisite is ready
-for vm-release, branch CI, integration/push and primary verification. Do not describe
-it as a completed financial attribution workflow.
+Browser: real GRAND clerk login, preview/submit, separate reviewer approval and
+withdrawal at1440x1000/390x844. Original approval and full history retained; mobile
+checks found no horizontal overflow/duplicate IDs. Screenshots output/playwright/claim-*.png.
+Isolated media lacks default GRAND logo/avatar (404s). Browser sessions and port8018
+stopped. Synthetic paired SQLite preview files remain under
+`.tmp/grand-source-tests-i2l7amgw`; no operator data.
 
-Source prerequisite release `74b51d5` was vm-committed/tagged and pushed on the feature
-branch. Integration/primary CI are still pending. Native integration also emitted
-23 existing GRAND conditional-uniqueness warnings (none inventory); see validation.
-These remain an integration risk outside this read-only source resolver's coverage.
+Recovery PASS: stopped paired source backed up/restored, all193 default/83 finance
+tables reconciled, integrity/FKs valid. Injected loss of an approval event was detected
+and recovered; source hashes unchanged. Evidence:
+`C:/Users/Administrator/.codex/backups/gsov2-attribution-rehearsal-20261017-011803`.
+This database-only rehearsal does not cover private uploads or online MySQL recovery.
+
+Release pending: no branch ruleset/protection found. Inspect/preview vm-release,
+stage intended files only, publish branch/tag, wait branchCI, fast-forward/push master
+and verify primaryCI/remote/operator hash. Then start the next feature branch.
+Source prerequisite releases74b51d5/d13554c are published; primaryCI38935738686 passed.
+No live test, preview or browser process remains from this work.
 
 ## Published receiving milestone
 

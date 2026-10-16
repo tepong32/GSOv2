@@ -19,8 +19,11 @@ The first prerequisite supplies portable inventory UUIDs, GRAND-matched runtime
 versions, production settings checks, stock-owner enforcement and runtime-data
 exclusion from Git. A Finance adapter remains planned.
 Receiving/inspection is now implemented as described in [receiving operations](receiving.md).
-Next implement reviewed financial attribution, then the existing
-maintenance/clearance/stock-count sequence. Later general-office records should use
+An optional GRAND claim-support workflow now provides reviewed amount attribution;
+see [claim support and limits](claim-attribution.md). Accepted-receipt cost correction,
+quantity/cost allocation and recognized-JEV links remain incomplete. Continue the
+maintenance/clearance/stock-count sequence alongside these financial integration gaps.
+Later general-office records should use
 GRAND's records/custody/HR capabilities where available instead of duplicating them.
 
 ## Planned features, in order

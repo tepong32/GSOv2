@@ -110,6 +110,26 @@ role grants or permission-copying from the prototype are allowed.
 
 ## Financial relationships (adapter after physical receiving)
 
+Implemented initial workflow on `codex/reviewed-receipt-claims`: optional
+`inventory_finance` app, installed only with GRAND. Its initial migration depends on
+inventory0015, departments0005 and vouchers0038 from the inspected graph. Same-store
+PROTECT relations retain the receipt line, case, Finance owner and actors; replaceable
+DV lines retain local identity and source snapshot instead of a foreign key.
+The initial service proposes and independently approves a documented claim
+support amount, with explicit permissions, owner checks and stale-source rejection.
+It does not allocate physical quantities, determine acquisition cost, reserve Budget
+capacity or post accounting entries. Quantity/cost attribution and recognized-JEV
+relationships below remain later work. Rejection/withdrawal now retain events and
+original approval evidence; stale or replaced source lines can still be withdrawn.
+Scoped reads require both attribution permission/office scope and existing case
+visibility. Actual-model service, native capacity races and integrated HTTP tests pass; browser
+clerk/reviewer/withdrawal flow was inspected. GRAND-base screens and signed-preview confirmation are included, with HTTP/native
+and browser validation recorded in the validation document. Approved support is capped both by the
+claim line and, across claims, by accepted quantity times positive documented receipt
+unit cost. Unknown/zero cost fails closed; accepted-receipt cost correction remains
+unfinished. This ceiling is documentary support, not Accounting valuation. The app
+is not enabled in the standalone shell. See [claim support](claim-attribution.md).
+
 An explicit allocation row is needed when a receipt line supports a claim or a
 recognized accounting amount. The shape is many-to-many: one receipt line may be
 claimed in parts; one claim/JEV can cover multiple receipt lines. It must retain

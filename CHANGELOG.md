@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.0] - 2026-10-17
+### Added
+- Add independently reviewed GRAND receipt claim support
+
 ## [0.4.3] - 2026-10-17
 ### Documentation
 - Record native GRAND constraint limitations

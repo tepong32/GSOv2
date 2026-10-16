@@ -3,6 +3,9 @@
 Standalone Django shell for the LGU General Services inventory module destined for
 GRAND. Product code is `inventory/`; `user/` and `src/` are local adapters. `home/`
 is retained legacy evidence, not an active application.
+Optional GRAND-only relationships belong in `inventory_finance/`; do not install
+that app in the standalone shell or duplicate GRAND authority models to make it run.
+Its tests use the isolated actual-GRAND harness; see the handoff for development status.
 
 ## Start and continue
 
