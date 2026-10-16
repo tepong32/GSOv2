@@ -258,3 +258,19 @@ keys are not portable identifiers. No asset/stock/FIFO value or Finance posting 
 rewritten. New claim support pins the accepted amendment identity/checksum and uses
 its documentary cost ceiling; stale approved support requires explicit withdrawal.
 No new Finance party, ledger, posting or cross-store relationship is introduced.
+
+## Supplied requisition lineage
+
+Inventory0022 adds default-store request headers, lines, fulfillment and events;
+see [workflow](stock-request-design.md). Retain public UUIDs and remap protected
+local item/user/movement keys when merging installations. Requesting-department
+IDs resolve through GRAND's native directory; their retained labels are historical,
+not identities for automatic matching. A physical issue links exactly one stock
+movement to a requested line. Neither the issue nor FIFO cost is an Accounting
+expense posting. Reuse this lineage for future reviewed returns/RSMI support;
+do not create duplicate Finance accounts, journal lines or approval authorities.
+An installation-to-installation importer is not implemented: retained audit
+snapshots also contain source-local IDs. Any later import must preserve original
+snapshots and document reviewed identity mappings, rather than silently rewriting
+history/checksums. Code/migration integration into GRAND is tested separately from
+that unimplemented data-import operation.

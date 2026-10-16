@@ -1103,3 +1103,54 @@ Broad standalone and actual-GRAND suites selected because stock mutation is shar
 
 Source research and remaining request workflow are recorded in stock-request-design.md.
 Version Manager README inspected; release preview and remote CI gate integration.
+
+## Supplied requisitions and physical fulfillment — 2026-10-17
+
+Scope: four new operational models/migration0022, explicit grants, private evidence,
+case/stock transactions and screens. Full shell and actual-GRAND native suites are
+appropriate for schema, shared stock and authorization impact. Start fetch: GSO
+58f7cfa clean0/0; Finance32ab046 fetched0/0 with96 parallel changes preserved.
+- PASS: `python manage.py test inventory.test_requisitions`:5 discovered,4 executed,
+  1 native skip,0.966s. Covers unchanged entry balance, independent review, partial
+  issue, unavailable observation, closure, exact creation retry, stale issue replay,
+  over-issue denial, rollback after history failure, exact decimals, scope and
+  missing/changed source/history. Initial test storage override was corrected to
+  patch the instantiated file storage; subsequent suites use temporary private roots.
+- PASS: `python manage.py test`:109 discovered,93 executed,16 native skips,28.161s.
+- PASS: `python scripts/run_mysql_tests.py`:109/109,100.492s, including two concurrent
+  attempts against the same version yielding one issue and one stale rejection,
+  one fulfillment/FIFO allocation and the correct remaining stock. Schema removed.
+- PASS: `python scripts/run_grand_source_tests.py --grand-root
+  C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`:
+  112/112,38.137s; default and finance schemas removed. Actual source32ab046,
+  explicit grants, native department identity, owner/UAT/ungranted-superuser denial,
+  private download scope, revocation and zero Finance queries covered.
+- PASS: `python manage.py check`, `python manage.py makemigrations --check --dry-run`,
+  `git diff --check`. Migration creates only the four operational default tables.
+- PASS: `.tmp/preview_requisition.py` on copied paired fixtures: populated upgrade
+  preserves existing inventory/claim/mapping rows and Finance bytes. Real browser
+  supplies request entry, dynamic extra row, independent reviewer and3-unit partial
+  issue against6 requested; stock10 becomes7. Desktop/mobile screenshots inspected;
+  width/scroll390/390 and no duplicate IDs. Browser/preview8030 stopped.
+  Initial incorrect integration URL404 corrected; CLI multiline quoting rejected
+  before interaction, then executed from a JS file. Synthetic logo/avatar404s are
+  existing fixture limitations. These are not product regressions.
+- PASS: `.tmp/rehearse_requisition_recovery.py`: stopped paired recovery211 default/
+  83 finance tables,4 private files; backup
+  `.codex/backups/gsov2-requisition-recovery-20261017-2xmbbwth`.
+  Request, original issue, FIFO and history preserved; stale issue replay denied,
+  altered request and missing evidence detected; sources unchanged. Read-only
+  `check_requisition_evidence` reports1 checked, zero discrepancies. Not live
+  MySQL recovery or operator acceptance.
+- FAIL - CAUSED BY CURRENT WORK, corrected: initial VM preview found a Windows
+  encoded en dash in the edited design document. Corrected to UTF-8; Markdown
+  decoding check and repeated VM preview pass, only VERSION/CHANGELOG proposed.
+- PASS: owned MySQL33317 normal shutdown exit0 after all schemas removed. Canonical
+  operator DB SHA256 remains
+  `5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
+- NOT RUN - OUT OF SCOPE: operator migrations/grants/deployment, official-form
+  acceptance, cross-installation data import and Finance production scrutiny.
+  Returns, Accounting recognition and cost allocation remain separate roadmap work.
+
+Version Manager README/inspect/preview reviewed; minor release gates primary
+integration on successful branch CI, then verifies remote/tag and primary CI.

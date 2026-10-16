@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.16.0] - 2026-10-17
+### Added
+- Add supplied requisition review and partial stock fulfillment
+
 ## [0.15.2] - 2026-10-17
 ### Fixed
 - Prevent duplicate stock movements on retried submissions

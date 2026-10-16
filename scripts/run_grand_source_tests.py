@@ -78,6 +78,7 @@ def main():
                  "gso_integration_tests.grand_custody_return_races",
                  "gso_integration_tests.grand_stock_authority",
                  "gso_integration_tests.grand_stock_counts",
+                 "gso_integration_tests.grand_requisitions",
                  "gso_integration_tests.grand_receipt_basis",
                  "gso_integration_tests.grand_receiving_authority",
                  "gso_integration_tests.grand_asset_authority",

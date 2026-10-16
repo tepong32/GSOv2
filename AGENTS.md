@@ -78,6 +78,12 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   allocate FIFO or change balance twice. Fresh forms are new operations, not
   duplicate-document detection. Preserve legacy/internal no-ID callers' atomic
   behavior. See [request/issue design](docs/stock-request-design.md).
+- Supplied requisitions retain source documents and fixed lines; independent GSO
+  review is a document check, not an originating-office signature. Lock sorted
+  items before the case; issue through stock services with version checks and
+  protected fulfillment links. Closure never reverses physical issues. Include
+  private requisition evidence in paired recovery; no stock reservation or Finance
+  posting is implied. See [request design](docs/stock-request-design.md).
 - Supply counts pin today's item/ledger basis and require private evidence plus an
   independent non-uploader's review. Lock item before count; stale bases require
   cancellation/recount. Apply differences through the existing movement service,

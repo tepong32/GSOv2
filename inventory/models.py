@@ -1,4 +1,5 @@
 from pathlib import Path
+from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.core.files.storage import FileSystemStorage
@@ -1323,3 +1324,114 @@ class ReceiptCostAmendmentEvent(models.Model):
 
     class Meta:
         ordering = ("pk",)
+
+
+def supply_requisition_path(instance, filename):
+    return f"inventory/requisitions/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class SupplyRequisition(models.Model):
+    """GSO's retained supplied requisition; not a new requesting-office approval."""
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    department_id = models.PositiveBigIntegerField(db_index=True)
+    requesting_department_id = models.PositiveBigIntegerField(db_index=True)
+    requesting_department_label = models.CharField(max_length=160)
+    reference = models.CharField(max_length=120)
+    requested_on = models.DateField()
+    purpose = models.TextField()
+    file = models.FileField(upload_to=supply_requisition_path, storage=disposal_private_storage, max_length=500)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    status = models.CharField(max_length=12, default="pending", choices=(
+        ("pending", "Awaiting document review"), ("approved", "Reviewed; available for issue"),
+        ("fulfilled", "Requested quantities issued"), ("closed", "Closed with remainder")))
+    state_version = models.PositiveIntegerField(default=1)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_requisitions_recorded")
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_requisitions_reviewed")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.CharField(max_length=240, blank=True)
+    close_note = models.CharField(max_length=240, blank=True)
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+        default_permissions = ()
+        permissions = (("view_supply_requisition", "Can view supplied GSO requisitions"),
+            ("record_supply_requisition", "Can record and close supplied GSO requisitions"),
+            ("review_supply_requisition", "Can independently review supplied GSO requisitions"))
+        constraints = (models.CheckConstraint(condition=models.Q(status__in=("pending", "approved", "fulfilled", "closed")), name="gso_requisition_state"),)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Requisitions are retained. Close an incorrect record and retain a corrected request.")
+
+
+class SupplyRequisitionLine(models.Model):
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    requisition = models.ForeignKey(SupplyRequisition, on_delete=models.PROTECT, related_name="lines")
+    item = models.ForeignKey(ConsumableItem, on_delete=models.PROTECT, related_name="requisition_lines")
+    item_name = models.CharField(max_length=160)
+    unit = models.CharField(max_length=40)
+    quantity = models.DecimalField(max_digits=12, decimal_places=3, validators=[MinValueValidator(Decimal("0.001"))])
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+        constraints = (models.UniqueConstraint(fields=("requisition", "item"), name="gso_request_item_once"),
+            models.CheckConstraint(condition=models.Q(quantity__gt=0), name="gso_request_line_positive"))
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Requested lines are retained unchanged. Close and record a corrected request.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Requested lines are retained.")
+
+
+class SupplyFulfillment(models.Model):
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    line = models.ForeignKey(SupplyRequisitionLine, on_delete=models.PROTECT, related_name="fulfillments")
+    movement = models.OneToOneField(StockMovement, on_delete=models.PROTECT, null=True, blank=True, related_name="requisition_fulfillment")
+    quantity = models.DecimalField(max_digits=12, decimal_places=3)
+    outcome = models.CharField(max_length=12, choices=(("issued", "Issued"), ("unavailable", "Unavailable at check")))
+    recipient = models.CharField(max_length=160, blank=True)
+    note = models.CharField(max_length=240)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_fulfillments")
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+        constraints = (models.CheckConstraint(condition=(
+            models.Q(outcome="issued", quantity__gt=0, movement__isnull=False)
+            | models.Q(outcome="unavailable", quantity=0, movement__isnull=True)), name="gso_fulfillment_outcome"),)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Fulfillment history cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Fulfillment history is retained.")
+
+
+class SupplyRequisitionEvent(models.Model):
+    requisition = models.ForeignKey(SupplyRequisition, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_requisition_events")
+    action = models.CharField(max_length=24)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Requisition history cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Requisition history is retained.")

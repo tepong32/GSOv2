@@ -5,6 +5,39 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Supplied requisitions and partial issues — validated checkpoint
+
+Branch `codex/supplies-requisition-workflow` started from58f7cfa after fresh clean0/0
+fetch. Prior retry milestone58f7cfa is published; branchCI38970761831 and
+primaryCI38970881508 PASS, remote master/tag verified. Finance32ab046 fetched0/0
+with96 dirty/untracked files preserved; its latest clerk wording follow-up is
+acknowledged. Only the authorized GSO coordination note was appended there.
+
+Migration0022 adds four default-store requisition/line/fulfillment/event tables.
+Private supplied document, immutable requested quantities, independent document
+review, exact partial issues, unavailable observations and reasoned remainder
+closure now have services and screens. Sorted item locks precede the case; stale
+versions cannot repeat issues, FIFO/history commit atomically, and no Finance
+posting or reservation is inferred. See [design](docs/stock-request-design.md).
+
+Shell109 discovered/93 executed/16 skips PASS28.161s; native shell109/109
+PASS100.492s; actual GRAND112/112 PASS38.137s. Check/drift/diff pass. Populated
+upgrade preserves existing inventory/claim/mapping rows and Finance bytes.
+Browser entry, separate document reviewer and partial issue PASS; desktop/mobile
+inspected,390px client/scroll widths, no duplicate IDs. Preview8030/browser stopped.
+Stopped paired recovery211 default/83 finance tables and4 private files PASS,
+preserving request/issue/FIFO/history and detecting tampered request/missing source.
+Backup `.codex/backups/gsov2-requisition-recovery-20261017-2xmbbwth`.
+Native schemas removed, owned33317 shut down; operator DB hash unchanged.
+
+Next: explicit original-issue supply returns with reviewed quantities and retained
+cost/quantity lineage. Official forms/current local applicability, Accounting
+valuation and physical receipt cost allocation remain gaps. Cross-installation
+data import is not implemented; preserve original audit snapshots when designing
+reviewed identity mappings. No operator migration, role grant or deployment.
+Release identity is retained in VERSION/CHANGELOG/history; remote CI gates primary
+integration. Overall goal remains active and incomplete.
+
 ## Stock movement retry safety — validated checkpoint
 
 Developed on `codex/stock-issue-retry-safety` from830a1ec after fresh fetch0/0.

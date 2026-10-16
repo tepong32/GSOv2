@@ -1,8 +1,9 @@
 # Supplies request and issue trail
 
-Research/design checkpoint2026-10-17. The complete request workflow below is not
-implemented. The immediate prerequisite fixes duplicate stock POSTs; this does not
-replace the planned request-to-issue trail or establish official RIS compliance.
+Implementation checkpoint2026-10-17. Supplied requisition entry, independent
+document review, partial issues, unavailable observations and remainder closure
+are implemented. Original-issue return lineage remains next. This operational
+trail does not establish official RIS compliance.
 
 ## Verified source boundary
 
@@ -24,21 +25,21 @@ remain unverified. Do not choose the2020 GAM, NGA or barangay appendices merely
 because they are readily downloadable. Retain supplied signed documents while
 confirming the municipal form/version and approval authorities.
 
-## Selected approach for the next workflow
+## Implemented request and issue workflow
 
-Use a small GSO operational case for a supplied approved requisition, with private
+The small GSO operational case retains a supplied approved requisition, with private
 source evidence, native requesting-department identity, reference/date/purpose,
 bounded item lines and explicitly requested quantities. A document review records
 what GSO checked; it never fabricates the original requesting office's approval or
 signature. Keep the requesting office, physical recipient and issuing GSO distinct.
 
-Each fulfillment must link explicit quantities to request lines and existing
-`StockMovement` rows. Use the current quantity/FIFO service under item locks, with
+Each fulfillment links explicit quantities to request lines and existing
+`StockMovement` rows. It uses the current quantity/FIFO service under item locks, with
 case/line version checks and retained outcomes for unavailable and partial items.
 Never deduct requested quantities merely because a requisition was entered. A
 reviewed remaining quantity is not reserved stock unless a reservation workflow is
 separately designed. Cancelled remainders do not undo completed physical issues.
-Returned supplies need explicit original-issue lineage and reviewed quantities,
+The next return workflow needs explicit original-issue lineage and reviewed quantities,
 not an unrelated positive movement or an inferred reversal of Accounting expense.
 
 Keep all physical records in GRAND default. Native users/departments and public
@@ -48,7 +49,45 @@ financial treatment and any RSMI recognition. GSO issue/FIFO values alone do not
 authorize a journal entry. Recheck actual GRAND source before defining optional
 Finance relationships; no new cross-store FK or automatic posting is planned.
 
-## Retry prerequisite implemented on the current branch
+## Data, permissions and recovery
+
+Migration0022 adds four default-store tables: `SupplyRequisition`, immutable
+`SupplyRequisitionLine`, immutable `SupplyFulfillment` and retained
+`SupplyRequisitionEvent`. Header, line and fulfillment UUIDs survive transfer;
+the existing stock movement has a protected one-to-one link to its fulfillment.
+Unavailable observations have zero quantity and no movement. Stock units and names
+are captured with each line; changed units/names block issues. Completed requests
+close automatically when all requested quantities have been issued. Otherwise an
+explicit reasoned closure retains the unissued remainder and all physical issues.
+
+New explicit grants are `view_supply_requisition`, `record_supply_requisition`
+and `review_supply_requisition`, alongside stock view and existing issue authority.
+GRAND UAT users cannot mutate; an ungranted superuser cannot bypass this. Read and
+download scope is the GSO owning office. No roles are granted by the migration.
+The creator cannot perform the independent document review. Review does not
+fabricate an originating office signature or validate the legal authority of one.
+
+Creation accepts 1–50 distinct item lines, exact positive three-decimal quantities,
+a non-future source date and a bounded private PDF/image. Its signed actor-bound
+request UUID permits exact retries. The supplied header, evidence and lines are
+retained unchanged; close and record anew for a correction. Subsequent actions
+require the current case version. Locks follow sorted item IDs, then the case;
+issue, FIFO allocation, fulfillment and history commit atomically. Replayed stale
+actions fail with a reload message and never issue twice. This does not deduplicate
+independently entered documents with fresh identities or reserve future stock.
+
+Evidence lives under `inventory/requisitions/<request UUID>/`. Include it in the
+coordinated default/finance/private-file backup. `check_requisition_evidence`
+reports missing, altered, unsafe and unreferenced files without changing them.
+History checks reproduce the retained case and issue links before transitions.
+Checksums detect drift; they do not defeat a privileged database administrator who
+rewrites both data and checksums. Storage is not transactional: orphan uploads
+after a database failure remain for investigation, never silently deleted.
+Missing/changed evidence blocks review and issue; a reasoned closure remains
+possible if history itself is intact. Official outputs, digital requesting-office
+approval, returns and Accounting expense recognition remain separate work.
+
+## Published retry prerequisite
 
 Reproduced against the published service: replaying an identical receipt, issue or
 adjustment HTTP POST changed stock twice. An issue of3 against10 left4 rather than7.

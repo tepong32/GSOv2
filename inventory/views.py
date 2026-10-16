@@ -786,6 +786,7 @@ def stock_access_required(action="view"):
 
 @stock_access_required()
 def consumable_list(request):
+    from .requisitions import can_act as can_requisition
     items = _stock_items(request.user).annotate(on_hand_value=Sum("movements__signed_quantity"))
     query = request.GET.get("q", "").strip()
     if query:
@@ -798,6 +799,7 @@ def consumable_list(request):
         "can_add": can_stock(request.user, "add"),
         "can_receive": can_stock(request.user, "receive"),
         "can_export": can_stock(request.user, "export"),
+        "can_requisition": can_requisition(request.user, "view"),
     })
 
 

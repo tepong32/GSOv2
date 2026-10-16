@@ -148,3 +148,9 @@ Include them in the same coordinated backup as default/finance stores. Run
 header and event chain. Missing sources or changed custody block independent review;
 an as-of review is not a permanent employee-clearance authorization. See
 [the case design](hr-custody-review.md) and validation for current release status.
+
+Supplied requisition documents use `inventory/requisitions` private storage.
+Include this namespace with both databases and run `check_requisition_evidence`
+on restored copies. Retain request/line/fulfillment UUIDs, linked stock movements,
+FIFO allocations and review/event history together. See [request design](stock-request-design.md)
+for permissions, lock order, retry and evidence-integrity boundaries.
