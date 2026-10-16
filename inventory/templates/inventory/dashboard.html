@@ -5,12 +5,13 @@
   <div>
     <p class="eyebrow">Your office · GRAND concept</p>
     <h1>{{ department.name|default:"General Services Office" }}</h1>
-    {% if is_gso %}<p>Find an asset, review its current status, or update the office register.</p>{% else %}<p>Review the assets assigned to your office. GSO maintains the central asset records.</p>{% endif %}
+    {% if is_gso %}<p>Track equipment, vehicles, and supplies with clear department responsibility and history.</p>{% else %}<p>Review the assets and supply issues assigned to your office. GSO maintains the central records.</p>{% endif %}
   </div>
   <div class="person"><span>Welcome back</span><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>Employee workspace</span></div>
 </header>
 <nav class="quick-links" aria-label="Everyday tasks">
   <a href="{% url 'inventory:asset-list' %}">Open asset register</a>
+  {% if can_view_stock %}<a href="{% url 'inventory:consumable-list' %}">Open consumables</a>{% endif %}
   {% if can_add %}<a class="button primary" href="{% url 'inventory:asset-create' %}">Add an asset</a>{% endif %}
 </nav>
 <section class="metrics" aria-label="Asset overview">
@@ -22,7 +23,8 @@
 <div class="section-head"><div><h2>Office workspace</h2><span class="muted">GSO records and day-to-day work</span></div></div>
 <section class="workspace-grid" aria-label="GSO workspaces">
   <article class="module"><span class="pill available">Available</span><h3>Inventory register</h3><p>Search assets, review assigned office and custodian, and check acquisition and status details.</p><a class="button primary" href="{% url 'inventory:asset-list' %}">Open register</a></article>
-  <article class="module"><span class="pill">Planned</span><h3>Property issuance and transfers</h3><p>Track custody handoffs, receiving acknowledgements, and return records.</p><span class="muted">Planned workspace · not connected yet</span></article>
+  {% if can_view_stock %}<article class="module"><span class="pill available">Available</span><h3>Consumable supplies</h3><p>Record stock received and issued by department. FIFO lot tracking is optional per item.</p><a class="button primary" href="{% url 'inventory:consumable-list' %}">Open consumables</a></article>{% endif %}
+  <article class="module"><span class="pill">Planned</span><h3>Property issuance and transfers</h3><p>Track custody handoffs, receiving acknowledgements, and return records.</p><span class="muted">Planned workflow</span></article>
   <article class="module"><span class="pill">Planned</span><h3>Procurement and suppliers</h3><p>Follow purchase references, delivery details, and supplier information.</p><span class="muted">Planned workspace · not connected yet</span></article>
   <article class="module"><span class="pill">Planned</span><h3>Maintenance requests</h3><p>Coordinate equipment concerns and retain repair history against an asset.</p><span class="muted">Planned workspace · not connected yet</span></article>
 </section>

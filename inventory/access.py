@@ -69,7 +69,7 @@ def in_gso_scope(user):
 
 
 def can(user, action):
-    codename = f"{action}_asset"
+    codename = "export_asset_register" if action == "export" else f"{action}_asset"
     if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):
         return False
     department = department_for_user(user)
@@ -85,6 +85,28 @@ def can(user, action):
 
 def can_view_audit(user):
     return bool(in_gso_scope(user) and user.has_perm("inventory.view_asset_audit"))
+
+
+def can_stock(user, action):
+    """GSO controls stock; department users may see only their own issue history."""
+    if not getattr(user, "is_authenticated", False) or not getattr(user, "is_active", False):
+        return False
+    department = department_for_user(user)
+    gso = getattr(user, "is_superuser", False) or _is_gso_department(department)
+    permission = {
+        "view": "view_consumableitem",
+        "add": "add_consumableitem",
+        "change": "change_consumableitem",
+        "receive": "receive_stock",
+        "issue": "issue_stock",
+        "adjust": "adjust_stock",
+        "export": "export_stock_register",
+    }.get(action)
+    if not permission:
+        return False
+    if action == "view" and department and not gso:
+        return bool(user.has_perm(f"inventory.{permission}"))
+    return bool(gso and user.has_perm(f"inventory.{permission}"))
 
 
 def asset_in_scope(user, asset):

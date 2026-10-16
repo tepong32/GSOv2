@@ -9,6 +9,9 @@ This repository is a standalone development shell for the GSO asset inventory mo
 - “Delete” is implemented as retirement. It removes an asset from active use while retaining its row and an immutable change snapshot.
 - Each asset records its department scope, creator, last editor, and timestamps. Create, update, and retirement actions write audit events.
 - The register is database-backed. Excel and Google Sheets are not live data stores; exports/imports can be added as explicit workflows later.
+- Equipment and vehicles have separate types. Record each new tagged unit as its own asset and retain optional COA, fund, purchase-order, voucher, and journal references for later Finance reconciliation. COA mappings are references for review, not automatic accounting entries.
+- Consumables have an append-only movement register for receipts, issues, returns, and reasoned adjustments. Quantity-only tracking is the default. FIFO lot allocation can be enabled per supply item; when enabled, issues use the oldest available receipt lot first. Unit cost is optional and does not create or post a Finance journal. GSO can export movement history to CSV; department users with view access see only their issue history.
+- Asset and stock CSVs are controlled interchange exports for review and reconciliation. They are not, by themselves, accepted COA forms or accounting entries.
 
 ## Access model
 
@@ -21,6 +24,14 @@ The assigned department scopes each view. GSO staff with the appropriate permiss
 | `inventory.change_asset` | Update asset records |
 | `inventory.delete_asset` | Retire an asset; the database row is retained |
 | `inventory.view_asset_audit` | View change history |
+| `inventory.export_asset_register` | Export the scoped asset register and accounting references as CSV |
+| `inventory.view_consumableitem` | View GSO supply items (department users see only items with issues to their department) |
+| `inventory.add_consumableitem` | Add a supply item |
+| `inventory.receive_stock` | Record receipts and returns |
+| `inventory.issue_stock` | Issue supplies to a department |
+| `inventory.adjust_stock` | Record a balance adjustment with a reason |
+| `inventory.view_stock_audit` | View supply movement history |
+| `inventory.export_stock_register` | Export supply movement history as CSV |
 
 For standalone concept work, create Django Groups in `/admin/` and assign the permissions above. Suggested groups are GSO Viewer, GSO Clerk, and GSO Asset Steward. `/admin/` manages accounts, departments, groups, and permissions; asset changes go through the scoped inventory workflow. Keep `is_staff` limited to people who need Django admin; ordinary inventory users do not need staff access. Public registration and Google OAuth are intentionally not enabled in this shell.
 
@@ -48,4 +59,4 @@ Integration should:
 5. Route `inventory` migrations to the default database. Finance's database separation remains unchanged.
 6. Import and reconcile legacy data before the new register becomes authoritative. The former `home.Item` schema is preserved under `home/` as a reference and is no longer installed or routed. Its fields map to the new asset form as follows: date → purchase date; OBR number → OBR/reference; category and subcategory → category text; brand/supplier/price/quantity/status/return date/notes → corresponding asset fields. Derive the asset name from the old category/brand after review, and confirm whether each row represents one item or a pooled quantity. Review old status values before mapping them to the new in-service, maintenance, transferred, and retired states.
 
-The module is intentionally bounded to a register and asset history. Property issuance, transfer acknowledgements, procurement, repair work orders, document attachments, and reporting are future modules, not implied by the dashboard cards.
+Property transfer acknowledgements, maintenance work orders, document attachments, official COA reports, and automatic journal posting remain future work. Supply movements and asset references provide auditable source data for later GRAND integration and reconciliation.
