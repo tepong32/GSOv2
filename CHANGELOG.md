@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.2] - 2026-10-17
+### Fixed
+- Validate supply ledger inputs and GRAND stock authority
+
 ## [0.9.1] - 2026-10-17
 ### Documentation
 - Record witnessed return release and recovery evidence

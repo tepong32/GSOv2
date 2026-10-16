@@ -5,6 +5,23 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Current work: supplies ledger validation
+
+Previous turn published return notes v0.9.1/e7483a6; branchCI38951646913 and primary
+CI38951773610 PASS. Fresh fetch and clean0/0 preceded `codex/stock-ledger-validation`.
+GRAND remains32ab046, fetched0/0; unrelated Form1 changes preserved.
+Inspection found a direct-service precision gap and implicit GRAND stock authority.
+Regression test reproduced acceptance of0.0004 despite three-place storage. Services
+now reject invalid precision/nonfinite/negative values, require adjustment reasons,
+resolve issue destination labels, validate catalog minimums and preserve omitted FIFO.
+GRAND stock permissions reuse explicit grants and deny UAT mutations.
+Standalone76 discovered/67 executed/nine native skips PASS14.660s; native76/76
+PASS49.834s. Actual GRAND native63/63 PASS19.761s. Both disposable schemas removed
+and owned MySQL33317 session61913 shut down normally. See
+[stock-count design](docs/stock-counts.md). No schema or operator
+data changes. Complete this integrity prerequisite before reviewed physical counts;
+HR-reference clearance and financial relationships remain in scope.
+
 ## Published witnessed returns
 
 Custody-review notes published as v0.8.1 at efbc671; branch CI38947862792 and

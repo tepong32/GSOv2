@@ -63,6 +63,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   private evidence. Retain original employee identity; change physical custody only,
   not maintenance, acquisition value or Finance. Distinguish known GSO returns from
   unlinked legacy names. See [return design](docs/custody-returns.md).
+- Supplies services must validate exact decimal quantities/costs before ledger/FIFO
+  writes, resolve issue offices from the directory, and retain adjustment reasons.
+  GRAND stock mutations require explicit grants and deny Finance UAT viewers.
+  Physical counts never establish financial valuation; see [stock counts](docs/stock-counts.md).
 
 ## Validation
 

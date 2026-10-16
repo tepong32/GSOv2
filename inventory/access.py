@@ -149,6 +149,14 @@ def can_stock(user, action):
     }.get(action)
     if not permission:
         return False
+    from django.apps import apps
+    if apps.is_installed("vouchers"):
+        from vouchers.access import has_explicit_permission
+        from vouchers.roles import is_finance_uat_viewer
+        if action not in ("view", "export") and is_finance_uat_viewer(user):
+            return False
+        if not has_explicit_permission(user, f"inventory.{permission}"):
+            return False
     if action == "view" and department and not gso:
         return bool(user.has_perm(f"inventory.{permission}"))
     return bool(gso and user.has_perm(f"inventory.{permission}"))

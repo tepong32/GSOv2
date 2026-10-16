@@ -560,3 +560,38 @@ canonical master fast-forward/push; remote master/tag match
 Operator DB SHA-256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 No operator migration, role grant or deployment. Release notes use separate
 `codex/custody-return-release-notes` after clean fetch0/0.
+
+## Supplies service integrity — 2026-10-17
+
+Fresh fetch and clean0/0 at e7483a6 before `codex/stock-ledger-validation`.
+Actual GRAND source/helper rechecked against fetched32ab046; parallel Form1 edits
+preserved. This is a service/permission repair before physical counts, with no schema
+or storage-format changes. Expanded standalone/native and actual-GRAND tests cover
+the shared receiving-to-stock dependency and explicit authority.
+
+FAIL - PRE-EXISTING reproduced: a direct receipt of0.0004 did not raise validation
+despite three-place ledger fields; regression1/1 failed0.348s before the fix,
+`.tmp/stock-validation-before.log`. The new service validates decimal fields before
+balance/FIFO/persistence and full-cleans the pending model before saving.
+FAIL - CAUSED BY CURRENT WORK: initial targeted test expected ValidationError for a
+missing department, while the existing resolver correctly raises PermissionDenied.
+Corrected the test expectation and removed accidentally rediscovered imported tests;
+no authority rule weakened. See `.tmp/stock-validation-after.log`.
+
+PASS: `manage.py test inventory --noinput`,76 discovered/67 executed/nine native
+skips14.660s, `.tmp/stock-validation-shell.log`. PASS: `scripts/run_mysql_tests.py`,
+76/76 in49.834s, `.tmp/stock-validation-native.log`. Includes five new regression
+cases for precision, nonfinite/range/cost failures with no partial writes, required
+adjustment reasons, exact fractional FIFO, partial catalog edits and trusted issue
+department labels. `makemigrations --check --dry-run` PASS: no schema changes.
+PASS: actual-GRAND native63/63 in19.761s, `.tmp/grand-stock-validation-native.log`.
+The two new authority tests verify explicit grants, owner boundaries, UAT write
+denials/read grants, real department labels and no Finance queries. Existing23
+GRAND W036 warnings remain outside GSO. Disposable schemas removed; owned MySQL33317
+shut down normally. `pip check` PASS.
+
+NOT RUN - OUT OF SCOPE: a new browser layout or recovery rehearsal. No screen,
+file format, migration or backup boundary changed. The shared service path and actual
+permission helper are tested; prior paired recovery evidence remains applicable.
+No operator migration, permission grant, deployment, Finance posting or official
+supplies form is claimed. Physical-count workflow remains next work.

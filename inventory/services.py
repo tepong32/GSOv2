@@ -768,9 +768,11 @@ def create_consumable(*, actor, data):
     department = gso_department_for_user(actor)
     if department is None:
         raise PermissionDenied
-    item = ConsumableItem.objects.create(
+    item = ConsumableItem(
         **data, department_id=department.pk, department_label=department.name, created_by=actor,
     )
+    item.full_clean()
+    item.save()
     ConsumableAuditEvent.objects.create(
         item=item, actor=actor, action=ConsumableAuditEvent.CREATED, snapshot=consumable_snapshot(item),
     )
@@ -792,11 +794,12 @@ def update_consumable(*, actor, item, data):
     data = _editable_data(data, CONSUMABLE_INPUT_FIELDS)
     item = ConsumableItem.objects.select_for_update().get(pk=item.pk)
     _stock_permission(actor, "change", item)
-    if item.use_fifo != data.get("use_fifo") and item.movements.exists():
+    if item.use_fifo != data.get("use_fifo", item.use_fifo) and item.movements.exists():
         raise ValidationError("FIFO tracking cannot be changed after stock movements exist.")
     for field, value in data.items():
         setattr(item, field, value)
     item.updated_by = actor
+    item.full_clean()
     item.save()
     ConsumableAuditEvent.objects.create(
         item=item, actor=actor, action=ConsumableAuditEvent.UPDATED, snapshot=consumable_snapshot(item),
@@ -848,18 +851,32 @@ def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="
     _stock_permission(actor, permission, item)
     if not item.is_active:
         raise ValidationError("Inactive supply items cannot receive new movements.")
-    quantity = Decimal(quantity)
+    # Validate before balance comparisons or persistence: databases may otherwise
+    # round excess precision differently from the in-memory FIFO allocation.
+    quantity = StockMovement._meta.get_field("quantity").clean(quantity, None)
     if quantity <= 0:
         raise ValidationError("Enter a quantity greater than zero.")
+    unit_cost = StockMovement._meta.get_field("unit_cost").clean(unit_cost, None)
+    if unit_cost is not None and unit_cost < 0:
+        raise ValidationError("Unit cost cannot be negative.")
+    if kind in (StockMovement.ADJUSTMENT_IN, StockMovement.ADJUSTMENT_OUT) and not reason.strip():
+        raise ValidationError("Record the reason for the stock adjustment.")
+    if kind == StockMovement.ISSUE:
+        destination = _resolve_assigned_department(department_id)
+        if destination is None or not recipient.strip():
+            raise ValidationError("Select the receiving department and record who received the supplies.")
+        department_id, department_label = destination.pk, destination.name
     inbound = kind in (StockMovement.RECEIPT, StockMovement.RETURN, StockMovement.ADJUSTMENT_IN)
     if not inbound and _stock_signed_total(item) < quantity:
         raise ValidationError(f"Only {_stock_signed_total(item):g} {item.unit} are available.")
     signed = quantity if inbound else -quantity
-    movement = StockMovement.objects.create(
+    movement = StockMovement(
         item=item, kind=kind, quantity=quantity, signed_quantity=signed,
         department_id=department_id, department_label=department_label,
         recipient=recipient, reference=reference, reason=reason, unit_cost=unit_cost, actor=actor,
     )
+    movement.full_clean()
+    movement.save()
     if item.use_fifo:
         if inbound:
             _create_stock_lot(item, movement)
