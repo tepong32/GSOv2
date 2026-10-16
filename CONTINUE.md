@@ -5,7 +5,12 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Original-issue supply returns — validated checkpoint
+## Original-issue supply returns — published
+
+Feature e78c404 is integrated/pushed. BranchCI38973327525 and primaryCI38973485610
+PASS; remote master/tag verified ate78c4043386c322bbaef023e46cb1d1f19046a26.
+The documentation follow-up corrects the cited presentation's slide range and
+records publication; application code and native validation below are unchanged.
 
 Branch `codex/supply-return-lineage` started from2ae5a9e after fresh clean0/0 sync.
 Prior requisition milestone2ae5a9e is published; branchCI38972044163 and

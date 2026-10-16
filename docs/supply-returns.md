@@ -78,8 +78,8 @@ remain the authority register. No verified current municipal return-costing rule
 was found in this follow-up search. The stock limits, review and unknown-cost
 handling above are engineering controls, not claimed COA-prescribed form rules.
 A [15 May2024 PHALGA-hosted presentation](https://www.phalga.org/assets/downloads/19thANC/Download/Updates-Latest-Guidelines-and-details-on-the-COA-Circular-2020-004.pdf)
-discusses the GAM deferment and proposed enhancements on slides8–11; extracted
-text was read. It is a dated corroborating research lead, not proof of current
+discusses the GAM deferment on slides8–11 and labels later enhancements as proposed;
+extracted text was read. It is a dated corroborating research lead, not proof of current
 reinstatement, complete circular text or accepted municipal forms. Do not substitute
 NGA, barangay, private study notes or proposed changes for applicable municipal authority.
 

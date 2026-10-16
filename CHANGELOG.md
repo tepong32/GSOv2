@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.17.1] - 2026-10-17
+### Documentation
+- Record verified supply return publication and clarify source reference
+
 ## [0.17.0] - 2026-10-17
 ### Added
 - Add reviewed supply returns linked to original issues

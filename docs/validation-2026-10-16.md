@@ -1204,3 +1204,12 @@ are covered. Both aliases removed; owned33317 normal shutdown exit0. Operator DB
 SHA256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 Source research found a dated PHALGA presentation as a corroborating deferment
 lead, not current return-costing authority; the feature document records that limit.
+
+Publication verified: featuree78c404, branchCI38973327525 PASS, then canonical
+master fast-forward/push. Remote master/tag match
+e78c4043386c322bbaef023e46cb1d1f19046a26. PrimaryCI38973485610 PASS; canonical clean0/0.
+Documentation follow-up corrects the PHALGA slide reference: deferment is on8–11,
+proposed enhancements follow later. No application changes. Native suites are
+NOT RUN - OUT OF SCOPE for this documentation-only follow-up; the unchanged code
+retains the completed native/browser/recovery evidence above. Diff/UTF-8/VM preview
+checks apply; remote CI still gates integration under the normal workflow.
