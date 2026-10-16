@@ -653,3 +653,10 @@ Backup `C:/Users/Administrator/.codex/backups/gsov2-stock-count-recovery-2026101
 NOT RUN - OUT OF SCOPE: online MySQL/operator recovery, role grants, deployment,
 official supplies form acceptance and historical-count reconciliation. These remain
 separate gates; this release does not establish financial valuation or post journals.
+
+Actual external VM minor release3ec09d6 integrated/pushed to canonical master after
+branch CI38955242812 PASS38s; remote master/tag match
+3ec09d6b6e204759c8e5e33b526fc0662e33e25b. Primary CI38955372028 PASS35s.
+Operator DB SHA-256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Documentation follow-up uses separate `codex/stock-count-release-notes`, fresh clean
+fetch0/0; no code/schema/storage changes in the follow-up.

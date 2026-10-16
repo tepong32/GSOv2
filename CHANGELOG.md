@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.10.1] - 2026-10-17
+### Documentation
+- Record reviewed stock count release and recovery evidence
+
 ## [0.10.0] - 2026-10-17
 ### Added
 - Add independently reviewed supply counts and low-stock indicators

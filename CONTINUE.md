@@ -5,7 +5,7 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Reviewed physical counts — release validation
+## Published reviewed physical counts
 
 Started `codex/reviewed-stock-counts` after fresh fetch and clean 0/0 at
 8809372/v0.9.3 (primary CI38953114417 PASS39s). GRAND fetched 0/0 at32ab046;
@@ -31,8 +31,11 @@ including original actors, basis, adjustment and all three events. Missing/chang
 files detected and restored; source unchanged. Backup:
 `C:/Users/Administrator/.codex/backups/gsov2-stock-count-recovery-20261017-k6d90rer`.
 See [count design](docs/stock-counts.md) and [validation](docs/validation-2026-10-16.md).
-External VM minor release is ready; branch/primary CI and remote verification
-remain pending. Overall goal stays incomplete. Next: HR-reference review cases and
+Actual external VM minor release3ec09d6/v0.10.0 is integrated/pushed to master after
+branch CI38955242812 PASS38s. Remote master/tag match
+3ec09d6b6e204759c8e5e33b526fc0662e33e25b. Primary CI38955372028 PASS35s.
+Documentation follow-up uses `codex/stock-count-release-notes` after fresh clean
+fetch 0/0. Operator database hash is unchanged. Overall goal stays incomplete. Next: HR-reference review cases and
 Finance cost correction/allocation/JEV relationships, with official supplies forms
 and historical count reconciliation separately verified before implementation.
 

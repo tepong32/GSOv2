@@ -1,8 +1,8 @@
 # Supplies ledger and physical counts
 
 Ledger prerequisite published at cbece6c. See [CONTINUE](../CONTINUE.md)
-for release evidence. Reviewed current-day counts are implemented and validated on
-`codex/reviewed-stock-counts`; CONTINUE records publication status.
+for release evidence. Reviewed current-day counts are published at3ec09d6;
+CONTINUE records release and CI evidence.
 
 ## Existing ledger controls
 
