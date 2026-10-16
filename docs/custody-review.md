@@ -25,6 +25,11 @@ from accepted custody. Retired rows remain visible as historical records. Empty 
 filtered results cannot establish that an employee has no responsibilities; other
 offices and unlinked source documents may still need review.
 
+The witnessed-return release2a7bb5f adds a separate known GSO-held category and
+pending returns involving the current employee. Retained return history and private
+evidence use their own owner/former-custodian scope; a later custodian does not inherit
+that evidence. See [returns](custody-returns.md) for the write workflow and migration.
+
 Search uses retained labels/account snapshots and asset/property tags. Both lists
 are paginated at25 rows and search length is bounded at100 characters. Responses are
 not cached. GET is the only permitted method. Current HR comparisons use minimal
@@ -45,9 +50,9 @@ clearance/signature document.
 ## Remaining clearance implementation
 
 Next implement a documented GSO review of an explicitly supplied HR request/reference,
-with retained source evidence, unresolved-item notes and independent review. Returns
-must have a witnessed, independently verified GSO receipt path for employees who can
-no longer sign in. Never impersonate their acknowledgment. Keep return receipt,
+with retained source evidence, unresolved-item notes and independent review. The
+implemented witnessed-return path supports employees who can no longer sign in
+without impersonating their acknowledgment. Keep return receipt,
 employment status and financial liability as separate facts. A review conclusion
 must recheck live custody/pending handoffs under locks and preserve its as-of source;
 new later custody cannot be hidden behind an older conclusion. Resolve legacy and

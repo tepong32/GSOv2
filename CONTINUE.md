@@ -5,12 +5,12 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Validated witnessed returns — release in progress
+## Published witnessed returns
 
 Custody-review notes published as v0.8.1 at efbc671; branch CI38947862792 and
 primary CI38948007851 passed. Fresh fetch and clean 0/0 preceded branch
 `codex/witnessed-custody-returns`; a further fetch found no upstream changes.
-[Witnessed returns](docs/custody-returns.md) are validated and ready for VM release.
+[Witnessed returns](docs/custody-returns.md) are published at2a7bb5f, tagv0.9.0.
 Migration0018, services, private evidence/checker and signed staff screens are implemented.
 Standalone SQLite71 discovered/62 executed/nine native skips PASS17.436s;
 populated0017-to0018 preservation PASS1/1. Initial GRAND service SQLite55 discovered,
@@ -28,6 +28,11 @@ No operator database or Finance implementation changes. Clearance remains unimpl
 Next: HR-reference review cases/unresolved-item decisions, then consumable counts;
 Finance cost correction/allocation and recognized-JEV relationships remain separate gaps.
 
+Actual external VM minor release2a7bb5f was pushed on the feature branch. Branch
+CI38951280608 PASS before canonical master fast-forward/push. Remote master/tag
+match2a7bb5f978ee1747e869472c243312dc6a683dd1. PrimaryCI38951482546 PASS50s.
+Release notes use separate `codex/custody-return-release-notes` after clean fetch0/0.
+
 ## Published custody review milestone
 
 Previous goal turn made verified progress: custody236c5e1 and release notes55fc7bf
@@ -43,7 +48,7 @@ minimal current-HR comparisons, GET-only/no-store and bounded search/pagination.
 No new schema or clearance decision. Own custody remains visible after HR moves
 without granting owner-office write access. GRAND's explicit permission helper still
 requires an assigned department; GSO can review retained history when the employee
-cannot access it. Clearance cases, witnessed returns and signoff remain next work.
+cannot access it. At that checkpoint, clearance cases, returns and signoff were next.
 
 Standalone4/4 boundary tests PASS0.454s, full shell70 discovered/61 executed/nine
 native skips PASS11.670s. SQLite GRAND49 tests had one test expectation failure:
@@ -59,9 +64,8 @@ passed before canonical master fast-forward/push. Remote master/tag match
 `fb2eae2c59df7669cb228eb344bc3f1521f1469a`; operator DB hash unchanged.
 PrimaryCI38947689210 PASS. Release notes use separate
 `codex/custody-review-release-notes`, created after clean fetch0/0.
-Next: design and implement witnessed, independently confirmed returns with retained
-evidence, then HR-reference review cases and unresolved-item decisions. Neither
-returns nor clearance conclusions are implemented yet. Overall goal remains incomplete.
+The subsequent witnessed-return milestone is recorded above. HR-reference review
+cases and clearance conclusions remain unimplemented. Overall goal remains incomplete.
 
 ## Published maintenance milestone
 

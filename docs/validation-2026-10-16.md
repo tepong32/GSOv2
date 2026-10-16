@@ -553,3 +553,10 @@ detected corrupted and missing evidence; restored files pass and source remains
 unchanged. Backup `C:/Users/Administrator/.codex/backups/gsov2-return-recovery-20261017-tiw0kkdn`.
 NOT RUN - OUT OF SCOPE: online MySQL/operator restoration, deployment, role grants
 and human COA/Accounting/HR acceptance. This rehearsal is synthetic stopped recovery.
+
+Release2a7bb5f used actual external Version Manager. BranchCI38951280608 PASS before
+canonical master fast-forward/push; remote master/tag match
+2a7bb5f978ee1747e869472c243312dc6a683dd1. PrimaryCI38951482546 PASS50s.
+Operator DB SHA-256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+No operator migration, role grant or deployment. Release notes use separate
+`codex/custody-return-release-notes` after clean fetch0/0.

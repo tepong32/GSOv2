@@ -1,6 +1,6 @@
 # Witnessed returns to GSO
 
-See [CONTINUE](../CONTINUE.md) for validation and publication status. This working
+Published at2a7bb5f; see [CONTINUE](../CONTINUE.md) for release evidence. This working
 physical-custody record is not an official COA form, employee clearance, HR separation
 or liability finding.
 

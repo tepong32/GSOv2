@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.1] - 2026-10-17
+### Documentation
+- Record witnessed return release and recovery evidence
+
 ## [0.9.0] - 2026-10-17
 ### Added
 - Add witnessed custody returns with independent verification

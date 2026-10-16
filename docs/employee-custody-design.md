@@ -67,8 +67,8 @@ HR department changes must flag a review need, not move the asset automatically.
 ## Clearance sequence — remaining work
 
 The [custody review workbench](custody-review.md) now implements the read-only
-retained-assignment prerequisite, published atfb2eae2. Clearance decisions and
-witnessed returns remain unimplemented.
+retained-assignment prerequisite, published atfb2eae2. [Witnessed returns](custody-returns.md)
+are published at2a7bb5f. HR-reference clearance decisions remain unimplemented.
 
 List retained assets by explicit employee identity, including unresolved legacy
 records separately instead of claiming a complete employee inventory. Preserve
