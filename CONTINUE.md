@@ -5,42 +5,51 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [COA sources](docs/coa-requirements.md), [receiving](docs/receiving.md) and
 [validation](docs/validation-2026-10-16.md).
 
+## Current source integration checkpoint
+
+Branch `codex/finance-receipt-attribution` in
+`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on published
+`9ae80c0`. Fresh fetch shows 0/0 against remote master; intended changes are local.
+Optional read-only source resolver uses GRAND's actual workbench/case visibility,
+case lock, owner and party identity. No routes, allocation writes or migrations added.
+GRAND replaces DV lines on re-preparation: retain reviewed case/version/line snapshots;
+do not add a protected line FK that blocks that existing Finance workflow.
+
+PASS: four pure tests; six actual GRAND SQLite integration tests including fresh
+inventory migrations, core users/departments, receipt/audit creation in default,
+no inventory table/queries in finance, and outsider denial. Seven native MySQL
+integration tests PASS (0.953s) with source replacement on separate connections.
+Logs: `.tmp/grand-inventory-validation-latest.log`, `.tmp/grand-native-validation-latest.log`.
+Tests use clean detached GRAND `32ab046` at
+`C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation`.
+
+Stronger native lock-proof PASS: seven tests in 0.925s, exit 0; log
+`.tmp/grand-native-lock-proof.log`. MySQL performance_schema confirmed the reader
+blocked while preparation held the case lock, then rejected the replaced source line.
+Both random schemas were verified removed; owned MySQL server stopped normally.
+Native success does not establish populated import, coordinated recovery, routes/UI
+integration or reviewed financial attribution.
+
+Release preparation: Version Manager README/inspect/patch preview completed; only
+VERSION/CHANGELOG would change. No branch protection/rulesets found. Full standalone
+suite PASS (49 discovered, 43 executed, six native skips, 4.124s); migration drift
+and pip check PASS. Operator hash unchanged. Source resolver prerequisite is ready
+for vm-release, branch CI, integration/push and primary verification. Do not describe
+it as a completed financial attribution workflow.
+
 ## Published receiving milestone
 
-Branch `codex/receiving-inspection`, worktree
-`C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`, based on `405f360`.
-Fresh fetch: HEAD/master 0/0; all listed local changes belong to this feature.
-Version Manager released `7d3547fcc86e570e79db4bfc67f742335c38cf2d`; branch/tag pushed.
-Feature CI38932007629 passed before fast-forward integration/push to master. Remote
-master/tag verified at that commit, canonical status clean and operator hash unchanged.
-Primary GSO checks CI38932087704 passed at that commit. Check live state before work.
-No required PR/protection/ruleset found. Documentation follow-up uses branch
-`codex/receiving-release-notes` in the same worktree; it changes release evidence only.
+Receiving `7d3547f` and documentation `9ae80c0` are published; primary checks
+38932087704 and 38932337771 passed. Migrations0013/0014 provide draft corrections,
+protected evidence, independent acceptance and atomic asset/stock materialization.
+0015 provides portable lifecycle uniqueness and duplicate preflight. Accepted receipt
+reversal and incremental remainder processing remain unimplemented; see receiving guide.
 
-Implemented migrations 0013/0014: receipt/line/evidence/history, draft corrections,
-retained voids, protected uploads/downloads, submission and independent review.
-Acceptance atomically materializes accepted assets/supply quantities. Version checks
-prevent replay; owner locking protects identifier allocation. No automatic financial
-posting/classification, role grants, operator migration or production deployment.
-See receiving guide for accepted-receipt reversal and remainder limitations.
-
-0015 replaces transfer/disposal conditional uniqueness with GRAND's nullable generated
-marker pattern. Virtual markers permit populated SQLite upgrades; STORED additions
-failed in rehearsal. Duplicate preflight stops before DDL without rewriting history.
-Native tests cover direct/concurrent inserts, close/reopen and populated upgrades.
-
-Validation: MySQL 45/45 PASS (9.867s), no warnings/skips; SQLite 39 executed plus six
-native-only skips PASS (4.943s). Migration drift and pip check PASS; runtime/optional
-native dependency audit found no known vulnerabilities. Browser draft creation/list/
-draft and accepted detail inspected at 1440x1000 and 390x844; no phone overflow or
-nonempty duplicate IDs. Enforced-CSRF HTTP tests cover the complete clerk/reviewer flow.
-
-Read-only evidence check reports missing/changed/unsafe/unreferenced files. Synthetic
-SQLite DB+evidence restore passed including corruption recovery. Populated 0012-to-0014
-copy preserved 42 rows across 37 tables; 0015 tests preserve lifecycle history.
-Rehearsal artifacts: `.codex/backups/gsov2-receiving-rehearsal-20261017-001404`.
-Owned MySQL fixture on port 33317 stopped; random test schemas verified removed.
-No actual GRAND router/two-store or human acceptance is claimed.
+Published native suite: 45/45 PASS, including competing acceptance/asset identifiers,
+lifecycle uniqueness and populated upgrades. Synthetic backup/restore rehearsals
+preserved data and evidence, including corruption detection. Evidence artifacts:
+`.codex/backups/gsov2-receiving-rehearsal-20261017-001404`.
+No production deployment, operator migration or human acceptance is claimed.
 
 ## Preservation and parallel work
 
@@ -66,7 +75,7 @@ parallel work; fetch and inspect its current source before adapter work.
 2. On a new feature branch after fresh sync, implement concrete reviewed Finance
    attribution using existing parties/claims/posting identities, without duplicating
    authority. Recheck actual GRAND state first.
-3. Complete COA source/annex review: 2024-006 main four pages verified, remaining
-   annexes and relevant 2002-003/2023-004 text need review before official outputs.
+3. All 21 pages of the retained 2024-006 copy are visually reviewed. Establish
+   publication/amendments and review relevant 2002-003/2023-004 text before official outputs.
 4. Continue maintenance, stock counts, custody/clearance, general-office records,
    accepted outputs, GRAND import/router and coordinated recovery work per roadmap.

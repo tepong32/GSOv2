@@ -30,3 +30,24 @@ SQLite executes 39 tests and explicitly skips six native-only tests.
 GRAND router/two-store tests,
 named-time-zone reporting, real migrations and operational recovery remain separate
 integration gates. See [validation](validation-2026-10-16.md).
+
+## Actual GRAND integration harness
+
+Use GRAND's dependency environment and an explicit clean source checkout:
+`python scripts/run_grand_source_tests.py --grand-root PATH` uses fresh SQLite
+default/finance databases. Add `--mysql` to use the same explicit disposable
+loopback credentials above and two randomly named MySQL schemas. This loads GRAND's
+actual settings/router and installs the GSO inventory app with private evidence
+storage isolated under `.tmp`. It never loads either checkout's operator `.env`.
+
+The harness exercises existing Finance source visibility and snapshot currentness,
+plus receiving with GRAND users/departments and operational-store routing. The
+MySQL-only source replacement test uses separate connections and the same case-lock/
+line-replacement transaction shape as voucher preparation; it does not execute the
+entire Finance preparation workflow. SQLite skips that test. Fresh schema success
+does not prove populated data import, coordinated restore or route/UI integration.
+Record actual results in the validation document before claiming these gates pass.
+The native concurrency assertion inspects `performance_schema.data_lock_waits` and
+`performance_schema.threads` to prove the reader was blocked; the disposable test
+account needs read access to those tables. These are test privileges, not proposed
+application-user grants.

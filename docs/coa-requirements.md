@@ -13,7 +13,7 @@ annex, effectivity and amendments with the LGU Accountant and relevant process o
 | [COA Circular 92-386, 20 October 1992](https://www.coa.gov.ph/wpfd_file/coa-circular-no-92-386-october-20-1992/) | COA's indexed listing identifies LGU supply/property management rules. Direct page retrieval failed in this session. | Baseline source for custody, receipt, inspection and accountability. Full text and later amendments still need section-level review; do not invent mandatory fields from its title. |
 | [COA Circular 2002-003, 20 June 2002](https://www.coa.gov.ph/wpfd_file/coa-circular-no-2002-003-june-20-2002/) | COA's indexed listing identifies the NGAS manual for LGUs. | Start official LGU form/accounting mapping here; do not assume national-agency or barangay annex numbers apply unchanged to a municipality. Exact applicable editions/annexes remain to be compared. |
 | [COA Circular 2023-004, 14 June 2023](https://www.coa.gov.ph/wpfd_file/coa-circular-no-2023-004-june-14-2023/) | COA's indexed issuance listing identifies updated documentary requirements amending 2012-001. | Align GSO evidence with GRAND's existing versioned Finance document rules. Do not build a competing hardcoded checklist. Obtain and review the relevant procurement/receipt annex before declaring completeness. COA's FAQ has a date typo (2003); use the issuance listing's 2023 date. |
-| [COA Circular 2024-006, 14 March 2024 — UP Law ONAR record](https://naro.law.upd.edu.ph/issuances/3842) | Official registry metadata specifically identifies supplemental **LGU** implementation of Circular 2022-004 and the increase from PHP15,000 to PHP50,000. | Important LGU-specific companion to 2022-004. The browser limit was overcome by downloading the official copy on 2026-10-17. Main circular pages 1–4 were visually inspected; annexes still require review. See the source receipt below. |
+| [COA Circular 2024-006, 14 March 2024 — UP Law ONAR record](https://naro.law.upd.edu.ph/issuances/3842) | Official registry metadata specifically identifies supplemental **LGU** implementation of Circular 2022-004 and the increase from PHP15,000 to PHP50,000. | Important LGU-specific companion to 2022-004. The browser limit was overcome by downloading the official copy on 2026-10-17. All 21 pages were visually inspected, including annexes; see findings and remaining limits below. See the source receipt below. |
 | [DBM-COA Joint Circular 2024-1, 30 January 2024](https://www.dbm.gov.ph/index.php/joint-circulars?catid=342&id=2627%3Ajoint-circular-no-2024-01-dbm-coa&view=article) and [government-hosted circular](https://www.prc.gov.ph/sites/default/files/COA-DBM%20JOINT%20CIRCULAR%20NO.%202024-1%20DATED%20JANUARY%2030%2C%202024.pdf) | DBM identifies the revised disposal manual; the government-hosted text addresses LGUs among covered entities. | Existing disposal case retains request, authority and completion evidence. This does not yet validate every mode, committee, valuation, document or approval requirement in the manual. |
 | [COA PPE inventory-report FAQ](https://www.coa.gov.ph/FAQS/when-should-the-inventory-report-of-property-plant-and-equipment-be-submitted/) | Annual count, December 31 reporting date and January 31 submission are stated in the FAQ. | Existing dated verification and working reconciliation support this work. Confirm the municipal form and signatories before generating an official RPCPPE; a FAQ alone is not an approved local template. |
 
@@ -29,7 +29,7 @@ governed Accounting/Budget decisions.
 | Workflow | Current shell | Next work / authority boundary |
 | --- | --- | --- |
 | Asset and supply registers | Present, scoped permissions and audit history | Receiving/inspection/tagging; explicit physical item versus supply catalog distinction; reviewed classification. |
-| Receipt evidence | Asset purchase references and stock receipt movements only | Receipt header/lines, accepted/rejected quantities, private evidence and independent acceptance; Finance readiness remains separate. |
+| Receipt evidence | Published receipt header/lines, accepted/rejected quantities, private evidence and independent acceptance | Official outputs and reviewed Finance attribution remain separate. |
 | Custody and accountability | Department handoffs with acknowledgement | Employee identities from GRAND, PAR/ICS references and validated outputs, returns and exit-clearance evidence. Never infer signatures. |
 | Stock cards / requisition and issue | Quantity ledger, optional FIFO, department issues | Reviewed requisition/issue/return lineage, dated stock counts and adjustments; confirm RSMI/RPCI and semi-expendable registers/forms before official generation. |
 | Physical counts and Accounting reconciliation | Dated counts, unregistered findings, private Accounting snapshot, working CSV | Signed committee/source evidence and accepted official output; preserve missing/duplicate/unreconciled states. |
@@ -59,6 +59,49 @@ publication; the publication date was not established here.
 
 Design consequence: retain separate receipt, issuance, acquisition date and custody
 facts; do not treat semi-expendable equipment as disposable consumables. GRAND
-Accounting must apply reviewed treatment and correction lineage. Annex form fields,
-account definitions and illustrative entries remain unverified; inspect pages 5–21
-before implementing those details. No automatic historical reclassification is authorized.
+Accounting must apply reviewed treatment and correction lineage. No automatic
+historical reclassification is authorized.
+
+Additional visual review: pages 5–8 of the same retained official PDF cover Annex
+A.1 (PAR form/instructions) and A.2 (Semi-expendable Property Card form/instructions).
+PAR is maintained by fund, renewed every three years or on a custody/user change,
+and uses year-month-annual-series numbering. It records quantity/unit/description,
+property number, acquisition date/cost, and dated issuer/recipient signatures, names
+and offices. Two copies go to the property unit and recipient.
+
+The SPC records class, fund, property number, estimated useful life, acquisition/
+issue/transfer/disposal references, quantities, receipt unit/total cost, recipient
+office/officer and balance. Its instructions require source-document posting and
+annual reconciliation with RPCSPC, including investigation of discrepancies.
+Engineering consequence: preserve semi-expendable custody after expense recognition;
+do not substitute the consumables ledger or delivery record for an SPC/PAR.
+These forms are not yet generated by the app.
+
+Pages 9–10 (Annex A.3) were also visually checked: the Semi-expendable Property
+Ledger Card belongs to Accounting, separately from the property unit's SPC. Its
+fields include source/JEV reference, receipt quantities/cost, issues/transfers/
+adjustments, adjusted cost, and repair nature/amount. Instructions require
+reconciliation against physical count, SPC and control accounts. GSO may provide
+custody/repair facts but must not create a competing financial ledger.
+
+Pages 11–12 begin Annex B. Verified listed account families cover semi-expendable
+machinery/equipment and furniture/fixtures/books inventories, related supplies
+expenses and repair expenses. Page 12 describes initial acquisition debits and
+credits on issuance, impairment, transfer, loss or disposal for its first four
+inventory accounts. This supports keeping receipt, issuance and financial adjustment
+as separate events; it does not authorize automatically posting a new account map.
+Pages 13–17 complete Annex B: further equipment categories, furniture/fixtures/books,
+issuance expenses and day-to-day repair expenses are separately described. Pages
+18–21 (Annex C) illustrate four distinct transitions: pre-2024 acquisitions still
+held by the property unit; pre-2024 acquisitions already issued; pre-2024 acquisitions
+issued in 2024; and acquisitions and issuance both in 2024. The examples distinguish
+reclassification, closing accumulated depreciation/impairment, prior-period
+adjustment and issuance expense. These are illustrative cases, not permission to
+reclassify every historical item based on its present price alone.
+
+All 21 pages of this retained copy have now been visually reviewed. Publication date,
+later amendments, local adoption and related issuances remain to be established.
+Implementation consequence: retain acquisition and issuance dates, original cost,
+custody state and Finance correction references separately. Accounting must review
+the applicable transition and amounts; no journal recipes or automatic account
+mapping were introduced by this research.

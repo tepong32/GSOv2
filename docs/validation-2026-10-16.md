@@ -191,3 +191,37 @@ canonical status was clean and operator DB hash matched the preservation manifes
 No operator migration or deployment occurred. Primary GSO checks CI38932087704 passed
 at the release commit. This follow-up changes documentation only. The broader integration,
 Finance attribution and remaining roadmap remain incomplete.
+
+
+## GRAND source adapter checkpoint - 2026-10-17 (unpublished)
+
+PASS: four standalone payload tests (0.001s); actual GRAND source tests, five tests
+(0.080s), using clean published GRAND 32ab046 and isolated SQLite default/finance
+schemas. Command: `grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py
+--grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation`.
+Log: `.tmp/grand-source-validation-latest.log`. That run did not install inventory.
+
+FAIL - CAUSED BY CURRENT WORK in initial harness fixtures: duplicate profile creation
+and stale reverse-profile cache from GRAND's user creation signal. Fixed by updating
+the signal-created profile and refreshing the fixture user; completed run above passes.
+
+PASS: `gsov2-development/Scripts/python.exe manage.py test inventory --verbosity 1`,
+49 discovered, 43 executed, six native-only skips, 3.537s. Scope: optional source
+adapter plus existing operational regression coverage. No operator database changes.
+PASS: expanded runner installs inventory and applies the full migration graph with
+GRAND's users and database router. Six tests in 0.090s, exit 0; log
+`.tmp/grand-inventory-validation-latest.log`. New test creates receipt/audit records
+using core identities, proves no Finance queries/table, and denies an outsider.
+Both fresh SQLite databases were destroyed normally. Native concurrency, populated
+imports and routes/UI integration remain NOT RUN - OUT OF SCOPE for this checkpoint.
+
+PASS: first native GRAND integration run, seven tests in 0.953s, MySQL 8.4.11,
+actual GRAND router and inventory migrations, exit 0. Log
+`.tmp/grand-native-validation-latest.log`; both test schemas destroyed. Source
+replacement used a separate connection but did not yet assert observed lock waiting.
+PASS: strengthened native run, seven tests in 0.925s, exit 0; log
+`.tmp/grand-native-lock-proof.log`. performance_schema confirmed the reader waited
+while preparation held the case lock and then rejected the replaced line. Both test
+schemas were verified absent and the owned MySQL server shut down normally.
+Full standalone release suite PASS: 49 discovered, 43 executed, six native skips,
+4.124s. Migration drift, pip check and diff check PASS. Operator hash unchanged.

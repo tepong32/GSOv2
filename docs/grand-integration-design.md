@@ -2,8 +2,8 @@
 
 Design checkpoint: 2026-10-16, Asia/Singapore. Recommended approach selected under
 the user's instruction to align the projects and avoid speculative architecture.
-Only the portable identity prerequisite below is implemented in this checkpoint.
-Receiving and Finance adapters are subsequent work, not available functionality.
+Receiving is published through `7d3547f` with documentation at `9ae80c0`.
+Finance attribution remains under development, not available functionality.
 
 ## Source of truth inspected
 
@@ -38,7 +38,7 @@ the mapping below. No GRAND application code or migrations were changed here.
 | Posted amounts | `accounting.JournalEntry.public_id`; `JournalLine.sequence` within entry in finance | Link to entry UUID + line sequence + source/checksum/state evidence, not a database PK alone. Keep reversal/origin lineage. Liability claim-credit lines and asset/expense debit lines serve different purposes. |
 | Physical stock/assets | `inventory.Asset`, `ConsumableItem`, `StockMovement` in default | GSO owns accepted quantities, item identity, physical condition and custody. Financial valuation and posting remain Accounting decisions. |
 
-## Smallest useful receiving structure (next implementation)
+## Receiving structure and remaining extensions
 
 Use a receipt header and receipt lines, alongside the existing register. Do not
 embed a single DV foreign key in `Asset`: a delivery can be partially accepted,
@@ -48,8 +48,9 @@ cover several assets/supplies, or be paid in several claims.
 delivery reference/date, inspection/acceptance reference/date, recorded actor,
 review status/version and retained evidence. Start with draft, submitted, accepted,
 returned. Only a separately authorized reviewer can accept another person's entry.
-Acceptance records actual inspection evidence; a button cannot stand in for a
-physical signature. Corrections after acceptance retain the original and reason.
+Acceptance records inspection evidence; a button cannot stand in for a physical
+signature. Accepted-receipt correction/reversal remains a future extension and must
+retain the original and reason; current accepted records are read-only.
 
 **Receipt line:** receipt + stable line number, description/specification/unit,
 delivered/accepted/rejected quantities, rejection reason, acquisition source
@@ -67,6 +68,45 @@ Do not auto-generate official property numbers until the LGU numbering rule is k
 
 Only add these tables/fields when implementing the corresponding tested workflow.
 No generic document, warehouse or procurement engine is needed for this slice.
+See [implemented receiving and explicit limits](receiving.md); the acquisition-source
+classification and incremental remainder processing above are not yet implemented.
+
+## Claim source review - 2026-10-17
+
+Re-fetched both repositories: GSO `9ae80c0`, GRAND `32ab046`, each 0/0 against its
+remote master. GRAND's local signed Form1 work is still unpublished and was not
+changed. Inspected actual `vouchers/access.py`, `case_exports.py`, `services.py`,
+models and router, not only earlier design documents.
+
+`vouchers.services.prepare_voucher` deletes/recreates voucher lines on re-preparation.
+Therefore a PROTECT FK to `VoucherLineItem` would block an existing Finance workflow.
+Use the stable case relation plus reviewed line-local-ID/version/content evidence;
+on replacement, retain history and require review. Do not assign a fictional line
+UUID or silently retarget by matching amount/description. Same-store case PROTECT
+is appropriate for the eventual installed adapter; the numeric line ID alone is not
+a portable import identity. Recheck the source before any allocation write.
+
+The new optional `inventory.finance_sources.resolve_claim_line` is read-only, has
+no route or tables, and refuses lookup in the standalone shell. In GRAND it calls
+the existing `can_view_workbench` and `visible_cases_for_user`, scopes the line to
+the selected case, and reads under the existing default-store case lock. It retains
+case UUID/version/stage, actual Finance owner, party composite identity, DV and
+line content in a hashed snapshot. It does not expose tax identifiers/bank details
+or write to Finance. A snapshot is an observation, not approval or capacity.
+
+Four pure payload/standalone-disabled tests and five tests against actual GRAND
+models/settings/router pass. The latter use isolated SQLite default/finance schemas
+and cover source visibility, UAT read access, line replacement and version changes.
+A subsequent six-test run also installs GSO schemas and creates a receipt/audit
+record using GRAND identities in default, with no Finance query or inventory table
+in finance. This is fresh SQLite compatibility, not populated import or native
+concurrent re-preparation proof.
+Seven native MySQL integration tests also pass, including a source reader observed
+waiting on the preparation case lock and rejecting the old line after replacement.
+Next implement reviewed receipt-line attribution. Read authority does not grant mutation authority:
+UAT viewers must be rejected on writes, and independent Finance review must respect
+the pinned owner even when GSO custody belongs to a different office. No default
+role grants or permission-copying from the prototype are allowed.
 
 ## Financial relationships (adapter after physical receiving)
 

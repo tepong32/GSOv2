@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.2] - 2026-10-17
+### Added
+- Add scoped GRAND source resolution and integration validation
+
 ## [0.4.1] - 2026-10-17
 ### Documentation
 - Record receiving release and validation evidence
