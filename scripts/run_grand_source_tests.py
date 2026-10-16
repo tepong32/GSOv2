@@ -84,6 +84,7 @@ def main():
                  "gso_integration_tests.grand_receipt_amendments",
                  "gso_integration_tests.grand_journal_sources",
                  "gso_integration_tests.grand_journal_mappings",
+                 "gso_integration_tests.grand_hr_custody_reviews",
                  interactive=False, keepdb=False, verbosity=1)
 
 

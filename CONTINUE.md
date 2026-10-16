@@ -5,12 +5,49 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## HR-reference custody review — validated; release in progress
+
+Branch `codex/hr-custody-review` based on676bc29 after fresh fetch clean0/0.
+Previous documentation release676bc29/v0.14.1 is published; branchCI38966229245
+and primaryCI38966414324 PASS. The current HR feature is not yet released.
+Actual GRAND32ab046 rechecked0/0 with87 parallel changes preserved; only its GSO
+coordination note was appended. No typed separation event exists there, and its
+DepartmentRecord remains the general records authority.
+
+Migration0021 adds default-store review/event tables. Supplied private HR request,
+native employee identity, explicit owner grants, findings/coverage, signed custody
+submission, independent review, returned drafts and cancellation now have services
+and screens. Retained outcomes are office-scoped as-of observations, never clearance
+certificates, HR status, payroll holds or Finance liability. Source locks follow
+sorted assets → employee → case, rejecting changed asset sets. See
+[design and limits](docs/hr-custody-review.md).
+
+Shell99 discovered/85 executed/14 skips PASS28.987s; native shell99/99 PASS84.119s; check/drift PASS. Populated
+upgrade preserves inventory/claim/mapping rows and Finance bytes. Browser recorder
+submission and separate reviewer decision PASS; desktop/mobile inspected,
+390px page/scroll widths and no duplicate IDs. Preview8030/browser stopped.
+Stopped paired recovery207 default/83 finance tables and3 private files PASS;
+altered findings, missing decision and missing/changed evidence detected/restored.
+Backup `.codex/backups/gsov2-hr-custody-recovery-20261017-u2mmahc0`.
+
+Initial focused tests found fixture errors (reading a closed file, then explicitly
+closing a download response inside TestCase closed its database); both corrected.
+Recovery found a cached-file reopen error after removing evidence; verification
+now opens the checked private path afresh, and repeated missing-file coverage was
+added. Corrected focused SQLite12 discovered/10 executed/2 native skips PASS1.470s;
+final native GRAND109/109 PASS38.242s includes the file fix and both observed races.
+Both native schemas removed; owned33317 shutdown requested after standalone99/99
+PASS84.119s. Final diff/checks and operator DB hash pass. Version Manager minor
+preview proposes only VERSION/CHANGELOG updates. Next: execute VM release, verify
+branch CI before primary integration/push, then verify remote master/tag and CI.
+No operator migration, grant or deployment. Overall goal remains incomplete.
+
 ## Reviewed receipt recognition mappings
 
 Published code milestone: ba17b63/v0.14.0, integrated/pushed after branchCI38965891940
 PASS. Remote master/tag verified atba17b6357f192478a2180ea89b41aa4317d1ff0a.
-Primary CI38966060591 PASS. Documentation cleanup follows on
-`codex/recognition-mapping-handoff`, preserving the tested implementation.
+Primary CI38966060591 PASS. Documentation cleanup676bc29/v0.14.1 is published,
+preserving the tested implementation; both branch and primary CI passed.
 
 Developed on `codex/receipt-journal-mapping`, based onbc2fabc after clean fresh
 fetch0/0. GRAND32ab046 fetched0/0 with87 parallel dirty/untracked files preserved;

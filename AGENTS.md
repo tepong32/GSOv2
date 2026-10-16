@@ -59,6 +59,12 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   automatically move inventory; preserve recorded custody for documented review.
   Personal custody reads do not expand owner-office write authority. Live working
   lists, empty results and retired history never constitute employee clearance.
+- HR-reference custody cases retain a supplied private request and qualified
+  office findings; never infer separation from account status or issue universal
+  clearance. Lock sorted assets before the employee, then the case; recheck the
+  asset set and reject changes instead of locking new assets after the employee.
+  Named handoffs must keep their target-user lock. Reuse GRAND Records for future
+  general filing; do not duplicate its registry. See [case design](docs/hr-custody-review.md).
 - Witnessed returns reuse custody movements with independent GSO confirmation and
   private evidence. Retain original employee identity; change physical custody only,
   not maintenance, acquisition value or Finance. Distinguish known GSO returns from

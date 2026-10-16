@@ -15,6 +15,9 @@ The GRAND-only [custody review](docs/custody-review.md) separates personal assig
 owner-office review, legacy records and pending handoffs. Clearance remains pending.
 The [witnessed return workflow](docs/custody-returns.md) adds independently confirmed
 GSO receipt with private evidence; it preserves maintenance and Finance values.
+The [HR-reference review case](docs/hr-custody-review.md) retains a supplied request,
+office coverage and independently reviewed custody findings. It does not issue
+employee clearance or change HR/Finance; see CONTINUE for validation/release state.
 Assets, supply items and stock movements have public UUIDs for portable references;
 CSV exports include these IDs. Local integer keys and historical links are retained.
 

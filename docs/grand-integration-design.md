@@ -6,7 +6,12 @@ Receiving is published through `7d3547f` with documentation at `9ae80c0`.
 Reviewed claim support is published at28da3f1; see [claim support](claim-attribution.md).
 Maintenance is published at3905a74. [Employee custody](employee-custody-design.md)
 is published at236c5e1 with protected user relationships and signed handoffs.
-Employee movement/exit clearance remains unimplemented.
+Official employee movement/exit clearance remains unimplemented. The
+[HR-reference case](hr-custody-review.md) records qualified GSO findings using native
+users and private supplied evidence, without changing HR or Finance. It adds only
+default-store case/event tables; see CONTINUE for validation/publication status.
+GRAND's existing DepartmentRecord remains the authority for general office filing;
+GSO is not yet among its supported association types, so no association is invented.
 The [witnessed return design](custody-returns.md) extends the same custody movement
 and native user relationships in default. It preserves Finance and maintenance
 authority; see CONTINUE for validation/publication status.

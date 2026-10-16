@@ -100,6 +100,7 @@ def custody_review(request):
             (in_gso_scope(actor) and asset_in_scope(actor, asset))
             or asset.last_custody_return.source_custodian_user_id == actor.pk))
     pending_page = Paginator(pending.select_related("asset").order_by("-requested_at", "-pk"), 25).get_page(request.GET.get("handoff_page"))
+    from .hr_custody_reviews import can_act
     return render(request, "inventory/custody_review.html", dict(page=page, pending_page=pending_page,
         named_count=named_count, legacy_count=legacy_count, returned_count=returned_count, scope=scope, mode=mode, query=query,
-        office_access=office_access))
+        office_access=office_access, hr_review_access=can_act(actor, "view")))

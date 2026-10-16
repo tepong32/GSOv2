@@ -13,6 +13,99 @@ def disposal_private_storage():
     return FileSystemStorage(location=settings.DISPOSAL_PRIVATE_ROOT, base_url=None)
 
 
+def custody_review_source_path(instance, filename):
+    return f"inventory/custody-reviews/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class EmployeeCustodyReview(models.Model):
+    """GSO findings for an explicit HR request, never an employment decision."""
+    DRAFT, SUBMITTED, REVIEWED, CANCELLED = "draft", "submitted", "reviewed", "cancelled"
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    department_id = models.PositiveBigIntegerField(db_index=True)
+    department_label = models.CharField(max_length=160)
+    employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        related_name="gso_custody_reviews")
+    employee_label = models.CharField(max_length=240)
+    reference = models.CharField(max_length=160)
+    request_date = models.DateField()
+    request_kind = models.CharField(max_length=16, choices=(("movement", "Movement request"),
+        ("exit", "Exit request"), ("other", "Other HR request")))
+    file = models.FileField(upload_to=custody_review_source_path, storage=disposal_private_storage, max_length=500)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    findings = models.TextField(blank=True)
+    coverage_note = models.TextField(blank=True)
+    source_snapshot = models.JSONField(default=dict, blank=True)
+    status = models.CharField(max_length=12, default=DRAFT, choices=tuple(
+        (value, value.title()) for value in (DRAFT, SUBMITTED, REVIEWED, CANCELLED)))
+    outcome = models.CharField(max_length=24, blank=True, choices=(
+        ("outstanding", "Outstanding named custody or pending movement"),
+        ("no_current_named_items", "No current named items in this office's reviewed scope")))
+    state_version = models.PositiveIntegerField(default=1)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        related_name="gso_custody_reviews_created")
+    created_at = models.DateTimeField(auto_now_add=True)
+    submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        related_name="gso_custody_reviews_submitted", null=True, blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        related_name="gso_custody_reviews_decided", null=True, blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.TextField(blank=True)
+    pending_employee = models.GeneratedField(expression=models.Case(
+        models.When(status__in=("draft", "submitted"), then=models.F("employee_id")),
+        default=models.Value(None)), output_field=models.BigIntegerField(null=True), db_persist=False)
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+        default_permissions = ("view",)
+        permissions = (("record_employeecustodyreview", "Can record HR-reference custody reviews"),
+                       ("review_employeecustodyreview", "Can independently review GSO custody findings"))
+        constraints = [models.UniqueConstraint(fields=("department_id", "pending_employee"),
+            name="gso_one_open_custody_review"), models.CheckConstraint(
+            condition=~models.Q(status="reviewed") | (models.Q(reviewed_by__isnull=False, reviewed_at__isnull=False,
+                submitted_by__isnull=False, submitted_at__isnull=False) & ~models.Q(reviewed_by=models.F("submitted_by"))
+                & ~models.Q(reviewed_by=models.F("created_by")) & ~models.Q(reviewed_by=models.F("employee"))),
+            name="gso_custody_review_independent")]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            prior = type(self).objects.get(pk=self.pk)
+            immutable = ("public_id", "department_id", "department_label", "employee_id", "employee_label",
+                "reference", "request_date", "request_kind", "file", "original_filename", "sha256", "size",
+                "created_by_id", "created_at")
+            if not getattr(self, "_workflow_write", False) or any(
+                    getattr(prior, field) != getattr(self, field) for field in immutable):
+                raise ValidationError("Retain the HR request and review history; use the review workflow.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain the custody review and its source evidence.")
+
+
+class EmployeeCustodyReviewEvent(models.Model):
+    review = models.ForeignKey(EmployeeCustodyReview, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        related_name="gso_custody_review_events")
+    action = models.CharField(max_length=20)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at", "pk")
+        default_permissions = ("view",)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Custody review events are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain custody review events.")
+
+
 class Asset(models.Model):
     """One register line for an asset or a homogeneous group of assets."""
 

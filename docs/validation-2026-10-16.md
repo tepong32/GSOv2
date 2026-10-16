@@ -1000,3 +1000,63 @@ cost-component and valuation scope. Affected local Markdown links and diff check
 PASS. NOT RUN - OUT OF SCOPE: repeating local application/native suites for this
 prose-only correction; code is unchanged from the final97-case native PASS.
 VM inspect/patch preview checked; generated changes are VERSION and CHANGELOG only.
+
+## HR-reference custody review implementation — 2026-10-17
+
+Branch `codex/hr-custody-review`, based on676bc29 after fresh remote fetch and clean
+0/0 comparison. GRAND32ab046 freshly checked0/0;87 parallel changes retained, only
+GSO_INTEGRATION_REVIEW.md appended. Default-only migration0021, explicit owner
+permissions, supplied private HR request and native employee, findings/coverage,
+signed submission, independent review/return/cancellation and retained snapshots.
+Sorted asset → employee → case locks and changed-set retry cover new named handoffs.
+No duplicate HR/Records authority, employee clearance certificate or Finance writes.
+
+- PASS: `gsov2-development/Scripts/python.exe manage.py test inventory user --noinput`:
+  99 discovered,85 executed/14 expected native skips,28.987s. Schema/services/shared
+  routing justify broad shell coverage. `manage.py check`, copied actual-GRAND
+  `makemigrations inventory inventory_finance --check --dry-run`, compileall and
+  `git diff --check` pass.
+- FAIL - CAUSED BY CURRENT WORK, corrected: first focused6 tests had one fixture
+  read of a closed FieldFile; next10 test run had7 cascading errors after the HTTP
+  fixture explicitly closed its response/database. The first native109 run used
+  that earlier fixture and reproduced the same7 errors (38.952s). Both new native
+  races completed successfully there. Tests now consume streaming downloads via
+  Django's test-client wrapper. These are test bugs, not pre-existing failures.
+- PASS: corrected focused actual-GRAND SQLite `.tmp/test_hr_custody_reviews_grand.py
+  --grand-root .../gsov2-grand-source-validation`:12 discovered,10 executed/2 native
+  skips,1.470s. Scope: owner/explicit grants/UAT, independent review, actor-bound
+  tokens, CSRF, private downloads, stale custody, inactive identity, original file
+  and event corruption, actual witnessed return and retained resolved asset.
+- PASS: `.tmp/preview_hr_custody.py --grand-root .../gsov2-grand-source-validation`
+  copies stopped populated databases, migrates only inventory/default, checks all
+  pre-existing inventory/claim/mapping rows equal and Finance byte hash unchanged.
+  Preview data was created only in copies. Original Finance digest:
+  `d69658dc0f271c7d7202ac6b631ffee3ce9ffe25fdadf3daafdcb407b1423fe6`.
+- PASS: real browser recorder saves/submits, has no independent-review control;
+  separate reviewer records decision. Desktop/mobile screenshots inspected;
+  390px client/scroll widths, no duplicate IDs. Preview8030 and browser stopped.
+  An initial wrong preview URL404 was corrected to the actual integration route;
+  copied GRAND logo/avatar/favicon404s are synthetic fixture limitations.
+- FAIL - CAUSED BY CURRENT WORK, corrected: recovery first found cached FieldFile
+  reopening after deletion raised ValueError. Verification now opens the checked
+  private filesystem path each time; repeated missing-file test added. Final
+  `.tmp/rehearse_hr_custody_recovery.py` PASS, backup
+  `.codex/backups/gsov2-hr-custody-recovery-20261017-u2mmahc0`:207 default/83 finance
+  tables and3 private files; altered findings, missing review event and missing/
+  changed source detected/restored. Original paired sources/files unchanged. This
+  stopped synthetic SQLite rehearsal is not live MySQL/operator recovery acceptance.
+- PASS: native standalone `gsov2-development/Scripts/python.exe scripts/run_mysql_tests.py` on owned loopback33317:99/99,84.119s; schema removed.
+- PASS: final `grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py
+  --grand-root .../gsov2-grand-source-validation --mysql`:109/109,38.242s. Both
+  schemas removed; owned33317 normal shutdown requested. Includes the final file
+  correction and both native races: observed incoming-handoff employee-lock wait
+  rejects a newly appearing asset set, and competing review/cancellation retains
+  exactly one decision. Log `.tmp/hr-custody-grand-native-final.log`.
+- NOT RUN - OUT OF SCOPE: operator migrations/grants, deployment, formal LGU/COA
+  acceptance and Finance production scrutiny. No dependencies changed. Official
+  clearance, financial liability and general Records association remain separate.
+
+Operator db.sqlite3 SHA256 remains
+`5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
+Version Manager README/inspect/preview checked: proposed minor release updates
+only VERSION and CHANGELOG. All local gates now pass; release and remote CI evidence follow below.

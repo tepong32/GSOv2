@@ -141,3 +141,10 @@ be included with the database pair in recovery. Use the read-only
 Amendment review checks retained bytes and content/predecessor basis; unknown/zero
 cost never creates positive claim-support capacity. No amendment or recovery
 fixture authorizes an operator migration, grant or deployment.
+
+HR-reference custody cases add `inventory/custody-reviews` private request files.
+Include them in the same coordinated backup as default/finance stores. Run
+`check_custody_review_evidence` on restored copies; preserve the immutable case
+header and event chain. Missing sources or changed custody block independent review;
+an as-of review is not a permanent employee-clearance authorization. See
+[the case design](hr-custody-review.md) and validation for current release status.

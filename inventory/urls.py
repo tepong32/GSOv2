@@ -8,10 +8,15 @@ from . import employee_custody_views
 from . import custody_review
 from . import custody_return_views
 from . import stock_count_views
+from . import hr_custody_review_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("hr-custody-reviews/", hr_custody_review_views.review_list, name="hr-custody-review-list"),
+    path("hr-custody-reviews/new/<int:employee_id>/", hr_custody_review_views.review_create, name="hr-custody-review-create"),
+    path("hr-custody-reviews/<int:pk>/", hr_custody_review_views.review_detail, name="hr-custody-review-detail"),
+    path("hr-custody-reviews/<int:pk>/evidence/", hr_custody_review_views.review_evidence, name="hr-custody-review-evidence"),
     path("receiving/lines/<int:pk>/cost-amendments/", receipt_amendment_views.amendments, name="receipt-amendments"),
     path("receiving/cost-amendments/<int:pk>/", receipt_amendment_views.amendment_detail, name="receipt-amendment-detail"),
     path("receiving/cost-amendments/<int:pk>/evidence/", receipt_amendment_views.amendment_evidence, name="receipt-amendment-evidence"),

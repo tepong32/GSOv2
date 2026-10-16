@@ -74,13 +74,17 @@ Named employee custody is published at236c5e1; see
 [verified HR boundary and selected relationships](employee-custody-design.md).
 GRAND currently provides employee identity/current department, but no verified
 separation event. Named-custody migration, services and signed staff screens are implemented;
-clearance workflows remain unimplemented. The [custody review workbench](custody-review.md)
+official clearance remains unimplemented. The [custody review workbench](custody-review.md)
 is published atfb2eae2 as the next prerequisite. No operator migration or deployment.
 
 [Witnessed returns](custody-returns.md) are published at2a7bb5f:
 independent GSO confirmation, protected receipt evidence and retained former custody,
 with no HR clearance or Finance decision. See CONTINUE for validation evidence.
-HR-reference review cases and unresolved-item decisions remain after this slice.
+The [HR-reference review case](hr-custody-review.md) is implemented and validated on
+`codex/hr-custody-review`: supplied private request, office findings, retained
+as-of custody and independent review. It does not create HR separation events,
+universal clearance, financial holds or duplicate GRAND's general records registry.
+Unresolved-liability decisions and accepted official outputs remain future work.
 
 After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
 

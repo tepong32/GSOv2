@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.15.0] - 2026-10-17
+### Added
+- Add documented HR-reference GSO custody reviews
+
 ## [0.14.1] - 2026-10-17
 ### Documentation
 - Reconcile Finance integration handoff with published mapping capabilities
