@@ -44,14 +44,31 @@ exact database copy, SQLite backup API snapshot, tracked user image, hash manife
 The snapshot passed integrity_check. This is not a complete evidence backup.
 The canonical operator database must retain its original hash throughout release.
 
-Release/integration status must be verified against live Git and CI before resuming.
-Use the Version Manager preview/release workflow; only completed GSO work belongs
-in that release. Never commit the preserved runtime files or publish GRAND changes.
+## Published prerequisite
+
+Version Manager created `v0.3.0` at `e642d9edc0c8f98c2cc9b01dcb900c776d0385f2`.
+Feature branch and tag were pushed and verified. The feature
+[CI run](https://github.com/tepong32/GSOv2/actions/runs/38927980234) passed before
+fast-forward integration. Canonical `master` and remote `master` were verified at
+the same commit (0 ahead / 0 behind); its
+[primary run](https://github.com/tepong32/GSOv2/actions/runs/38928123403) also passed.
+Recheck current remote state before the next feature. No branch protection/ruleset required
+a PR at this checkpoint; no review policy was bypassed.
+
+The canonical database's local changes were retained in a named Git stash and the
+external backup before integration, then its original bytes and the user image
+were restored and re-hashed. The files now remain local/ignored. No operator
+migration occurred. A separate restored **copy** successfully migrated through 0012;
+all original table row counts, stock links, UUID uniqueness and SQLite integrity
+passed. The source database's hash still matches the preservation manifest.
+
+Only completed GSO work belongs in this release. Never commit preserved runtime
+files or publish GRAND's parallel changes. Check live Git/CI before resuming;
+the documentation follow-up may advance primary beyond this feature checkpoint.
 
 ## Next work
 
-1. Complete/verify this checkpoint's VM release, remote regression check, primary
-   integration and preservation checks; update actual release status here.
+1. Verify the primary check and any documentation follow-up against live Git/CI.
 2. Fetch/check sync again, then use a new feature branch for the receipt header/
    line workflow in the design: inspection evidence, partial/rejected quantities,
    independently accepted serialized assets/supply movements and retry protection.

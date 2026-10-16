@@ -19,6 +19,8 @@ Runtime below: `C:/xxx/_INSTALLS/_HERE/_xxx/gsov2-development/Scripts/python.exe
 | `python manage.py check --deploy` with synthetic `DEBUG=0`, strong test secret, explicit host and absolute private path | PASS with W005 and W021 warnings: subdomain HSTS and preload deliberately disabled pending actual domain rollout. No production settings/secrets used. |
 | `git diff --check` | PASS. |
 | SQLite backup API snapshot + integrity_check; SHA-256 comparison of operator original/raw copy | PASS: integrity_check `ok`; raw copy and original bytes equal; no operator migration. |
+| `GSO_DATABASE_PATH=<protected restored copy> python manage.py migrate --noinput` | PASS: actual operator snapshot copied to an isolated path, migrated through 0012; original table counts, link identities, distinct UUIDs and SQLite integrity verified. Original DB hash unchanged. |
+| Feature GitHub workflow at `e642d9e`, run `38927980234` | PASS: dependency consistency/audit, system checks, migration drift and full regression on Ubuntu/Python 3.11. |
 | Native MySQL and actual GRAND router/import integration | NOT RUN — ENVIRONMENTAL: not configured for this standalone shell; parallel Finance's native environment is not borrowed or disrupted. Required before GRAND merge. |
 | Browser layout / official form outputs | NOT RUN — OUT OF SCOPE: no templates/UI fields or official outputs changed. Django HTTP tests exercise export, list, detail and rejected cross-office action routes. |
 | Full data/evidence restore, penetration testing, LGU acceptance | NOT RUN — ENVIRONMENTAL: requires coordinated target deployment, evidence set and operational review. No production-readiness claim. |
@@ -40,5 +42,10 @@ a modified untracked test file. Operator files were never involved. This demonst
 why canonical integration must preserve data externally rather than force checkout.
 The rehearsal directory is under `.codex/worktrees/gso-untrack-rehearsal-tcs6r8bi`.
 
-Remote CI/release result is recorded after execution in CONTINUE.md. Local tests do
-not stand in for a future GitHub run or verification of the pushed commit.
+Version Manager inspect and preview preceded the actual release commit/tag. Preview
+initially proposed rewriting historical baseline version mentions; these were
+expressed as immutable baseline commit references before release so historical facts
+were preserved. Only VERSION and CHANGELOG were then automatically updated.
+Canonical/remote primary and tag were verified at `e642d9e`; operator bytes were
+rechecked unchanged after integration. Primary CI and later documentation status
+are linked from CONTINUE.md. Local tests do not stand in for a future GitHub run.
