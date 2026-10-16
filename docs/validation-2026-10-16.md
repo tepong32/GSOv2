@@ -1067,3 +1067,39 @@ master fast-forward/push. Remote master/tag verified at
 PASS. The documentation follow-up records that publication. No code changes
 in that follow-up. Owned33317 shutdown exited0; preview8030 stopped. All prior
 migration, recovery, browser and native test evidence above applies to this code.
+
+## Stock movement retry safety — 2026-10-17
+
+Scope: receipt/issue/adjust HTTP retry identity, shared stock service and FIFO.
+Broad standalone and actual-GRAND suites selected because stock mutation is shared.
+- FAIL - PRE-EXISTING, reproduced: new replay regression against published services
+  doubled receipt/issue/adjustment quantities (16/4/6 instead of13/7/8).
+  Evidence `.tmp/stock-retry-before.log`; fixed by this milestone.
+- PASS: `python manage.py test inventory.test_stock_retries` final focused run:
+  5 discovered,4 executed,1 native skip,0.716s.
+- PASS: `python manage.py test`:104 discovered,89 executed,15 native skips,24.350s.
+- PASS: `python scripts/run_mysql_tests.py`:104/104,89.120s, including concurrent
+  identical receipt/issue requests producing one movement and FIFO allocation.
+- PASS: `python scripts/run_grand_source_tests.py --grand-root
+  C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`:
+  110/110,40.463s. Actual source32ab046; signed HTTP replay, UAT denial, revoked
+  permission denial and zero Finance queries covered. Both schemas removed.
+- PASS: `python manage.py check`, `python manage.py makemigrations --check --dry-run`,
+  `git diff --check`. No migration changes.
+- PASS: browser3-unit issue from10 leaves7; desktop form inspected; mobile390px
+  client/scroll widths, no duplicate IDs, hidden token not exposed as visible field.
+  Screenshot `output/playwright/stock-retry-mobile.png`. Browser did not simulate
+  replay; automated HTTP tests do. Synthetic logo/avatar404s remain fixture limits.
+- PASS: `.tmp/rehearse_stock_retry_recovery.py`: stopped paired backup/restore of
+  207 default/83 finance tables and3 private files; replay of restored identity
+  returns original movement/allocation, changed quantity rejected, no added rows.
+  Backup `.codex/backups/gsov2-stock-retry-recovery-20261017-ae0mofvh`.
+  Original sources unchanged. This is not live MySQL/operator recovery acceptance.
+- PASS: owned MySQL33317 normal shutdown exit0 after schema cleanup; browser and
+  preview8030 stopped. Canonical operator DB SHA256 remains
+  `5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039`.
+- NOT RUN - OUT OF SCOPE: operator migration/grants, deployment, current municipal
+  official-form acceptance and Finance production scrutiny. No dependencies changed.
+
+Source research and remaining request workflow are recorded in stock-request-design.md.
+Version Manager README inspected; release preview and remote CI gate integration.

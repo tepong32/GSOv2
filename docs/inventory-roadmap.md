@@ -32,6 +32,12 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 
 ## Planned features, in order
 
+Supplies follow-up: [request and issue design](stock-request-design.md) defines a
+small supplied-approved-requisition workflow, partial fulfillment and return
+lineage using existing GRAND authorities. The prerequisite stock form retry
+protection is implemented with existing movement UUIDs and no schema change.
+Full requisition fulfillment and accepted official outputs remain future work.
+
 ### 1. Annual physical count reporting and reconciliation — implemented
 
 Extend verification rounds with an explicit count/as-of date, a way to record items found during the count that are not in the register, and a discrepancy follow-up process. Produce a reviewable comparison between the GSO register, physical findings, and Accounting's asset records. Begin with controlled import/export and manual review; do not update Finance records automatically.

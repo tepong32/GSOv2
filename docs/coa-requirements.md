@@ -8,6 +8,12 @@ annex, effectivity and amendments with the LGU Accountant and relevant process o
 
 ## Verified sources and limits
 
+Supplies follow-up2026-10-17: [the request/issue design](stock-request-design.md)
+records reviewed historical GAFMIS2003-006 text and COA's indexed2021-007 deferment
+listing. Current municipal form/version, complete deferment text and later changes
+remain to be verified. Neither a2020 GAM reference nor an NGA/barangay form alone
+establishes the applicable municipal output. No executable accounting rule changed.
+
 | Source | What was verified | Application and remaining verification |
 | --- | --- | --- |
 | [COA Circular 92-386, 20 October 1992](https://www.coa.gov.ph/wpfd_file/coa-circular-no-92-386-october-20-1992/) | COA's indexed listing identifies LGU supply/property management rules. Direct page retrieval failed in this session. | Baseline source for custody, receipt, inspection and accountability. Full text and later amendments still need section-level review; do not invent mandatory fields from its title. |

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.15.2] - 2026-10-17
+### Fixed
+- Prevent duplicate stock movements on retried submissions
+
 ## [0.15.1] - 2026-10-17
 ### Documentation
 - Record verified HR custody review publication and recovery evidence

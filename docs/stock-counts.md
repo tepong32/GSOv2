@@ -6,6 +6,11 @@ CONTINUE records release and CI evidence.
 
 ## Existing ledger controls
 
+The [request/issue trail design](stock-request-design.md) describes remaining
+requisition lineage and the immediate signed retry prerequisite. Stock POST retries
+reuse an explicit movement UUID rather than deducting/receiving stock again; they
+do not establish a requisition approval or official RIS/RSMI output.
+
 Supply catalog, movements and optional FIFO lots remain in GRAND `default`.
 Quantities have three decimal places; optional unit costs have two. Service writes
 now validate field precision/range before balance comparisons, ledger insertion or

@@ -1,16 +1,20 @@
 import csv
+from uuid import uuid4
 
 from .employee_sources import can_manage_employee_custody
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core import signing
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models import Sum
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 
 from .access import (
     _is_gso_department, asset_access_required, asset_in_scope, can,
@@ -864,14 +868,37 @@ def consumable_detail(request, pk):
     })
 
 
+STOCK_REQUEST_SALT = "gso-stock-movement-request-v1"
+
+
+def _stock_request_form(request, item, action, form_type):
+    token = signing.dumps({"actor": request.user.pk, "item": str(item.public_id),
+        "action": action, "request": str(uuid4())}, salt=STOCK_REQUEST_SALT)
+    return form_type(request.POST if request.method == "POST" else None, initial={"request_token": token})
+
+
+def _stock_request_id(request, item, action, token):
+    try:
+        payload = signing.loads(token, salt=STOCK_REQUEST_SALT, max_age=1800)
+    except signing.BadSignature:
+        raise ValidationError("This movement form expired or changed. Check movement history, then reopen the form if needed.")
+    if payload.get("actor") != request.user.pk or payload.get("item") != str(item.public_id) or payload.get("action") != action:
+        raise PermissionDenied
+    return payload["request"]
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
 @stock_access_required("receive")
 def stock_receive(request, pk):
     item = get_object_or_404(_stock_items(request.user), pk=pk)
-    form = StockReceiptForm(request.POST or None)
+    form = _stock_request_form(request, item, "receive", StockReceiptForm)
     if request.method == "POST" and form.is_valid():
         try:
+            data = dict(form.cleaned_data)
+            identity = _stock_request_id(request, item, "receive", data.pop("request_token"))
             record_stock_movement(
-                actor=request.user, item=item, kind=StockMovement.RECEIPT, **form.cleaned_data,
+                actor=request.user, item=item, kind=StockMovement.RECEIPT, request_id=identity, **data,
             )
         except ValidationError as error:
             form.add_error(None, error)
@@ -881,17 +908,20 @@ def stock_receive(request, pk):
     return render(request, "inventory/stock_movement_form.html", {"form": form, "item": item, "heading": "Record received stock"})
 
 
+@never_cache
+@require_http_methods(["GET", "POST"])
 @stock_access_required("issue")
 def stock_issue(request, pk):
     item = get_object_or_404(_stock_items(request.user), pk=pk)
-    form = StockIssueForm(request.POST or None)
+    form = _stock_request_form(request, item, "issue", StockIssueForm)
     if request.method == "POST" and form.is_valid():
         data = dict(form.cleaned_data)
         department = _resolve_department(data.pop("department"))
         try:
+            identity = _stock_request_id(request, item, "issue", data.pop("request_token"))
             record_stock_movement(
                 actor=request.user, item=item, kind=StockMovement.ISSUE,
-                department_id=department.pk, department_label=department.name, **data,
+                department_id=department.pk, department_label=department.name, request_id=identity, **data,
             )
         except ValidationError as error:
             form.add_error(None, error)
@@ -901,16 +931,20 @@ def stock_issue(request, pk):
     return render(request, "inventory/stock_movement_form.html", {"form": form, "item": item, "heading": "Issue supplies"})
 
 
+@never_cache
+@require_http_methods(["GET", "POST"])
 @stock_access_required("adjust")
 def stock_adjust(request, pk):
     item = get_object_or_404(_stock_items(request.user), pk=pk)
-    form = StockAdjustmentForm(request.POST or None)
+    form = _stock_request_form(request, item, "adjust", StockAdjustmentForm)
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         kind = StockMovement.ADJUSTMENT_IN if data["direction"] == "in" else StockMovement.ADJUSTMENT_OUT
         try:
+            identity = _stock_request_id(request, item, "adjust", data["request_token"])
             record_stock_movement(
                 actor=request.user, item=item, kind=kind, quantity=data["quantity"], reason=data["reason"],
+                request_id=identity,
             )
         except ValidationError as error:
             form.add_error(None, error)

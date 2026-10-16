@@ -6,7 +6,7 @@ from io import StringIO
 from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Sum
 from django.db.models.functions import Lower, Trim
 from django.utils import timezone
@@ -836,7 +836,7 @@ def _allocate_fifo(item, issue, quantity):
 
 @transaction.atomic
 def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="", unit_cost=None,
-                          department_id=None, department_label="", recipient=""):
+                          department_id=None, department_label="", recipient="", request_id=None):
     permission = {
         StockMovement.RECEIPT: "receive",
         StockMovement.ISSUE: "issue",
@@ -849,8 +849,6 @@ def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="
     _stock_permission(actor, permission)
     item = ConsumableItem.objects.select_for_update().get(pk=item.pk)
     _stock_permission(actor, permission, item)
-    if not item.is_active:
-        raise ValidationError("Inactive supply items cannot receive new movements.")
     # Validate before balance comparisons or persistence: databases may otherwise
     # round excess precision differently from the in-memory FIFO allocation.
     quantity = StockMovement._meta.get_field("quantity").clean(quantity, None)
@@ -866,6 +864,21 @@ def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="
         if destination is None or not recipient.strip():
             raise ValidationError("Select the receiving department and record who received the supplies.")
         department_id, department_label = destination.pk, destination.name
+    if request_id is not None:
+        try:
+            request_id = UUID(str(request_id))
+        except (ValueError, TypeError, AttributeError):
+            raise ValidationError("Invalid stock movement request identity.")
+        existing = StockMovement.objects.filter(public_id=request_id).first()
+        if existing:
+            expected = {"item_id": item.pk, "actor_id": actor.pk, "kind": kind, "quantity": quantity,
+                "unit_cost": unit_cost, "department_id": department_id, "recipient": recipient,
+                "reference": reference, "reason": reason}
+            if any(getattr(existing, name) != value for name, value in expected.items()):
+                raise ValidationError("This request identity belongs to different recorded movement content.")
+            return existing
+    if not item.is_active:
+        raise ValidationError("Inactive supply items cannot receive new movements.")
     inbound = kind in (StockMovement.RECEIPT, StockMovement.RETURN, StockMovement.ADJUSTMENT_IN)
     if not inbound and _stock_signed_total(item) < quantity:
         raise ValidationError(f"Only {_stock_signed_total(item):g} {item.unit} are available.")
@@ -875,8 +888,18 @@ def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="
         department_id=department_id, department_label=department_label,
         recipient=recipient, reference=reference, reason=reason, unit_cost=unit_cost, actor=actor,
     )
-    movement.full_clean()
-    movement.save()
+    if request_id is not None:
+        movement.public_id = request_id
+    movement.full_clean(validate_unique=False)
+    try:
+        with transaction.atomic():
+            movement.save()
+    except IntegrityError:
+        # The item lock serializes ordinary retries. A UUID collision across
+        # different items must fail cleanly without allocating any stock.
+        if request_id is not None and StockMovement.objects.filter(public_id=request_id).exists():
+            raise ValidationError("This request identity already belongs to another stock movement.")
+        raise
     if item.use_fifo:
         if inbound:
             _create_stock_lot(item, movement)

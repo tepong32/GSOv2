@@ -43,3 +43,23 @@ class GrandStockAuthorityTests(TestCase):
         self.assertEqual(len(finance), 0)
         self.assertEqual(issue.department_label, self.other.name)
         self.assertEqual(self.item.on_hand, 2)
+
+    def test_signed_http_stock_retry_preserves_single_movement_and_denies_uat_replay(self):
+        from django.urls import reverse
+        self.client.force_login(self.clerk)
+        url = reverse("inventory:stock-receive", args=(self.item.pk,))
+        response = self.client.get(url)
+        token = response.context["form"].initial["request_token"]
+        data = {"quantity": "5", "reference": "GRAND-RETRY", "request_token": token}
+        with CaptureQueriesContext(connections["finance"]) as finance:
+            self.assertEqual(self.client.post(url, data).status_code, 302)
+            self.assertEqual(self.client.post(url, data).status_code, 302)
+        self.assertEqual(len(finance), 0)
+        self.assertEqual(self.item.on_hand, 5)
+        self.assertEqual(self.item.movements.count(), 1)
+        self.client.force_login(self.viewer)
+        self.assertEqual(self.client.post(url, data).status_code, 403)
+        self.client.force_login(self.clerk)
+        self.clerk.user_permissions.remove(Permission.objects.get(
+            content_type__app_label="inventory", codename="receive_stock"))
+        self.assertEqual(self.client.post(url, data).status_code, 403)

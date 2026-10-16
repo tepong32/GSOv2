@@ -434,14 +434,18 @@ class ConsumableItemForm(forms.ModelForm):
         return unit
 
 
-class StockReceiptForm(forms.Form):
+class StockMovementRequestForm(forms.Form):
+    request_token = forms.CharField(widget=forms.HiddenInput)
+
+
+class StockReceiptForm(StockMovementRequestForm):
     quantity = forms.DecimalField(min_value=0.001, max_digits=12, decimal_places=3)
     unit_cost = forms.DecimalField(required=False, min_value=0, max_digits=13, decimal_places=2)
     reference = forms.CharField(max_length=120, required=False, label="Delivery / purchase reference")
     reason = forms.CharField(max_length=240, required=False, label="Note")
 
 
-class StockIssueForm(forms.Form):
+class StockIssueForm(StockMovementRequestForm):
     quantity = forms.DecimalField(min_value=0.001, max_digits=12, decimal_places=3)
     department = forms.TypedChoiceField(choices=(), coerce=int, label="Receiving department")
     recipient = forms.CharField(max_length=160, label="Received by")
@@ -458,7 +462,7 @@ class StockIssueForm(forms.Form):
             self.fields["department"].choices = [(str(row.pk), row.name) for row in qs]
 
 
-class StockAdjustmentForm(forms.Form):
+class StockAdjustmentForm(StockMovementRequestForm):
     direction = forms.ChoiceField(choices=(("in", "Increase balance"), ("out", "Decrease balance")))
     quantity = forms.DecimalField(min_value=0.001, max_digits=12, decimal_places=3)
     reason = forms.CharField(max_length=240, label="Reason for adjustment")

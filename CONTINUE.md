@@ -5,6 +5,33 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Stock movement retry safety — validated checkpoint
+
+Developed on `codex/stock-issue-retry-safety` from830a1ec after fresh fetch0/0.
+Receipt, issue and adjustment forms now carry signed actor/item/operation request
+identities. Exact retries return the retained movement under the item lock;
+changed content fails without duplicate quantities or FIFO allocations. Current
+permissions still apply. Existing movement UUIDs are reused; no schema changes.
+Fresh forms remain distinct operations. See [supplies design](docs/stock-request-design.md).
+
+Standalone SQLite104 discovered/89 executed/15 native skips PASS24.350s; native
+standalone104/104 PASS89.120s; actual GRAND110/110 PASS40.463s. Check and migration
+drift pass. Browser issue and mobile390px checks pass. Stopped paired recovery
+207 default/83 finance tables and3 files preserves retry/FIFO identities without
+additional rows; backup `.codex/backups/gsov2-stock-retry-recovery-20261017-ae0mofvh`.
+Both native schemas removed and owned33317 shut down normally; preview stopped.
+Operator database hash remains unchanged. Full evidence is in the validation log.
+
+Finance32ab046 fetched0/0 with88 dirty/untracked files preserved. Its handoff now
+reports both full regressions passing; only the GSO coordination note was appended.
+Next: supplied approved requisitions, partial fulfillment and original-issue return
+lineage, following the documented design and actual GRAND authorities. This fix
+does not implement that workflow. Current municipal form applicability remains
+unverified; the COA source matrix records the indexed2021 GAM deferment and limits.
+No operator migration, grant, deployment or official-form acceptance occurred.
+Release identity is retained in VERSION, CHANGELOG and Git history; remote CI is
+verified before integration under the repository release workflow.
+
 ## HR-reference custody review — published
 
 Branch `codex/hr-custody-review` based on676bc29 after fresh fetch clean0/0.
