@@ -67,6 +67,12 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   writes, resolve issue offices from the directory, and retain adjustment reasons.
   GRAND stock mutations require explicit grants and deny Finance UAT viewers.
   Physical counts never establish financial valuation; see [stock counts](docs/stock-counts.md).
+- Supply counts pin today's item/ledger basis and require private evidence plus an
+  independent non-uploader's review. Lock item before count; stale bases require
+  cancellation/recount. Apply differences through the existing movement service,
+  retaining zero-variance decisions without fake movements or invented surplus costs.
+  Include count evidence in coordinated recovery; historical counts and official
+  supplies forms need separate reconciliation/acceptance, not backdated adjustments.
 
 ## Validation
 

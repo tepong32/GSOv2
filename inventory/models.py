@@ -1097,3 +1097,86 @@ class AssetReturnEvidence(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Return evidence is retained.")
+
+
+class StockCount(models.Model):
+    """One evidenced observation and independent decision against a pinned ledger."""
+    PENDING, APPROVED, CANCELLED = "pending", "approved", "cancelled"
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    item = models.ForeignKey(ConsumableItem, on_delete=models.PROTECT, related_name="counts")
+    counted_on = models.DateField()
+    quantity = models.DecimalField(max_digits=12, decimal_places=3, validators=[MinValueValidator(0)])
+    reference = models.CharField(max_length=120)
+    note = models.CharField(max_length=240)
+    basis = models.JSONField()
+    status = models.CharField(max_length=12, default=PENDING,
+        choices=((PENDING, "Awaiting independent review"), (APPROVED, "Reviewed and recorded"), (CANCELLED, "Cancelled")))
+    state_version = models.PositiveIntegerField(default=1)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_counts_recorded")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_counts_decided")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.CharField(max_length=240, blank=True)
+    adjustment = models.OneToOneField(StockMovement, on_delete=models.PROTECT, null=True, blank=True, related_name="physical_count")
+    pending_marker = models.GeneratedField(
+        expression=models.Case(models.When(status="pending", then=models.Value(1)), default=models.Value(None)),
+        output_field=models.PositiveSmallIntegerField(), db_persist=False, null=True)
+
+    class Meta:
+        ordering = ("-recorded_at", "-pk")
+        default_permissions = ()
+        permissions = (("record_stock_count", "Can record evidenced GSO supply counts"),
+                       ("review_stock_count", "Can independently review GSO supply counts"))
+        constraints = (
+            models.UniqueConstraint(fields=("item", "pending_marker"), name="gso_one_pending_stock_count"),
+            models.CheckConstraint(condition=models.Q(quantity__gte=0), name="gso_stock_count_nonnegative"),
+            models.CheckConstraint(condition=models.Q(status__in=("pending", "approved", "cancelled")), name="gso_stock_count_state"),
+        )
+
+
+class StockCountEvent(models.Model):
+    count = models.ForeignKey(StockCount, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_count_events")
+    action = models.CharField(max_length=24)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    snapshot = models.JSONField()
+
+    class Meta:
+        ordering = ("occurred_at", "pk")
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Count events cannot be replaced.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Count events are retained.")
+
+
+def stock_count_evidence_path(instance, filename):
+    extension = filename.rsplit(".", 1)[-1].lower()
+    return f"inventory/stock_counts/{instance.count.public_id}/{uuid4().hex}.{extension}"
+
+
+class StockCountEvidence(models.Model):
+    count = models.ForeignKey(StockCount, on_delete=models.PROTECT, related_name="evidence")
+    file = models.FileField(upload_to=stock_count_evidence_path, storage=disposal_private_storage, max_length=255)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    note = models.CharField(max_length=240)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_count_uploads")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("uploaded_at", "pk")
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Count evidence cannot be replaced. Append a correction document.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Count evidence is retained.")

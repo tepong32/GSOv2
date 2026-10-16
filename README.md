@@ -70,6 +70,8 @@ The assigned department scopes each view. GSO staff with the appropriate permiss
 | `inventory.receive_stock` | Record receipts and returns |
 | `inventory.issue_stock` | Issue supplies to a department |
 | `inventory.adjust_stock` | Record a balance adjustment with a reason |
+| `inventory.record_stock_count` | Owning GSO: record today's physical count and retain evidence, with stock view permission |
+| `inventory.review_stock_count` | Owning GSO: independently approve a count, with stock view and adjustment permissions |
 | `inventory.view_stock_audit` | View supply movement history |
 | `inventory.export_stock_register` | Export supply movement history as CSV |
 
@@ -109,6 +111,10 @@ Integration should:
 4. Assign the `inventory` permissions to existing GRAND Groups or users. A department assignment by itself should not grant read/write/delete.
 5. Route `inventory` migrations to the default database. Finance's database separation remains unchanged.
 6. Import and reconcile legacy data before the new register becomes authoritative. The former `home.Item` schema is preserved under `home/` as a reference and is no longer installed or routed. Its fields map to the new asset form as follows: date → purchase date; OBR number → OBR/reference; category and subcategory → additional item description; brand/supplier/price/quantity/status/return date/notes → corresponding asset fields. Existing rows require later selection of an inventory class and item type. Derive the asset name from the old category/brand after review, and confirm whether each row represents one item or a pooled quantity. Review old status values before mapping them to the new in-service, maintenance, transferred, and retired states.
+
+Reviewed current-day supply counts and configured low-stock indicators are implemented;
+see [count workflow, permissions and limits](docs/stock-counts.md). Review never posts
+to Finance, and historical count sheets need separate reconciliation.
 
 Basic maintenance history and named employee handoffs are implemented. Employee exit
 clearance and official COA report generation remain future work; automatic journal

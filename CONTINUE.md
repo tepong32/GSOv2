@@ -5,6 +5,37 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
+## Reviewed physical counts — release validation
+
+Started `codex/reviewed-stock-counts` after fresh fetch and clean 0/0 at
+8809372/v0.9.3 (primary CI38953114417 PASS39s). GRAND fetched 0/0 at32ab046;
+parallel Form1 work is preserved. Migration0019 adds one-item count records,
+protected evidence/events, signed staff screens and configured low-stock indicators.
+Counts pin today's ledger; stale bases require cancellation/recount. Independent
+approval creates one exact existing-ledger adjustment, or no movement for zero
+variance. Surplus cost remains unknown. No Finance writes or operator migration.
+Historical counts need separate reconciliation; this is not an official RPCI.
+
+Final standalone native91/91 PASS74.794s; SQLite91 discovered/79 executed/12 native
+skips PASS28.059s. Migration drift and dependency consistency pass. Initial GRAND65
+run exposed a test cleanup error after a successful download; corrected the test,
+final actual-GRAND native65/65 PASS19.277s, log`.tmp/grand-stock-count-release.log`.
+Both disposable schemas removed; owned MySQL33317/session51174 shut down normally.
+Existing23 GRAND W036 warnings remain outside GSO; no GSO system-check warnings.
+
+Actual GRAND browser record/upload/independent approval passes; stock10 to8 with
+one adjustment-out2 and minimum8 reminder. Desktop/mobile visually checked, no
+page overflow or duplicate IDs. Both browsers and preview8023 are stopped.
+Stopped paired recovery preserves201 default/83 finance tables and one count file,
+including original actors, basis, adjustment and all three events. Missing/changed
+files detected and restored; source unchanged. Backup:
+`C:/Users/Administrator/.codex/backups/gsov2-stock-count-recovery-20261017-k6d90rer`.
+See [count design](docs/stock-counts.md) and [validation](docs/validation-2026-10-16.md).
+External VM minor release is ready; branch/primary CI and remote verification
+remain pending. Overall goal stays incomplete. Next: HR-reference review cases and
+Finance cost correction/allocation/JEV relationships, with official supplies forms
+and historical count reconciliation separately verified before implementation.
+
 ## Published supplies ledger validation
 
 Previous turn published return notes v0.9.1/e7483a6; branchCI38951646913 and primary
@@ -19,14 +50,13 @@ Standalone76 discovered/67 executed/nine native skips PASS14.660s; native76/76
 PASS49.834s. Actual GRAND native63/63 PASS19.761s. Both disposable schemas removed
 and owned MySQL33317 session61913 shut down normally. See
 [stock-count design](docs/stock-counts.md). No schema or operator
-data changes. Complete this integrity prerequisite before reviewed physical counts;
+data changes. This published integrity prerequisite supports reviewed physical counts;
 HR-reference clearance and financial relationships remain in scope.
 
 Actual VM patch releasecbece6c, tagv0.9.2, is integrated/pushed to master after
 branchCI38952776429 PASS31s. Remote master/tag matchcbece6c9d2875d1b255be29c03ac29ce72ae23ba.
 PrimaryCI38952884082 PASS41s. Documentation follow-up uses separate
-`codex/stock-ledger-release-notes`, created after clean fetch0/0. Next implement
-the documented reviewed physical-count workflow; it is not implemented by this fix.
+`codex/stock-ledger-release-notes`, created after clean fetch0/0. The reviewed physical-count workflow is tracked above; it was not part of this fix.
 
 ## Published witnessed returns
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.10.0] - 2026-10-17
+### Added
+- Add independently reviewed supply counts and low-stock indicators
+
 ## [0.9.3] - 2026-10-17
 ### Documentation
 - Record stock integrity validation and next count workflow

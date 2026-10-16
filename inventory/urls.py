@@ -6,10 +6,15 @@ from . import maintenance_views
 from . import employee_custody_views
 from . import custody_review
 from . import custody_return_views
+from . import stock_count_views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path("stock-counts/", stock_count_views.count_list, name="stock-count-list"),
+    path("consumables/<int:pk>/count/", stock_count_views.count_start, name="stock-count-start"),
+    path("stock-counts/<int:pk>/", stock_count_views.count_detail, name="stock-count-detail"),
+    path("stock-counts/evidence/<int:pk>/", stock_count_views.count_evidence, name="stock-count-evidence"),
     path("custody-returns/", custody_return_views.return_list, name="custody-return-list"),
     path("<int:pk>/custody-return/", custody_return_views.return_start, name="custody-return-start"),
     path("custody-returns/<int:pk>/", custody_return_views.return_detail, name="custody-return-detail"),

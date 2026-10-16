@@ -784,6 +784,8 @@ def consumable_list(request):
     query = request.GET.get("q", "").strip()
     if query:
         items = items.filter(Q(name__icontains=query) | Q(category__icontains=query))
+    for item in items:
+        item.low_stock = item.is_active and item.minimum_stock > 0 and (item.on_hand_value or 0) <= item.minimum_stock
     return render(request, "inventory/consumable_list.html", {
         "items": items, "query": query,
         "is_gso": request.user.is_superuser or _is_gso_department(department_for_user(request.user)),
@@ -841,6 +843,7 @@ def consumable_edit(request, pk):
 
 @stock_access_required()
 def consumable_detail(request, pk):
+    from .stock_counts import can_manage_count
     item = get_object_or_404(_stock_items(request.user), pk=pk)
     movements = item.movements.all()
     department = department_for_user(request.user)
@@ -851,6 +854,7 @@ def consumable_detail(request, pk):
     audit_events = item.audit_events.all() if is_gso and request.user.has_perm("inventory.view_stock_audit") else ()
     return render(request, "inventory/consumable_detail.html", {
         "item": item, "page": page, "is_gso": is_gso, "audit_events": audit_events,
+        "can_record_count": can_manage_count(request.user, "record", item) and item.is_active,
         "can_receive": can_stock(request.user, "receive"),
         "can_issue": can_stock(request.user, "issue"),
         "can_adjust": can_stock(request.user, "adjust"),

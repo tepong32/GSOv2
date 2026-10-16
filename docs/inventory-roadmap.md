@@ -77,13 +77,16 @@ HR-reference review cases and unresolved-item decisions remain after this slice.
 
 After GRAND HR integration is available, show assets assigned to an employee when their department changes or an exit is initiated. Let GSO and the employee's office record return, acknowledged handoff, or a documented unresolved item. The process must use HR as the source for employee status, preserve the asset transfer trail, and avoid blocking unrelated HR actions automatically.
 
-### 5. Consumable stock counts and low-stock reminders
+### 5. Consumable stock counts and low-stock reminders — initial workflow implemented
 
-The [ledger and count design](stock-counts.md) records the selected next workflow.
-Before count adjustments, repair service-level numeric/authority gaps discovered
-during source review; see CONTINUE for validation/release status. Physical custody
-prerequisites are published. HR-reference clearance remains separate pending its
-explicit source workflow; this does not authorize deriving HR status from accounts.
+The [ledger and count design](stock-counts.md) records the implemented current-day
+workflow: one-item observations with shared sheet references, private evidence,
+independent review and exact linked adjustments through the existing stock service.
+Stale ledger/item bases require cancellation and recount; zero variance creates no
+fake movement. Active items at/below a positive configured minimum are flagged.
+Historical count sheets and official supplies reports remain separate reconciliation
+and acceptance work. See CONTINUE for validation/release status. HR-reference
+clearance remains separate; never derive employment status from account activation.
 
 Let GSO record a dated physical count for consumables, compare counted quantity with the movement-ledger balance, and record a reasoned adjustment after review. Add a clear low-stock indicator using the existing minimum-stock value. Keep ordinary supplies quantity-only by default; FIFO remains optional per item. Validate any official supplies count report with the LGU Accountant before adding a form export.
 

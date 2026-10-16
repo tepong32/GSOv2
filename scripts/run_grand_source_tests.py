@@ -77,6 +77,7 @@ def main():
                  "gso_integration_tests.grand_custody_return_http",
                  "gso_integration_tests.grand_custody_return_races",
                  "gso_integration_tests.grand_stock_authority",
+                 "gso_integration_tests.grand_stock_counts",
                  interactive=False, keepdb=False, verbosity=1)
 
 

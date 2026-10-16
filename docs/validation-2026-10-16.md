@@ -602,3 +602,54 @@ cbece6c9d2875d1b255be29c03ac29ce72ae23ba. PrimaryCI38952884082 PASS41s.
 Operator DB SHA-256 unchanged at5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 Documentation follow-up uses separate `codex/stock-ledger-release-notes` after
 clean fetch0/0, with no code, schema or storage changes.
+
+## Reviewed supplies counts — 2026-10-17
+
+Fresh fetch and clean 0/0 at8809372 preceded `codex/reviewed-stock-counts`.
+GRAND source pinned to fetched32ab046; parallel Form1 changes preserved. Full native
+suites are appropriate for new tables, protected user/movement links, shared stock
+adjustments, permissions and private files. No operator data migrated.
+
+PASS: `python manage.py test --verbosity 1`,91 discovered/79 executed/12 native
+skips in28.059s, `.tmp/stock-count-release-sqlite.log`. PASS:
+`python scripts/run_mysql_tests.py`,91/91 in74.794s,
+`.tmp/stock-count-release-native.log`, native MySQL8.4.11 on owned loopback33317.
+Includes populated0018-to0019 ledger/lot/allocation preservation, generated pending
+uniqueness, quantity constraints, duplicate record/approval and receipt-vs-review
+races, stale/offsetting movement detection, audit-failure atomic rollback, exact
+fractional FIFO, unknown surplus cost, zero-variance review, reviewer-only cancel,
+signed-token/CSRF/actor boundaries, private download and integrity failures.
+Earlier intermediate native90/90 PASS70.770s and91/91 PASS75.130s are superseded.
+PASS: `manage.py makemigrations --check --dry-run`, no changes; `python -m pip check`,
+no broken requirements; `git diff --check`.
+
+FAIL - CAUSED BY CURRENT WORK: initial actual-GRAND65-test run had one test cleanup
+error (`file_to_stream` is None after the test client wraps/exhausts a successful
+stream). Removed the redundant manual close; the test client's exhausted streaming
+wrapper closes the source. No application authority or evidence guard was changed.
+PASS: final `python scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-source-validation --mysql`,
+65/65 in19.277s, `.tmp/grand-stock-count-release.log`. Native GRAND permissions,
+UAT denials/scoped reads, protected actors, evidence boundaries and zero Finance
+queries pass. Existing23 GRAND W036 warnings remain outside GSO. Both test schemas
+removed; owned MySQL33317 shut down normally. PASS: `python -m pip_audit -r
+requirements.txt`, no known vulnerabilities found.
+
+PASS: actual GRAND browser, isolated fixture`.tmp/grand-source-tests-4_1avirq` on8023:
+clerk records8 against10, uploads synthetic PDF; separate reviewer approves an
+adjustment-out2, retained ledger becomes8 and configured minimum8 is flagged.
+Recorder has no self-approval action. Desktop1440x1000/mobile390x844 inspected;
+mobile client/scroll widths both375 (scrollbar excluded), no duplicate IDs on review.
+Stock table retains its existing panel scroll without page overflow. Screenshots
+`output/playwright/stock-count-*.png` visually inspected. Only synthetic GRAND
+logo/favicon404s; no workflow errors. Both browser sessions and preview stopped.
+
+PASS: `.tmp/rehearse_stock_count_recovery.py` backed up/restored stopped paired
+SQLite and private files outside Git. All201 default/83 finance table contents,
+integrity/foreign-key checks, approved count/native actors, original UUID basis,
+linked adjustment and three events survive. `check_stock_count_evidence` detects
+changed/missing files, restored evidence passes and original hashes stay unchanged.
+Backup `C:/Users/Administrator/.codex/backups/gsov2-stock-count-recovery-20261017-k6d90rer`.
+NOT RUN - OUT OF SCOPE: online MySQL/operator recovery, role grants, deployment,
+official supplies form acceptance and historical-count reconciliation. These remain
+separate gates; this release does not establish financial valuation or post journals.

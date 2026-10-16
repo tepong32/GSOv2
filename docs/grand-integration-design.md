@@ -10,6 +10,11 @@ Employee movement/exit clearance remains unimplemented.
 The [witnessed return design](custody-returns.md) extends the same custody movement
 and native user relationships in default. It preserves Finance and maintenance
 authority; see CONTINUE for validation/publication status.
+The [supply-count workflow](stock-counts.md) adds migration0019 in default with
+protected native actors, item/count/movement UUIDs and one explicit adjustment
+link. A reviewed count establishes physical quantity only. Unknown surplus cost,
+historical reconciliation and Accounting valuation remain separate; no journal or
+cross-database foreign key is created. Include its private evidence in paired recovery.
 
 ## Source of truth inspected
 

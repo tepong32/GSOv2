@@ -85,6 +85,18 @@ This database-only rehearsal covers attribution relationships/history; its fixtu
 had no private attachment set. It does not establish online MySQL backup consistency,
 offsite retention, operational RPO/RTO or complete GRAND private-file recovery.
 
+## Supply-count evidence
+
+Include `inventory/stock_counts/` in coordinated private storage backups. Run
+`python manage.py check_stock_count_evidence` against the paused/restored intended
+store; it reports missing, changed, unsafe and orphan files without repairing them.
+Review and downloads check retained hashes and sizes. Filesystem writes cannot roll
+back with a failed database transaction; investigate unreferenced files rather than
+silently deleting them. A stopped synthetic paired restore preserved201 default and
+83 finance tables plus one count file, detected/restored corruption/loss and left
+source hashes unchanged. See [validation](validation-2026-10-16.md); this does not
+establish online/operator recovery or document authenticity.
+
 ## Gates still open
 
 Witnessed returns add private files under `inventory/custody_returns/`; include them

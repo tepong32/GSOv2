@@ -1,8 +1,8 @@
 # Supplies ledger and physical counts
 
-Ledger prerequisite published atcbece6c. See [CONTINUE](../CONTINUE.md)
-for release and validation evidence. Counts and independently reviewed count
-adjustments remain unimplemented; this prerequisite hardens their underlying ledger.
+Ledger prerequisite published at cbece6c. See [CONTINUE](../CONTINUE.md)
+for release evidence. Reviewed current-day counts are implemented and validated on
+`codex/reviewed-stock-counts`; CONTINUE records publication status.
 
 ## Existing ledger controls
 
@@ -22,22 +22,56 @@ GRAND stock action grant; the standalone shell retains its existing access adapt
 Item-owner checks still run after locking the current item row. These changes do
 not write Finance, infer accounting valuation, grant permissions or migrate data.
 
-## Next count workflow
+## Reviewed count workflow
 
-Implement dated physical counts against the scoped ledger with retained count
-evidence, observed quantity, variance reason and independent review. Record the
-actual item identity, unit and ledger basis used at count time. An intervening
-movement must invalidate a pending adjustment basis; recheck under the existing
-item lock before approving, and require recount/review instead of overwriting the
-current balance. Approved differences create append-only stock adjustments exactly
-once; a zero variance still retains the count and review without a fake movement.
+Migration 0019 adds one-item StockCount records, immutable decision events and private
+evidence without changing existing ledger rows. A shared count-sheet reference can
+group observations for staff search; there is no duplicate stock ledger or general
+workflow engine. Protected native user links retain the recorder and deciding officer.
+The source pins item UUID/name/unit/owner/FIFO/active state plus movement count,
+latest movement UUID and quantity balance. Movement ordering uses occurrence time
+and UUID, not a new installation's integer key. Signed previews bind actor, item,
+basis and request UUID for 30 minutes; exact retries reuse the original record.
+
+Only the owning GSO can read count records/evidence. Recorders need stock view and
+`record_stock_count`; independent approvers need stock view, `review_stock_count`
+and `adjust_stock`. GRAND requires explicit grants and denies UAT writes. Neither
+the recorder nor any evidence uploader can approve. A recorder or authorized reviewer
+can cancel an incorrect count without changing stock. Reviewer-only cancellation
+does not require upload authority. No role is granted automatically.
+
+Item-first locks serialize counts and stock movements. Pending versions reject
+stale decisions, and the database permits only one pending count per item. Approval
+checks the current item/ledger against the source. Any movement, even offsetting
+receipts/issues, invalidates the basis: cancel and recount rather than overwriting
+the live balance. An approved difference creates one protected-linked append-only
+adjustment through the existing stock service. Zero variance retains the review
+without a fake movement. Failure writing the audit event rolls back the adjustment,
+FIFO allocation and decision together. Closed records are not edited or deleted.
 
 Keep ordinary supplies quantity-only. Where FIFO was explicitly enabled, use the
 existing allocation service; a count surplus must not invent a financial unit cost.
 Do not conflate consumables with semi-expendable equipment requiring named custody.
-Low-stock indicators should use the existing minimum quantity, without adding a
-notification service before staff validate the workflow. Existing direct adjustment
-history remains distinguishable from future reviewed count adjustments.
+The register flags active items at/below a positive configured minimum; a zero
+minimum leaves the reminder unset. No notification service is introduced. Direct adjustment
+history remains distinguishable from reviewed count adjustments.
+
+Count evidence follows established private PDF/image validation, bounded to 20 files,
+15 MB each and 100 MB total. Review and scoped downloads verify case paths, hashes
+and sizes; downloads use attachment/no-store/nosniff. Include `inventory/stock_counts/`
+with both GRAND stores in recovery, then run `check_stock_count_evidence`. The checker
+reports missing/changed/unsafe/orphan files without repairs or deletion. Filesystem
+writes do not roll back with database transactions; investigate any orphan finding.
+
+## Limits and remaining work
+
+The adjusting workflow accepts today's count against the current ledger basis.
+Historical count sheets need a separate reconciliation path because entry timestamps
+alone cannot prove the physical balance on a past count date. It does not retrospectively
+adjust a date's stock or replace a signed annual report. Observations up to nine whole
+digits and three decimal places follow the existing per-movement quantity limit.
+Approved-count corrections require a new observed count; no destructive reversal
+shortcut is supplied. Quantity/cost allocation and Accounting valuation remain separate.
 
 These are selected engineering controls, not asserted COA form requirements.
 Applicable supplies-count forms and signatories still need primary-text and local
