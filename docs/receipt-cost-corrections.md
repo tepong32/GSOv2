@@ -19,7 +19,7 @@ This is a missing prerequisite for an amendment workflow. Current authorized UI
 does not edit accepted receipts; tests model future amendment locks or deliberate
 out-of-band changes, not an existing public-UI exploit.
 
-The `codex/receipt-support-basis` change adds a nullable JSON receipt snapshot to
+Published receipt-basis change543fef8 adds a nullable JSON receipt snapshot to
 the optional default-store attribution table. New signed previews, proposals and
 events pin receipt UUID/version/owner, delivery and inspection facts, line sequence,
 description/unit/quantities/unit cost, original materialized UUIDs, acceptance actor

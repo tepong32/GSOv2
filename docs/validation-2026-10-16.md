@@ -716,3 +716,9 @@ role grants, GRAND installation, legal/Accounting acceptance and cost amendment 
 Standalone native suite not repeated: no inventory implementation/schema changed;
 actual GRAND native covers the changed optional adapter and its shared dependencies.
 Canonical operator DB SHA-256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+
+Actual external VM minor release543fef8 integrated/pushed to canonical master after
+branch CI38957280486 PASS36s; remote master/tag match
+543fef8d72a30783923984c02fa4ea71157ba6bd. Primary CI38957393614 PASS42s.
+Release notes use separate `codex/receipt-basis-release-notes`, fresh clean fetch0/0;
+no code/schema/storage changes in that follow-up.

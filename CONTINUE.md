@@ -5,7 +5,7 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Current development: receipt-side claim review basis
+## Published receipt-side claim review basis
 
 Previous turn published counts3ec09d6 and notes217a4d3/v0.10.1. Final notes primary
 CI38955602714 PASS50s; feature primary CI38955372028 passed. Fresh fetch and clean
@@ -38,10 +38,18 @@ Final paired stopped recovery preserves201 default/83 finance tables, both sourc
 snapshots and original approval; deliberate approval-event loss detected/restored.
 Backup`.codex/backups/gsov2-receipt-basis-recovery-20261017-8y_nfx_8`; no attachments
 in this fixture. Source unchanged during recovery. Operator DB hash unchanged.
-External VM release/CI/integration remain pending. Overall goal stays active.
+Actual external VM minor release543fef8/v0.11.0 integrated/pushed to master after
+branch CI38957280486 PASS36s. Remote master/tag match
+543fef8d72a30783923984c02fa4ea71157ba6bd. Primary CI38957393614 PASS42s.
+Release notes use separate `codex/receipt-basis-release-notes`, fresh clean fetch0/0.
+Overall goal stays active.
 Next: reviewed documentary cost amendments, after checking receiving authorization
 against actual GRAND explicit grants/UAT controls; then financial quantity/cost/JEV
 relationships. HR-reference clearance and official outputs remain unfinished.
+Source audit for next step: `require_receiving` still uses `actor.has_perm` rather
+than GRAND's explicit helper/UAT check already used by maintenance and stock.
+Reproduce ungranted-superuser and GSO-assigned UAT cases before the next amendment
+feature; preserve standalone behavior and ordinary granted receiving access.
 
 ## Published reviewed physical counts
 

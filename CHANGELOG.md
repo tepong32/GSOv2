@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.11.1] - 2026-10-17
+### Documentation
+- Record receipt basis release and recovery validation
+
 ## [0.11.0] - 2026-10-17
 ### Added
 - Retain receipt facts in reviewed claim support
