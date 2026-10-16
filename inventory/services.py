@@ -52,13 +52,24 @@ def _require(user, permission, asset=None):
         raise PermissionDenied
 
 
+def _editable_data(data, allowed):
+    """Do not let adapters or future forms replace identity, ownership or actors."""
+    if set(data) - set(allowed):
+        raise ValidationError("The request contains fields that this workflow cannot change.")
+    return dict(data)
+
+
+ASSET_INPUT_FIELDS = (set(SNAPSHOT_FIELDS) - {"assigned_department_id", "assigned_department_label"}) | {"assigned_department"}
+CONSUMABLE_INPUT_FIELDS = {"name", "category", "unit", "use_fifo", "minimum_stock", "is_active", "notes"}
+
+
 @transaction.atomic
 def create_asset(*, actor, data):
     _require(actor, "add")
     department = gso_department_for_user(actor)
     if department is None:
         raise PermissionDenied
-    data = dict(data)
+    data = _editable_data(data, ASSET_INPUT_FIELDS)
     assigned_department_pk = data.pop("assigned_department", None)
     assigned_department = _resolve_assigned_department(assigned_department_pk)
     asset = Asset.objects.create(
@@ -77,6 +88,7 @@ def create_asset(*, actor, data):
 
 @transaction.atomic
 def update_asset(*, actor, asset, data):
+    asset = Asset.objects.select_for_update().get(pk=asset.pk)
     _require(actor, "change", asset)
     if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
         raise PermissionDenied("This asset has a handoff waiting for acknowledgment.")
@@ -87,7 +99,7 @@ def update_asset(*, actor, asset, data):
         raise PermissionDenied("This asset has an open disposal case and cannot be edited.")
     if asset.status == Asset.RETIRED:
         raise PermissionDenied("Retired asset records are read-only.")
-    data = dict(data)
+    data = _editable_data(data, ASSET_INPUT_FIELDS)
     assigned_department_pk = data.pop("assigned_department", None)
     assigned_department = _resolve_assigned_department(assigned_department_pk)
     for field, value in data.items():
@@ -629,16 +641,21 @@ def respond_to_disposal_case(*, actor, case, data):
     return case
 
 
-def _stock_permission(actor, action):
+def _stock_permission(actor, action, item=None):
     from .access import can_stock
 
     if not can_stock(actor, action):
         raise PermissionDenied
+    if item is not None and not actor.is_superuser:
+        department = gso_department_for_user(actor)
+        if department is None or item.department_id != department.pk:
+            raise PermissionDenied
 
 
 @transaction.atomic
 def create_consumable(*, actor, data):
     _stock_permission(actor, "add")
+    data = _editable_data(data, CONSUMABLE_INPUT_FIELDS)
     department = gso_department_for_user(actor)
     if department is None:
         raise PermissionDenied
@@ -663,7 +680,9 @@ def consumable_snapshot(item):
 @transaction.atomic
 def update_consumable(*, actor, item, data):
     _stock_permission(actor, "change")
+    data = _editable_data(data, CONSUMABLE_INPUT_FIELDS)
     item = ConsumableItem.objects.select_for_update().get(pk=item.pk)
+    _stock_permission(actor, "change", item)
     if item.use_fifo != data.get("use_fifo") and item.movements.exists():
         raise ValidationError("FIFO tracking cannot be changed after stock movements exist.")
     for field, value in data.items():
@@ -717,6 +736,7 @@ def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="
         raise ValidationError("Unknown stock movement type.")
     _stock_permission(actor, permission)
     item = ConsumableItem.objects.select_for_update().get(pk=item.pk)
+    _stock_permission(actor, permission, item)
     if not item.is_active:
         raise ValidationError("Inactive supply items cannot receive new movements.")
     quantity = Decimal(quantity)

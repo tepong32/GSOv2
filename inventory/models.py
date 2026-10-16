@@ -75,6 +75,7 @@ class Asset(models.Model):
         (RETIRED, "Retired"),
     )
 
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
     department_id = models.PositiveBigIntegerField(db_index=True)
     department_label = models.CharField(max_length=160, default="General Services")
     asset_name = models.CharField(max_length=180, verbose_name="Asset name")
@@ -607,6 +608,7 @@ class AssetDisposalEvent(models.Model):
 class ConsumableItem(models.Model):
     """A supply item. FIFO is an optional stock allocation aid, not an accounting workflow."""
 
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
     department_id = models.PositiveBigIntegerField(db_index=True)
     department_label = models.CharField(max_length=160, default="General Services")
     name = models.CharField(max_length=160)
@@ -701,6 +703,7 @@ class StockMovement(models.Model):
         (ADJUSTMENT_IN, "Adjustment increase"), (ADJUSTMENT_OUT, "Adjustment decrease"),
     )
 
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
     item = models.ForeignKey(ConsumableItem, on_delete=models.PROTECT, related_name="movements")
     kind = models.CharField(max_length=20, choices=KIND_CHOICES)
     quantity = models.DecimalField(max_digits=12, decimal_places=3)

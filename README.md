@@ -2,6 +2,14 @@
 
 The planned feature sequence and audit boundaries are in [the inventory roadmap](docs/inventory-roadmap.md).
 
+Start continuation at [CONTINUE.md](CONTINUE.md). Read the
+[GRAND data design](docs/grand-integration-design.md),
+[COA source matrix](docs/coa-requirements.md), and
+[security/recovery boundary](docs/security-and-recovery.md) before integration.
+Receipt/inspection and Finance allocation workflows are planned, not implemented.
+Assets, supply items and stock movements have public UUIDs for portable references;
+CSV exports include these IDs. Local integer keys and historical links are retained.
+
 This repository is a standalone development shell for the GSO asset inventory module intended for integration into the municipal GRAND application. The active product code lives in `inventory/`. Its local `user` app and Django project settings exist only to make the concept runnable; GRAND integration should use GRAND's existing `users.User`, `profiles.EmployeeProfile`, and `departments.Department` records.
 
 ## Current workflow
@@ -61,7 +69,18 @@ For standalone concept work, create Django Groups in `/admin/` and assign the pe
 5. In `/admin/`, create/confirm the General Services department, create employee accounts, and assign inventory permissions through Groups.
 6. Run `python manage.py runserver` and sign in at `/login/`.
 
-The local settings use SQLite, Asia/Manila time, and console email for password reset. Set `SKEY`, `DEBUG`, `ALLOWED_HOSTS`, `DISPOSAL_PRIVATE_ROOT`, and mail settings through environment variables for a controlled deployment; the fallback secret is only for local development. The phone camera option uses a standard HTML file input with `capture`; the browser and device control the camera prompt, so users may need to grant camera permission and some browsers may offer the photo library instead.
+The local settings use SQLite, Asia/Manila time, and console email for password reset.
+Runtime databases and user uploads are not distributed with new releases. Preserve
+your existing files and back them up before migrating; do not replace them with a
+checkout's data. `GSO_DATABASE_PATH` selects an alternate disposable SQLite file.
+Set `SKEY`, `DEBUG`, `ALLOWED_HOSTS`, `DISPOSAL_PRIVATE_ROOT`, and mail settings
+through environment variables for a controlled deployment. `DEBUG=0` requires a
+strong secret, explicit hosts and private evidence outside web-served directories;
+it enables HTTPS redirect and secure cookies. The fallback secret is development-only.
+See [deployment limits and recovery](docs/security-and-recovery.md). The phone camera
+option uses a standard HTML file input with `capture`; the browser and device control
+the camera prompt, so users may need to grant camera permission and some browsers
+may offer the photo library instead.
 
 ## GRAND integration target
 

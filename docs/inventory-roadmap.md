@@ -4,7 +4,23 @@ This roadmap prioritizes practical controls for equipment, vehicles, and consuma
 
 ## Current foundation
 
-The app currently supports an asset register with department scope and permissions, optional FIFO for consumables, asset handoffs, disposal requests with protected evidence, and GSO physical verification rounds with immutable check history. This branch adds count dates, unregistered findings, private Accounting CSV snapshots, variance review, and a working reconciliation export. Official RPCPPE form generation remains out of scope until the LGU Accountant validates the local format and sign-off process.
+The app supports an asset register with department scope and permissions, optional FIFO for consumables, asset handoffs, disposal requests with protected evidence, and GSO physical verification rounds with immutable check history. The physical-count reconciliation baseline (`64e458a`) includes count dates, unregistered findings, private Accounting CSV snapshots, variance review, and a working reconciliation export. Official RPCPPE form generation remains out of scope until the LGU Accountant validates the local format and sign-off process.
+
+## Alignment checkpoint — 2026-10-16
+
+The user expanded the goal to a practical LGU inventory and general-services records
+system, aligned with GRAND's parallel Finance work. [The data design](grand-integration-design.md)
+maps actual GRAND records, separates implemented prerequisites from proposals and
+defines the next receiving slice. [The COA matrix](coa-requirements.md) records
+verified sources and incomplete primary-text review. [CONTINUE](../CONTINUE.md)
+owns immediate state; [validation](validation-2026-10-16.md) owns test evidence.
+
+The first prerequisite supplies portable inventory UUIDs, GRAND-matched runtime
+versions, production settings checks, stock-owner enforcement and runtime-data
+exclusion from Git. It does not yet implement receiving or a Finance adapter.
+Next implement receiving/inspection before financial attribution, then the existing
+maintenance/clearance/stock-count sequence. Later general-office records should use
+GRAND's records/custody/HR capabilities where available instead of duplicating them.
 
 ## Planned features, in order
 
@@ -19,6 +35,12 @@ COA's published guidance describes an annual PPE physical count presented on RPC
 ### 2. Asset receiving and tagging
 
 Add a guided GSO intake for newly delivered equipment and vehicles. Capture delivery/inspection date, quantity accepted, supplier and purchase references, the receiving/inspection reference, and the person or office taking custody. Assign or record a property tag and check for possible duplicates by tag, serial, or chassis number before the asset becomes part of the active register. Keep Accounting's official classification and account mapping reviewable; the intake flow must not invent those values.
+
+Follow the [receipt header/line design and acceptance examples](grand-integration-design.md).
+Include supplies, partial/rejected deliveries, independent acceptance, retained
+evidence and duplicate-submit protection. Do not attach a single voucher ID to an
+asset or auto-post from a receipt. Add reviewed Finance attribution only after the
+physical workflow works and its current GRAND integration dependencies are checked.
 
 ### 3. Maintenance history
 

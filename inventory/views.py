@@ -133,7 +133,7 @@ def asset_export(request):
         "Property tag", "Asset type", "Inventory class", "Item type", "Name", "Additional description", "Brand", "Model", "Serial number",
         "Plate number", "Engine number", "Chassis number", "Status", "Department", "Office / custodian",
         "Acquisition date", "Acquisition cost", "Fund", "COA account code", "COA account title",
-        "Mapping reference", "OBR", "PO / contract", "Voucher", "Journal",
+        "Mapping reference", "OBR", "PO / contract", "Voucher", "Journal", "Asset UUID",
     ))
     for asset in _scoped_assets(request.user).order_by("asset_name", "pk"):
         writer.writerow(_csv_cell(value) for value in (
@@ -141,9 +141,9 @@ def asset_export(request):
             asset.get_item_type_display(), asset.asset_name, asset.category, asset.brand,
             asset.model_number, asset.serial_number, asset.plate_number, asset.engine_number, asset.chassis_number,
             asset.get_status_display(), asset.assigned_department_label, asset.assigned_office,
-            asset.purchase_date or "", asset.unit_cost or "", asset.fund_code, asset.coa_account_code,
+            asset.purchase_date or "", asset.unit_cost if asset.unit_cost is not None else "", asset.fund_code, asset.coa_account_code,
             asset.coa_account_title, asset.coa_basis, asset.obr_reference, asset.purchase_order_reference,
-            asset.voucher_reference, asset.journal_reference,
+            asset.voucher_reference, asset.journal_reference, str(asset.public_id),
         ))
     return response
 
@@ -712,11 +712,13 @@ def disposal_attachment_download(request, pk):
 def _stock_items(user):
     items = ConsumableItem.objects.all()
     department = department_for_user(user)
-    if user.is_superuser or _is_gso_department(department):
+    if user.is_superuser:
         return items
+    if _is_gso_department(department):
+        return items.filter(department_id=department.pk)
     if not department:
         raise PermissionDenied
-    return items.filter(movements__department_id=department.pk).distinct()
+    return items.filter(movements__department_id=department.pk, movements__kind=StockMovement.ISSUE).distinct()
 
 
 def stock_access_required(action="view"):
@@ -758,15 +760,15 @@ def stock_export(request):
     writer = csv.writer(response)
     writer.writerow((
         "Supply item", "Category", "Unit", "Movement", "Date", "Quantity", "Signed quantity",
-        "Department", "Recipient", "Reference", "Reason", "Unit cost", "Recorded by",
+        "Department", "Recipient", "Reference", "Reason", "Unit cost", "Recorded by", "Supply UUID", "Movement UUID",
     ))
-    movements = StockMovement.objects.select_related("item", "actor").order_by("occurred_at", "pk")
+    movements = StockMovement.objects.filter(item__in=_stock_items(request.user)).select_related("item", "actor").order_by("occurred_at", "pk")
     for movement in movements:
         writer.writerow(_csv_cell(value) for value in (
             movement.item.name, movement.item.category, movement.item.unit, movement.get_kind_display(),
             movement.occurred_at.isoformat(), movement.quantity, movement.signed_quantity,
             movement.department_label, movement.recipient, movement.reference, movement.reason,
-            movement.unit_cost or "", movement.actor or "",
+            movement.unit_cost if movement.unit_cost is not None else "", movement.actor or "", str(movement.item.public_id), str(movement.public_id),
         ))
     return response
 
@@ -783,7 +785,7 @@ def consumable_create(request):
 
 @stock_access_required("change")
 def consumable_edit(request, pk):
-    item = get_object_or_404(ConsumableItem, pk=pk)
+    item = get_object_or_404(_stock_items(request.user), pk=pk)
     form = ConsumableItemForm(request.POST or None, instance=item)
     if request.method == "POST" and form.is_valid():
         try:
@@ -817,7 +819,7 @@ def consumable_detail(request, pk):
 
 @stock_access_required("receive")
 def stock_receive(request, pk):
-    item = get_object_or_404(ConsumableItem, pk=pk)
+    item = get_object_or_404(_stock_items(request.user), pk=pk)
     form = StockReceiptForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         try:
@@ -834,7 +836,7 @@ def stock_receive(request, pk):
 
 @stock_access_required("issue")
 def stock_issue(request, pk):
-    item = get_object_or_404(ConsumableItem, pk=pk)
+    item = get_object_or_404(_stock_items(request.user), pk=pk)
     form = StockIssueForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         data = dict(form.cleaned_data)
@@ -854,7 +856,7 @@ def stock_issue(request, pk):
 
 @stock_access_required("adjust")
 def stock_adjust(request, pk):
-    item = get_object_or_404(ConsumableItem, pk=pk)
+    item = get_object_or_404(_stock_items(request.user), pk=pk)
     form = StockAdjustmentForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data

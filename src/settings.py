@@ -3,13 +3,28 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.environ.get("SKEY", "gso-concept-development-only-key")
 DEBUG = os.environ.get("DEBUG", "1") == "1"
+SECRET_KEY = os.environ.get("SKEY", "gso-concept-development-only-key" if DEBUG else "")
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",") if host.strip()]
+if not DEBUG:
+    if len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.startswith("django-insecure-"):
+        raise ImproperlyConfigured("Production requires a strong SKEY of at least 50 characters.")
+    if not os.environ.get("ALLOWED_HOSTS") or "*" in ALLOWED_HOSTS or not ALLOWED_HOSTS:
+        raise ImproperlyConfigured("Production requires explicit ALLOWED_HOSTS; wildcard hosts are forbidden.")
+
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+# Enable subdomains/preload only after the deployment's entire domain is HTTPS.
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+X_FRAME_OPTIONS = "DENY"
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -49,7 +64,7 @@ WSGI_APPLICATION = "src.wsgi.application"
 ASGI_APPLICATION = "src.asgi.application"
 DATABASES = {"default": {
     "ENGINE": "django.db.backends.sqlite3",
-    "NAME": BASE_DIR / "db.sqlite3",
+    "NAME": os.environ.get("GSO_DATABASE_PATH", BASE_DIR / "db.sqlite3"),
 }}
 AUTH_USER_MODEL = "user.User"
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
@@ -72,6 +87,15 @@ STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 DISPOSAL_PRIVATE_ROOT = Path(os.environ.get("DISPOSAL_PRIVATE_ROOT", BASE_DIR / "private_uploads"))
+if not DEBUG:
+    if not os.environ.get("DISPOSAL_PRIVATE_ROOT"):
+        raise ImproperlyConfigured("Production requires an explicit private evidence directory.")
+    private_root = DISPOSAL_PRIVATE_ROOT.resolve()
+    if not DISPOSAL_PRIVATE_ROOT.is_absolute() or any(
+        private_root == root.resolve() or root.resolve() in private_root.parents
+        for root in (MEDIA_ROOT, STATIC_ROOT)
+    ):
+        raise ImproperlyConfigured("Private evidence must be outside web-served media and static directories.")
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "inventory:dashboard"
