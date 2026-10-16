@@ -37,6 +37,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
 - Accounting owns account/treatment/valuation decisions. Inventory classes and
   optional FIFO allocation do not establish financial valuation policy. Check COA
   issuer, date, scope and applicability before implementing an official rule.
+  Follow the [property-record design](docs/property-record-design.md): retain supplied
+  treatment/useful-life facts without inventing Accounting approval; individual
+  custody survives expensing. Class/fund SPC output is distinct from Accounting's
+  SPLC. Native dimension associations require separate Finance authority.
 - Enforce department and action permissions in views and services. Preserve audit
   and correction history, private evidence, and independent review where required.
   Do not grant roles, change the operator database, or deploy as part of a code release.

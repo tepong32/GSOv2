@@ -1255,3 +1255,29 @@ fund/account strings do not resolve Finance dimensions. Current receipt claim an
 journal mappings allocate monetary support, not physical cost components. Follow
 verified COA2024-006 annexes and Finance ownership for the next design; do not infer
 classification from threshold alone or introduce a second Accounting SPLC.
+
+## Property-record source/design checkpoint — 2026-10-17
+
+Previous goal turn: progress, published25004cc after branchCI38974856868 and
+primaryCI38975011553 PASS. Fresh fetch now GSO clean0/0; Finance32ab0460/0 with103
+modified/untracked paths retained. This branch contains documentation only.
+
+Re-inspected retained official COA2024-006 pages2,3,7,8 visually and current ONAR
+metadata (issued2024-03-14, filed2024-04-15; filing is not proven publication).
+Compared actual Asset/ReceivingLine/AssetTransfer and GRAND Fund/LedgerAccount/
+ResponsibilityCenter definitions, plus optional claim/journal source services.
+One attempted read of inventory/journal_sources.py failed because the actual file
+is inventory_finance/journal_sources.py; discovered and inspected the latter.
+No inferred model or nonexistent API was used in the selected design.
+
+The design distinguishes individually retained custody, supplied property treatment/
+useful-life evidence, independently authorized Finance dimension links, class/fund
+SPC and Accounting SPLC. Existing money support is not physical cost allocation.
+Corrected an obsolete statement that actual-GRAND native integration was unverified;
+latest114/114 proof exists, while operator import/installation remains unverified.
+
+PASS: source/model comparison and relative documentation link check; git diff check.
+NOT RUN - OUT OF SCOPE: application/native/migration/recovery/browser suites for this
+documentation-only change. Retain25004cc results above without presenting them as
+new executions. Branch/resulting-primary CI remain the publication gates. No operator
+migrations, grants, data updates or deployment.

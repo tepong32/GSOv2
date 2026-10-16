@@ -188,6 +188,10 @@ legacy cost is NULL, not zero. Optional FIFO is physical lot allocation, not a
 decision that Financial inventory valuation uses FIFO.
 
 No automatic PPE/semi-expendable threshold or depreciation calculation is selected.
+The [property-record design](property-record-design.md) selects retained supplied
+determinations, individual custody and a separately authorized native Finance
+dimension link. It distinguishes the class/fund SPC from Accounting's SPLC; these
+extensions are not yet implemented.
 Accounting must pin treatment, fund/account, applicable policy release and evidence.
 Keep physical custody for semi-expendable items after expense recognition; never
 delete an asset because its carrying value reaches zero. Corrections, impairments,
@@ -223,7 +227,8 @@ pattern when a real cross-store write becomes necessary. No new sync framework.
 5. Native MySQL validation is required before GRAND merge. GSO0015 replaces inherited
    conditional uniqueness with generated markers and duplicate preflights, following
    GRAND's pattern. Standalone MySQL tests pass, including races and populated upgrades;
-   GRAND router/two-store integration is still unverified. See [native tests](native-testing.md).
+   Actual-GRAND router/two-store native suites now pass (latest114/114 at25004cc).
+   This does not prove operator installation or historical import. See [native tests](native-testing.md).
 6. Use GRAND's coordinated default/finance backup and restore procedure, separately
    capturing private uploads and exports. Keep pre-import backup, source package,
    import mapping and reconciliation receipt. Rehearse restore before cutover.

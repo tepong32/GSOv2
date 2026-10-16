@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.17.3] - 2026-10-17
+### Documentation
+- Document property records and native Finance ownership
+
 ## [0.17.2] - 2026-10-17
 ### Fixed
 - Protect receipt-origin facts from ordinary asset edits

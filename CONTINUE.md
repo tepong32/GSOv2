@@ -5,7 +5,22 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Receipt-origin asset edit protection — locally validated
+## Property-record design selected — implementation next
+
+Fresh fetch: GSO25004cc clean,0/0 against remote master. Prior VM publication is
+complete: branchCI38974856868 and primaryCI38975011553 PASS; remote master/tag
+verified. Finance32ab046 is0/0 with103 modified/untracked paths preserved.
+
+[The selected design](docs/property-record-design.md) maps actual asset, custody,
+receipt and native Finance dimensions to the next workflow. Re-inspected retained
+COA2024-006 PDF pages2,3,7,8 and ONAR metadata. SPC is a class/fund property record;
+do not substitute one asset's audit history or duplicate Accounting's SPLC.
+Next implement supplied property determination/useful-life evidence with independent
+documentary verification, then separately authorized native Finance dimension links
+and class/fund output. No schema/code change or official form acceptance is claimed
+by this design checkpoint. Physical cost-component allocation remains separate.
+
+## Receipt-origin asset edit protection — published
 
 Fresh fetch: canonical master clean and synchronized at4a81990 (prior publication
 CI38973934215 PASS). Branch `codex/received-asset-source-protection` protects
