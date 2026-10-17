@@ -190,3 +190,18 @@ class GrandAssetAuthorityTests(TestCase):
             record.refresh_from_db()
             self.assertFalse(record.needs_followup)
         self.assertEqual(len(finance), 0)
+    def test_par_preparation_reuses_native_view_authority_without_writes(self):
+        url = reverse('inventory:par-preparation')
+        fields = {'lines-TOTAL_FORMS':'5','lines-INITIAL_FORMS':'0',
+            'lines-MIN_NUM_FORMS':'0','lines-MAX_NUM_FORMS':'5'}
+        for actor in (self.clerk, self.viewer):
+            self.client.force_login(actor)
+            with CaptureQueriesContext(connections['finance']) as finance, CaptureQueriesContext(connections['default']) as default:
+                response = self.client.post(url, fields)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '[LGU / municipality]')
+            self.assertIn('no-store', response['Cache-Control'])
+            self.assertEqual(len(finance), 0)
+            self.assertFalse(any(q['sql'].lstrip().upper().startswith(('INSERT','UPDATE','DELETE')) for q in default))
+        self.client.force_login(self.super_no_grant)
+        self.assertEqual(self.client.get(url).status_code, 403)

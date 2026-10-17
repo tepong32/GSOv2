@@ -5,6 +5,36 @@ Read [roadmap](docs/inventory-roadmap.md), [completion audit](docs/completion-au
 [data design](docs/grand-integration-design.md), [COA sources](docs/coa-requirements.md)
 and [validation](docs/validation-2026-10-16.md) before substantial work.
 
+## Revised goal: carry GSO into GRAND
+
+User now explicitly asks for a reviewed integration-ready checkpoint, then actual
+carry-over into GRAND and parallel GSO/Finance branches in that repository. VM-commit
+after careful review at that checkpoint. User further confirmed: trial branch in
+GRAND, test there, then GRAND VM-commit/merge before parallel feature work. Use
+the latest paused Finance candidate a533482 as the trial base; preserve its original
+branch and validate the combined work before master promotion. Candidate CI has
+security/mysql PASS but verify failed on cancelled SQLite shards; do not claim a pass. See [carry-over plan](docs/grand-carryover-checkpoint.md).
+Goal tool cannot replace an unfinished objective (create_goal rejected the change);
+this repository handoff is the authoritative revised work plan. Do not falsely mark
+the original whole-system objective complete to replace it.
+
+PAR release3e2e535 /v0.26.0 is integrated/pushed master; featureCI38995634121 and
+masterCI38995810612 PASS. Current branch codex/grand-integration-checkpoint.
+Source review identifies required destination private-storage validation and native
+test discovery adaptation; product imports and migrations reuse GRAND authorities.
+Read-only transfer receipt .tmp/grand-transfer-review.json pins181 product files,
+43 standalone test files to retain at source/adapt explicitly. No GRAND code copied yet.
+
+Full native GRAND checkpoint PASS:147/147, zero skips,64.560s, exit0.
+Command: grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py
+--grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql.
+Both disposable schemas destroyed; owned MySQL33317 stopped normally. Log:
+.tmp/grand-integration-checkpoint.log. New PAR test verifies native grants, UAT
+read-only preparation, no database mutations and no Finance queries.
+Integration-boundary review complete; destination wiring remains to be implemented
+and validated on the trial branch. Next: checkpoint VM release/hosted gates, then
+trial from GRAND v0.7.173 and combined review/testing. No operator data changed.
+
 ## PAR fill-in preparation checkpoint — 2026-10-17
 
 User supplied the missing direction: use fill-in placeholders for LGU/form details;

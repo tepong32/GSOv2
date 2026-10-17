@@ -2,6 +2,13 @@
 
 This roadmap prioritizes practical controls for equipment, vehicles, and consumable supplies. Each feature is developed on its own branch, documented, checked, and merged before the next begins. Accounting decisions and official forms remain subject to confirmation by the LGU Accountant and relevant COA auditor.
 
+## Immediate sequence
+
+User direction2026-10-17: reviewed [integration readiness](grand-carryover-checkpoint.md),
+VM checkpoint, then actual carry-over and parallel GSO/Finance branches of GRAND.
+Do not keep developing two independent shells indefinitely. Preserve remaining
+system requirements while separating development integration from production acceptance.
+
 ## Current foundation
 
 The app supports an asset register with department scope and permissions, optional FIFO for consumables, asset handoffs, disposal requests with protected evidence, and GSO physical verification rounds with immutable check history. The physical-count reconciliation baseline (`64e458a`) includes count dates, unregistered findings, private Accounting CSV snapshots, variance review, and a working reconciliation export. Official RPCPPE form generation remains out of scope until the LGU Accountant validates the local format and sign-off process.

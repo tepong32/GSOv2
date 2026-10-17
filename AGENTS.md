@@ -7,6 +7,14 @@ Optional GRAND-only relationships belong in `inventory_finance/`; do not install
 that app in the standalone shell or duplicate GRAND authority models to make it run.
 Its tests use the isolated actual-GRAND harness; see the handoff for development status.
 
+## Current direction
+
+User direction2026-10-17: reach the reviewed [GRAND carry-over checkpoint](docs/grand-carryover-checkpoint.md),
+VM-commit it after careful code review, then carry GSO into GRAND and work on parallel
+GSO/Finance branches of that same repository. Keep source history; do not deploy or
+import prototype credentials/data as part of carrying code. Local form placeholders
+are authorized. Production acceptance remains separate from development integration.
+
 ## Start and continue
 
 - Before work, fetch the configured remote and compare branch history **and** local

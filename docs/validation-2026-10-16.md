@@ -2214,3 +2214,7 @@ normally after no disposable test schemas remained. No live owned test/preview.
 Changed Python syntax, Markdown local links and whitespace checks PASS.
 Feature/master hosted receipts will be checked after the actual VM transaction;
 this pre-release note does not claim those unperformed outcomes.
+
+## Reviewed GRAND carry-over checkpoint —2026-10-17
+
+PASS: grand-auth-venv/Scripts/python.exe scripts/run_grand_source_tests.py --grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql. Full native147/147, zero skips,64.560s, exit0; both disposable schemas destroyed. Log .tmp/grand-integration-checkpoint.log. Includes new PAR native grant/UAT/no-write test. Scope: integration-boundary review and current GSO suite against paused Finance a533482. Actual destination configuration and combined release gates pending; not production acceptance.
