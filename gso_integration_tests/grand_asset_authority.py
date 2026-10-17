@@ -136,3 +136,29 @@ class GrandAssetAuthorityTests(TestCase):
         self.assertEqual(len(finance), 0)
         self.assertEqual(case.events.count(), 0)
         self.assertEqual(case.attachments.count(), 0)
+
+    def test_disposal_evidence_native_download_scope_integrity_and_finance_isolation(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+        from django.core.files.storage import FileSystemStorage
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from inventory.models import AssetDisposalAttachment
+        case = AssetDisposalCase.objects.create(asset=self.asset, submitted_by=self.clerk,
+            reason="Synthetic", condition_details="Inspection required")
+        with TemporaryDirectory() as root, patch.object(
+                AssetDisposalAttachment._meta.get_field("file"), "storage", FileSystemStorage(location=root)):
+            row = services._save_disposal_attachments(case=case, actor=self.clerk,
+                groups=[("supporting", [SimpleUploadedFile("source.pdf", b"%PDF-native evidence")])])[0]
+            url = reverse("inventory:disposal-attachment-download", args=[row.pk])
+            with CaptureQueriesContext(connections["finance"]) as finance:
+                self.client.force_login(self.outsider)
+                self.assertEqual(self.client.get(url).status_code, 403)
+                self.client.force_login(self.clerk)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response["X-Evidence-Integrity"], "verified")
+                self.assertEqual(b"".join(response.streaming_content), b"%PDF-native evidence")
+                Path(row.file.path).write_bytes(b"%PDF-changed evidence")
+                self.assertEqual(self.client.get(url).status_code, 409)
+            self.assertEqual(len(finance), 0)

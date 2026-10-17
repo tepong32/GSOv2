@@ -619,18 +619,14 @@ def _record_disposal_event(case, actor, action, note=""):
     )
 
 
-def _save_disposal_attachments(*, case, actor, uploads, kind):
+def _save_disposal_attachments(*, case, actor, groups):
+    from .disposal_evidence import prepare_uploads
+    prepared = prepare_uploads(groups)
     attachments = []
-    mime_types = {
-        ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
-        ".webp": "image/webp", ".pdf": "application/pdf",
-    }
-    for upload in uploads:
-        extension = "." + upload.name.rsplit(".", 1)[-1].lower() if "." in upload.name else ""
+    for upload, kind, digest, size, content_type in prepared:
         attachment = AssetDisposalAttachment(
             disposal_case=case, kind=kind, original_filename=upload.name[:255],
-            content_type=mime_types.get(extension, "application/octet-stream"),
-            size=upload.size, uploaded_by=actor,
+            content_type=content_type, size=size, sha256=digest, uploaded_by=actor,
         )
         attachment.file.save(upload.name, upload, save=False)
         attachment.save()
@@ -663,9 +659,11 @@ def submit_asset_disposal_request(*, actor, asset, data):
         asset=asset, reason=data["reason"].strip(),
         condition_details=data["condition_details"].strip(), submitted_by=actor,
     )
-    _save_disposal_attachments(case=case, actor=actor, uploads=data["photos"], kind=AssetDisposalAttachment.PHOTO)
-    _save_disposal_attachments(case=case, actor=actor, uploads=[data["signed_request"]], kind=AssetDisposalAttachment.REQUEST_FORM)
-    _save_disposal_attachments(case=case, actor=actor, uploads=data.get("supporting_documents", []), kind=AssetDisposalAttachment.SUPPORTING)
+    _save_disposal_attachments(case=case, actor=actor, groups=[
+        (AssetDisposalAttachment.PHOTO, data["photos"]),
+        (AssetDisposalAttachment.REQUEST_FORM, [data["signed_request"]]),
+        (AssetDisposalAttachment.SUPPORTING, data.get("supporting_documents", [])),
+    ])
     _record_disposal_event(case, actor, "submitted")
     return case
 
@@ -718,14 +716,14 @@ def review_asset_disposal_case(*, actor, case, data):
             raise ValidationError("Attach evidence that the disposal was completed.")
         if case.asset.status == Asset.RETIRED:
             raise ValidationError("This asset is already retired; ask an administrator to review the record.")
-    _save_disposal_attachments(
-        case=case, actor=actor, uploads=data.get("supporting_documents", []),
-        kind=AssetDisposalAttachment.SUPPORTING,
-    )
-    if authority_document:
-        _save_disposal_attachments(case=case, actor=actor, uploads=[authority_document], kind="authority")
-    if completion_document:
-        _save_disposal_attachments(case=case, actor=actor, uploads=[completion_document], kind="completion")
+    if action in (AssetDisposalCase.AUTHORIZED, AssetDisposalCase.DISPOSED):
+        from .disposal_evidence import verify_case_evidence
+        verify_case_evidence(case, allow_legacy=True)
+    _save_disposal_attachments(case=case, actor=actor, groups=[
+        (AssetDisposalAttachment.SUPPORTING, data.get("supporting_documents", [])),
+        ("authority", [authority_document] if authority_document else []),
+        ("completion", [completion_document] if completion_document else []),
+    ])
     case.status = action
     case.review_note = note
     case.reviewed_by = actor
@@ -768,7 +766,7 @@ def respond_to_disposal_case(*, actor, case, data):
     if not note:
         raise ValidationError("Add a short response for GSO.")
     uploads = data.get("supporting_documents", [])
-    _save_disposal_attachments(case=case, actor=actor, uploads=uploads, kind=AssetDisposalAttachment.SUPPORTING)
+    _save_disposal_attachments(case=case, actor=actor, groups=[(AssetDisposalAttachment.SUPPORTING, uploads)])
     case.status = AssetDisposalCase.SUBMITTED
     case.review_note = note
     case.submitted_at = timezone.now()

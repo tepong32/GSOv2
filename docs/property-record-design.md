@@ -171,10 +171,10 @@ not independently move custody or post Finance journals.
 
 The disposal source trace exposed two prerequisites. Asset-before-case locking is
 now explicit for request/review/resubmission, including fresh authority checks.
-Its legacy attachments still lack retained SHA-256 fields, and upload validation
-is performed by forms rather than the shared save service. Complete that source
-integrity boundary before presenting disposal evidence as verified card support;
-do not invent hashes for old uploads as though they were captured at upload time.
+Migration0026 now supplies new-upload hashes and shared save-service validation
+as described below. Legacy attachments retain unknown hashes. A completed case
+with unknown evidence must not be presented as verified card support; do not
+invent hashes for old uploads as though they were captured at upload time.
 
 Physical receipt cost-component allocation remains a separate unfinished workflow:
 documented allocation targets need exact quantities, source amounts, component
@@ -189,3 +189,15 @@ history and successor correction; forged/stale HTTP posts; owner/UAT denial;
 unchanged custody/Finance; populated migration; native competing reviews; paired
 restore retaining source bytes and decisions. Official SPC/PAR/ICS parity and local
 acceptance remain separate, visible gates. This design does not satisfy them.
+
+Disposal evidence boundary (0026, locally validated): new uploads retain SHA-256
+and actual byte count after service-level validation of the whole action. Migration
+leaves legacy hashes blank and history untouched. Operational authorization and
+completion preserve legacy workflows with explicit unknown hashes, but reject
+missing files and detectable changes. `verify_case_evidence` is strict by default
+for future card-source consumers; a completed case alone is not verified evidence.
+The read-only checker reports unknowns as an investigation outcome, without
+backfilling/deleting files. A hash proves consistency with retained bytes, not the
+truth, legal sufficiency or malware safety of the supplied document. File storage
+and DB transactions remain separate; interrupted writes can leave orphan files,
+which the checker reports for investigation. No automatic cleanup is authorized.

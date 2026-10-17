@@ -45,8 +45,9 @@ numbers within the existing reviewed property packet, preserving preexisting
 history and unknown values. This is an SPC source prerequisite; numbered movement
 documents, opening reconciliation, historical balances and accepted output remain.
 Source tracing found disposal lock-order/fresh-authority gaps; these are now fixed
-before card movement integration. Next address legacy disposal evidence integrity
-and service-level upload validation, then reviewed movement annotations/openings.
+before card movement integration. Disposal0026 evidence integrity and service-level
+upload validation are implemented with local validation complete. Next develop reviewed
+movement annotations/openings, preserving historical evidence unknowns.
 See property-record-design for the actual receipt/handoff/return/disposal mapping.
 
 Supplies follow-up: [request and issue design](stock-request-design.md) records
@@ -152,3 +153,8 @@ before class/fund output. See CONTINUE for actual publication state.
 - [COA: When to submit the Report on the Physical Count of PPE](https://www.coa.gov.ph/FAQS/when-should-the-inventory-report-of-property-plant-and-equipment-be-submitted/)
 - [DBM: Internal Audit Manual for Local Government Units, 2023 edition](https://www.dbm.gov.ph/wp-content/uploads/Issuances/2023/Local-Budget-Circular/IAM-for-LGUs-2023-Edition.pdf)
 - [DBM-COA: Joint Circular No. 2024-01, Revised Manual on the Disposal of Government Properties](https://www.dbm.gov.ph/index.php?catid=342&highlight=WyJkaXNwb3NhbCJd&id=2627%3Ajoint-circular-no-2024-01-dbm-coa&view=article)
+
+Disposal source integrity prerequisite has passed local validation on
+`codex/disposal-evidence-integrity`:0026 preserves legacy unknown hashes, validates
+new uploads in services and adds read-only reconciliation. This does not supply
+movement numbering/openings, official SPC output or Accounting valuation.

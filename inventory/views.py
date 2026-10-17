@@ -748,11 +748,17 @@ def disposal_attachment_download(request, pk):
     if not (asset_in_scope(request.user, case.asset)
             or (case.submitted_by_id == request.user.pk and has_inventory_permission(request.user, "request_asset_disposal"))):
         raise PermissionDenied
+    from .disposal_evidence import open_checked_evidence
+    try:
+        source = open_checked_evidence(attachment, allow_legacy=True)
+    except ValidationError as error:
+        return HttpResponse(" ".join(error.messages), status=409, content_type="text/plain")
     response = FileResponse(
-        attachment.file.open("rb"), as_attachment=True,
+        source, as_attachment=True,
         content_type=attachment.content_type,
         filename=attachment.file.name.rsplit("/", 1)[-1],
     )
+    response["X-Evidence-Integrity"] = "verified" if attachment.sha256 else "unknown-legacy"
     response["X-Content-Type-Options"] = "nosniff"
     response["Cache-Control"] = "private, no-store"
     return response

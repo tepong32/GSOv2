@@ -775,6 +775,7 @@ class AssetDisposalAttachment(models.Model):
     file = models.FileField(upload_to=disposal_attachment_path, storage=disposal_private_storage)
     original_filename = models.CharField(max_length=255)
     content_type = models.CharField(max_length=100)
+    sha256 = models.CharField(max_length=64, blank=True, default="")
     size = models.PositiveBigIntegerField()
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,

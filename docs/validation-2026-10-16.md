@@ -1619,3 +1619,86 @@ PASS134/134 in54.937s, exit0, against candidate a533482;
 MySQL33317 normal shutdown confirmed. Actual VM release/hosted gates follow. No operator migration, grant or
 deployment; operator SQLite hash unchanged. The source map documents remaining
 SPC gaps and legacy disposal attachment hash/service-validation prerequisites.
+
+
+## Disposal evidence integrity — 2026-10-17
+Baseline577c549, clean0/0 after fetch; new feature branch. Finance candidate a533482,
+master32ab046 unchanged except the preserved coordination note. No operator changes.
+
+- PASS: focused initial10 (7 run/3 native skips),0.092s.
+- PASS: full shell `manage.py test --verbosity 1`,142 discovered,121 run/21 native
+  skips,44.109s,exit0; `.tmp/disposal-evidence-shell.log`. Includes populated0025→0026
+  preservation of attachment facts and old event snapshots. Broad scope selected
+  for shared evidence checker and disposal workflow changes.
+- PASS: system checks, migration drift and diff whitespace checks.
+- PASS: actual GRAND populated copy,216 prior non-migration tables preserved,
+  Finance bytes unchanged; `.tmp/disposal-evidence-preview.log`. No native guide
+  seed additions. Synthetic case1 contains one legacy blank hash and one new hash.
+- PASS: Playwright desktop1280 and mobile390 inspected, unknown/baseline labels
+  present, no page overflow; existing table has horizontal scroll on mobile.
+  Screens in output/playwright/disposal-evidence-{desktop,mobile}.png. Browser and
+  preview stopped. Existing fixture image404s are not this workflow's regression.
+- FAIL - CAUSED BY CURRENT WORK: first stopped recovery found ValueError when
+  reopening a cached FieldFile whose file had disappeared after earlier access.
+  Converted to controlled ValidationError; added explicit regression.
+- PASS: after fix, focused `manage.py test inventory.test_disposal_evidence
+  inventory.test_disposal_migration --verbosity 1`,6/6,0.351s,exit0.
+- PASS: repeated stopped paired SQLite restore217 default/83 Finance tables/9 files;
+  every table/file manifest equal, source unchanged, known hashes and unknowns
+  preserved, missing and tampered sources rejected. Backup
+  `C:/Users/Administrator/.codex/backups/gsov2-disposal-evidence-recovery-20261017-wm6udr7g`;
+  `.tmp/disposal-evidence-recovery.log`,exit0. Not online MySQL/operator recovery.
+
+Native standalone and actual GRAND full runs are active; final affected native
+rerun required after reopened-file fix. VM publication and hosted gates pending.
+No malware-scanning, legal authenticity, official-form or production acceptance
+claim. Legacy unknown files remain operationally readable but are rejected by the
+strict source verifier; missing/changed files cannot authorize/finalize a case.
+
+Native full standalone142 finished in132.136s with one error (exit1):
+FAIL - CAUSED BY CURRENT WORK, new HTTP test explicitly closed an already-consumed
+streaming response. The second request_finished signal closed MySQL's TestCase
+transaction, causing TransactionManagementError on the next HTTP request. Removed
+redundant response.close in both new standalone and GRAND tests; stream consumption
+already closes the response. Affected native rerun active; do not claim full native
+pass from this run. `.tmp/disposal-evidence-native.log` retains the failure.
+
+PASS: affected final native `scripts/run_mysql_tests.py inventory.test_disposal_evidence
+inventory.test_disposal_migration inventory.test_disposal_locking`,12/12 in1.955s,
+exit0; `.tmp/disposal-evidence-native-focused.log`. Covers reopened missing file,
+HTTP integrity response, migration preservation and native disposal concurrency.
+Operator database SHA256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+
+Continuation: previous turn made progress. Fresh fetch confirms feature base577c549
+still matches origin/master; intended edits preserved. Finance candidate unchanged.
+Initial actual GRAND native run terminal21111 ended1:135 tests61.717s,26 errors.
+FAIL - CAUSED BY CURRENT WORK: the old in-memory test still explicitly closed its
+streaming response. First failure was the new download test; subsequent errors
+were broken transactions after that close. Source line numbers in its traceback
+reflect the subsequently edited file, not a fresh import. Retained log
+`.tmp/disposal-evidence-grand.log`; both schemas removed by the runner. A fresh
+full actual GRAND run uses final corrected tests (`.tmp/disposal-evidence-grand-final.log`).
+Full standalone native final rerun also active (`.tmp/disposal-evidence-native-final.log`).
+No release while these outcomes remain unresolved. VM inspect/preview selects
+minor0.22.0 and changes only VERSION/CHANGELOG. Remote rulesets empty/master
+unprotected; normal hosted branch/master checks still required.
+
+Final full standalone native PASS143/143 in124.530s, exit0; terminal66565 and
+`.tmp/disposal-evidence-native-final.log`. Includes final reopened-file regression,
+HTTP integrity check, populated migration, all native disposal races and dependent
+inventory workflows. Test schema removed. Corrected full GRAND still active.
+
+Handoff reconciled: historical checkpoints moved to continuity-history.md, linked
+from a concise CONTINUE entry point. Obsolete bottom-of-file next-work instructions
+are explicitly historical there. Preserved release identity by commit to prevent
+Version Manager exact-version replacement from rewriting archived evidence; release
+tags remain in CHANGELOG. Preview rechecked after adding the archive.
+
+Final actual GRAND native PASS135/135 in55.812s, exit0, candidate a533482;
+`scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql`.
+`.tmp/disposal-evidence-grand-final.log` retains the corrected full result,
+including scoped downloads, changed-evidence denial and zero Finance queries.
+All disposable schemas removed; owned MySQL33317 normal shutdown confirmed.
+Local validation complete. No live previews/browser/test processes remain.
+Actual VM publication and hosted branch/master gates follow.

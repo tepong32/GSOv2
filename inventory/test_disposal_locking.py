@@ -39,7 +39,7 @@ class DisposalFixture:
         self.case.refresh_from_db()
         AssetDisposalAttachment.objects.create(disposal_case=self.case, kind="completion",
             file=SimpleUploadedFile("completion.pdf", b"%PDF-synthetic completion"),
-            original_filename="completion.pdf", content_type="application/pdf", size=25,
+            original_filename="completion.pdf", content_type="application/pdf", size=len(b"%PDF-synthetic completion"),
             uploaded_by=self.actor)
         return dict(action="disposed", note="Checked completion", disposal_method="destruction",
             disposal_date=timezone.localdate(), completion_reference="COMPLETION-1")

@@ -13,6 +13,7 @@ class Command(BaseCommand):
     help = "Check receiving evidence hashes and report unreferenced files. Never changes data or files."
     evidence_model = ReceivingEvidence
     namespace_name = "receiving"
+    report_unknown_hashes = False
 
     def handle(self, *args, **options):
         storage = self.evidence_model._meta.get_field("file").storage
@@ -21,6 +22,8 @@ class Command(BaseCommand):
         root = Path(storage.location).resolve()
         namespace = root / "inventory" / self.namespace_name
         report = {"checked": 0, "missing": [], "changed": [], "unsafe": [], "unreferenced": []}
+        if self.report_unknown_hashes:
+            report["unknown"] = []
         referenced = set()
         for record in self.evidence_model.objects.order_by("pk").iterator():
             name = record.file.name
@@ -44,7 +47,10 @@ class Command(BaseCommand):
             except OSError:
                 report["missing"].append({"id": record.pk, "path": name})
                 continue
-            if digest.hexdigest() != record.sha256 or size != record.size:
+            if self.report_unknown_hashes and not record.sha256:
+                report["unknown"].append({"id": record.pk, "path": name})
+            if (record.sha256 and digest.hexdigest() != record.sha256 or size != record.size
+                    or not record.sha256 and not self.report_unknown_hashes):
                 report["changed"].append({"id": record.pk, "path": name})
 
         def unreadable(error):
@@ -67,5 +73,5 @@ class Command(BaseCommand):
                     elif path.resolve() not in referenced:
                         report["unreferenced"].append(relative)
         self.stdout.write(json.dumps(report, indent=2))
-        if any(report[key] for key in ("missing", "changed", "unsafe", "unreferenced")):
+        if any(report[key] for key in report if key != "checked"):
             raise CommandError(f"{self.namespace_name.title()} evidence requires investigation. No data or files were changed.")

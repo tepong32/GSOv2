@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.22.0] - 2026-10-17
+### Added
+- Verify disposal evidence while preserving legacy unknowns
+
 ## [0.21.1] - 2026-10-17
 ### Fixed
 - Serialize disposal actions and recheck locked asset authority

@@ -69,7 +69,8 @@ storage configuration during a maintenance window with writes paused, or against
 isolated restored copy. It prints a JSON report and exits nonzero for missing/changed,
 unsafe-path or unreferenced files. It never repairs, deletes or attaches files.
 Restrict the report like other operational records. Only receiving evidence is
-covered; disposal attachments and Accounting import snapshots still require checks.
+covered; Accounting import snapshots still require separate checks. Disposal checks
+are described below.
 Do not run against a changing live store and interpret transient results as a verified
 backup. Symlink/junction redirection and paths outside receiving storage are rejected.
 
@@ -178,3 +179,21 @@ one shared packet is scoped through an explicit request and action grants; it
 does not widen the original GSO property routes. Verify retained link history and
 live dimension/mapping availability after restore. Missing/changed dimensions
 invalidate current-use assertions without deleting the historical association.
+
+
+Disposal evidence remains in `inventory/disposal`. Migration0026 adds retained
+SHA-256 for new uploads; old blanks remain unknown, without rewriting history or
+reading/backfilling historical files. Include the namespace and database records
+in coordinated backups. Run `python manage.py check_disposal_evidence` on restored
+copies. A nonzero result reports unknown baselines, missing/changed/unsafe paths
+or unreferenced files; investigate the report without deleting or silently
+rehashing evidence. The command never changes data or files.
+
+Downloads validate known hashes and all recorded sizes before streaming the same
+opened file; legacy downloads explicitly indicate unknown integrity. Authorization
+and completion reject missing or detectably changed retained evidence. Legacy
+unknowns remain operationally usable, but strict source verification rejects them.
+This distinction must survive restore and later property-card integration.
+New upload hashes establish byte consistency, not document authenticity or malware
+safety. File writes are not transactional with the database; interrupted operations
+can leave unreferenced files, which require investigation rather than automatic deletion.
