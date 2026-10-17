@@ -5,6 +5,36 @@ Read [roadmap](docs/inventory-roadmap.md), [completion audit](docs/completion-au
 [data design](docs/grand-integration-design.md), [COA sources](docs/coa-requirements.md)
 and [validation](docs/validation-2026-10-16.md) before substantial work.
 
+## PAR fill-in preparation checkpoint — 2026-10-17
+
+User supplied the missing direction: use fill-in placeholders for LGU/form details;
+prototype credentials were isolated, not reused in GRAND/live systems. User wants
+focused routine checks and tests at critical checkpoints. Do not repeat those
+questions or block draft output on unknown local details. Goal completion remains
+unproven; further work is authorized despite the goal tool retaining blocked status.
+
+Fetched feature/canonical baseline6b8aef4 clean0/0. Historical audit release is
+published: v0.25.2, featureCI38994339206/masterCI38994469284 PASS. Do not repeat it.
+Current branch `codex/property-form-placeholders` adds Property → Prepare PAR with
+placeholders. Optional LGU/office/fund/form revision/numbering/signatory fields,
+five supplied-property rows, unsigned print preview and persistent draft marking.
+Entries stay in the current page only; Print/Save as PDF retains a draft externally.
+No new models, auto-numbering, asset reads/imports, custody writes or Finance writes.
+Existing property-view grant controls access, CSRF and no-store apply. Placeholder
+output is not accepted official PAR formatting. ICS/SPC preparation can follow.
+
+Validation: four focused HTTP/form/access/no-write tests PASS0.215s. Browser login,
+blank and supplied previews, desktop print and390px mobile checks pass. Initial
+mobile table overflow corrected; final document width fits viewport and table scrolls
+inside the sheet. Template-cache preview needed a server restart to see final CSS.
+Preview75086/92818 and browser par-placeholders stopped. Runtime .tmp/par-preview-931pzjqo
+is disposable; no operator DB was used. No local full/native/migration/restore repeat:
+no affected schema, locking, native authority or storage implementation. Hosted CI
+remains the release checkpoint. See validation for commands and actual release state.
+
+Next: VM release/integrate/push with exact hosted gates, then continue draft output
+work using placeholders. Check remote receipts before repeating publication.
+
 ## Current historical-data audit
 
 Prior goal turn was progress: actual VM verification repair89890e1 /v0.25.1 was

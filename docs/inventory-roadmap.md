@@ -30,6 +30,16 @@ maintenance/clearance/stock-count sequence alongside these financial integration
 Later general-office records should use
 GRAND's records/custody/HR capabilities where available instead of duplicating them.
 
+## Placeholder output direction — 2026-10-17
+
+The user authorizes fill-in LGU, local-form, numbering and signatory placeholders.
+PAR preparation is implemented as a nonpersistent form/print preview; unknowns
+remain blank and the draft label remains visible. Use Property → Prepare PAR with
+placeholders. No auto-number, signature, custody or accounting event is created.
+Proceed to ICS/SPC preparation with the same clear unknowns; local official-form
+acceptance is separate from development of these drafts. Routine checks stay focused;
+broader tests are reserved for critical data/security/integration/release checkpoints.
+
 ## Planned features, in order
 
 The [completion audit](completion-audit.md) separates remaining engineering work

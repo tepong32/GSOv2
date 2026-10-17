@@ -43,10 +43,12 @@ reviewed identity mappings for business history. Do not substitute invented user
 or silently rewrite historical actor snapshots/checksums. No data importer exists
 yet, so this is a required import acceptance condition, not an implemented filter.
 
-Before an operational installation, the operator must identify whether these
-prototype credentials or signing secrets were reused, replace any affected live
-credentials and invalidate affected sessions through the owning system's supported
-process. Record disposition without including secrets. No live credential rotation,
+Operator confirmation2026-10-17: prototype credentials were isolated and were not
+reused in GRAND or any live system. Record that disposition; do not continue treating
+credential reuse as an unanswered blocker or request live rotation on this evidence.
+Historical copies still contain prototype authentication/private data, so the import
+exclusion and controlled handling remain. Signing-secret reuse was not separately
+verified by the bounded source check. No live credential rotation,
 session revocation, history rewrite or removal from existing clones is claimed.
 Historical release evidence and operator databases remain untouched.
 

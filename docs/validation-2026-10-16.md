@@ -1,5 +1,29 @@
 # GSO alignment foundation validation — 2026-10-16
 
+## 2026-10-17: PAR placeholder preparation
+
+User authorized placeholders and focused testing at routine checkpoints; confirmed
+prototype credentials were isolated. Fresh fetch clean0/0 at6b8aef4 before branch
+codex/property-form-placeholders. No operator data or native Finance modifications.
+
+PASS: isolated `.tmp/run_verification_tests.py inventory.test_property_outputs`,
+4 tests0.215s: existing view grant/login/CSRF/method controls, no-store, blank
+placeholders, no SQL mutation, escaped input, zero vs unknown cost, exact0.001
+quantity, invalid values and bounded five-form input. Django system check PASS.
+PASS: Playwright login→prepare→blank/supplied preview; desktop print-media screenshot
+and390px mobile. Initial table page overflow fixed with sheet-contained scrolling;
+final browser assertion verifies document width does not exceed viewport. The
+reused development server cached the template; restarted once for the changed CSS.
+Final screenshots output/playwright/par-placeholder-{mobile,print}-final.png.
+Print screenshot inspected; signature/date blanks and all five rows retained.
+Favicon404 is existing shell behavior. Both temporary preview servers and browser
+closed. Test/preview data are synthetic and isolated.
+
+NOT RUN - OUT OF SCOPE: repeated local full, native, populated-migration and restore
+suites. This addition reuses the property-view policy, has no model/migration, no
+asset queries or transaction/storage mutation, and does not modify Finance. Focused
+HTTP tests plus visual review are the routine gate; hosted release checks remain.
+
 ## 2026-10-17: historical-data exposure audit (documentation only)
 
 PASS: fresh GSO fetch/status and history comparison at89890e1, clean0/0. Finance

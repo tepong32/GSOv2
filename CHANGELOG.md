@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.26.0] - 2026-10-17
+### Added
+- Add fill-in PAR preparation sheets
+
 ## [0.25.2] - 2026-10-17
 ### Documentation
 - Document historical authentication exposure and import boundaries

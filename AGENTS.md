@@ -42,6 +42,9 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   protected result snapshots in recovery, and uncorrected snapshot shapes intact.
   Match delivery/claim/journal lines explicitly; do not infer relations from tags,
   free-text references, vendor names, coincident IDs or matching amounts.
+- Unknown LGU/form/numbering/signatory details may remain explicit fill-in
+  placeholders (user direction2026-10-17); they do not block draft preparation.
+  Keep draft labels and unsigned fields until local details are supplied.
 - Accounting owns account/treatment/valuation decisions. Inventory classes and
   optional FIFO allocation do not establish financial valuation policy. Check COA
   issuer, date, scope and applicability before implementing an official rule.
@@ -191,9 +194,11 @@ services in an outer default transaction. No Finance writes. Withdraw approved
 mappings before their claim support; retain approval history and recheck staleness.
 See [mapping design](docs/receipt-journal-mappings.md).
 
-Start with affected tests; expand for model, migration, auth, shared service and
-deployment changes. Full shell suite is currently small and is appropriate for
-release. Include populated migration replay and recovery preservation checks.
+User preference (2026-10-17): use focused checks during routine work and broad
+suites at critical checkpoints. Avoid repeating full local suites for simple UI or
+document changes; preserve hosted release gates. Expand for model, migration, auth,
+shared service and deployment changes. Include populated migration and recovery
+checks when those surfaces change.
 GRAND integration requires its default/finance router and native MySQL tests;
 SQLite passes do not establish native concurrency or conditional-constraint safety.
 Record PASS / caused failure / evidenced pre-existing failure / not run with reason.
