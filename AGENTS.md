@@ -9,6 +9,12 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
 
 ## Current direction
 
+The reviewed source checkpoint is published. Active integration and subsequent
+GSO/Finance development belong in GRAND; this repository preserves source history
+and standalone regression evidence. CONTINUE.md links the authoritative GRAND
+handoff and trial record. Do not maintain a competing standalone feature branch.
+
+
 User direction2026-10-17: reach the reviewed [GRAND carry-over checkpoint](docs/grand-carryover-checkpoint.md),
 VM-commit it after careful code review, then carry GSO into GRAND and work on parallel
 GSO/Finance branches of that same repository. Keep source history; do not deploy or

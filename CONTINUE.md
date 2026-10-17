@@ -1,5 +1,26 @@
 # GSO continuation
 
+## Source checkpoint complete; continue in GRAND
+
+GSO checkpoint a76a351 is VM-released, integrated and pushed; exact feature
+CI38996343497 and source-master CI38996500321 PASS. The reviewed standalone source
+and all historical tests remain here as the pre-integration reference.
+
+GRAND trial codex/gso-grand-v173-trial is based on v0.7.173/a533482, preserving
+the latest paused Finance work. Actual VM candidate v0.7.174/f352177 is pushed.
+Local native186/186 (zero skips), production-storage3/3, CI-unit9/9, migration drift,
+dependency audit and native browser sign-in/dashboard/PAR checks passed. Candidate
+hosted run38997287270 is pending; no GRAND primary integration is claimed here.
+
+Use [GRAND current handoff](https://github.com/tepong32/grand/blob/master/CONTINUE.md)
+and [trial integration record](https://github.com/tepong32/grand/blob/codex/gso-grand-v173-trial/docs/GSO_INTEGRATION.md)
+for subsequent actual results and final publication. Do not restart standalone
+feature development here. The user requests pause after tested/reviewed integration,
+critical committed documentation, and bullet reporting. No production acceptance
+or business-data/authentication import follows from this development carry-over.
+
+Earlier entries below are retained source-checkpoint history.
+
 Checkpoint: 2026-10-17, Asia/Singapore. Overall goal remains active and incomplete.
 Read [roadmap](docs/inventory-roadmap.md), [completion audit](docs/completion-audit.md),
 [data design](docs/grand-integration-design.md), [COA sources](docs/coa-requirements.md)

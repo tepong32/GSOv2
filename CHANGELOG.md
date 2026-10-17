@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.26.2] - 2026-10-17
+### Documentation
+- Point source continuity to GRAND integration
+
 ## [0.26.1] - 2026-10-17
 ### Documentation
 - Record reviewed GRAND carry-over checkpoint
