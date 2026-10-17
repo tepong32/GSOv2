@@ -14,6 +14,11 @@ GSO/Finance development belong in GRAND; this repository preserves source histor
 and standalone regression evidence. CONTINUE.md links the authoritative GRAND
 handoff and trial record. Do not maintain a competing standalone feature branch.
 
+User decision2026-10-17: keep GSOv2 unarchived and paused. Develop GSO features
+inside GRAND first; later bring suitable improvements back here with dependency
+review and standalone validation. This is deferred, selective work rather than
+automatic synchronization. Active development continues in GRAND conversations.
+
 
 User direction2026-10-17: reach the reviewed [GRAND carry-over checkpoint](docs/grand-carryover-checkpoint.md),
 VM-commit it after careful code review, then carry GSO into GRAND and work on parallel

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.26.3] - 2026-10-17
+### Documentation
+- Record paused standalone and GRAND-first development decision
+
 ## [0.26.2] - 2026-10-17
 ### Documentation
 - Point source continuity to GRAND integration

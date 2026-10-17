@@ -4,6 +4,12 @@ This roadmap prioritizes practical controls for equipment, vehicles, and consuma
 
 ## Immediate sequence
 
+Current decision2026-10-17: keep GSOv2 unarchived and paused. Develop GSO features
+inside GRAND first, then selectively bring suitable improvements into this
+standalone repository later, after dependency review and standalone validation.
+No standalone feature development or automatic synchronization starts now.
+See [the current handoff](../CONTINUE.md).
+
 User direction2026-10-17: reviewed [integration readiness](grand-carryover-checkpoint.md),
 VM checkpoint, then actual carry-over and parallel GSO/Finance branches of GRAND.
 Do not keep developing two independent shells indefinitely. Preserve remaining

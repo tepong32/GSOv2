@@ -1,5 +1,27 @@
 # GSO continuation
 
+## Current decision — 2026-10-17
+
+Keep GSOv2 **unarchived and paused**. Develop and finish GSO features inside
+GRAND first, alongside its Finance work. Later, bring suitable improvements back
+into this standalone repository after reviewing their dependencies and testing
+the standalone adapters. No automatic synchronization or immediate standalone
+feature work is authorized. Continue active work in GRAND's conversations and
+[current handoff](https://github.com/tepong32/grand/blob/master/CONTINUE.md).
+
+The integration below completed: GRAND VM v0.7.174 / f352177 was merged and
+pushed, followed by documentation release v0.7.175 / d24a22c. Candidate
+CI38997287270 and final master CI39000800010 passed all 19 jobs, accounting for
+2,724 discovered tests per database backend. GRAND may advance further; use its
+current handoff and exact-revision checks for subsequent development state.
+Earlier pending statements below describe the source handoff before completion.
+Archival, deployment and operator-data imports are not part of this decision.
+
+Validation for this documentation-only update: review intended diff and
+`git diff --check`; application suites NOT RUN - OUT OF SCOPE locally because
+no application, migration or configuration files change. Hosted release checks
+remain required before publication is considered verified.
+
 ## Source checkpoint complete; continue in GRAND
 
 GSO checkpoint a76a351 is VM-released, integrated and pushed; exact feature
