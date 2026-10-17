@@ -25,7 +25,7 @@ def source_basis(line):
     """Original physical facts; later documentary cost amendments are separate."""
     from .receiving import HEADER_FIELDS, LINE_FIELDS
     receipt = line.receipt
-    return plain({"receipt_uuid": str(receipt.public_id), "sequence": line.sequence,
+    basis = plain({"receipt_uuid": str(receipt.public_id), "sequence": line.sequence,
         "owner": receipt.department_id, "status": receipt.status, "is_void": line.is_void,
         "header": {key: getattr(receipt, key) for key in sorted(HEADER_FIELDS)},
         "line": {key: getattr(line, key) for key in sorted(LINE_FIELDS - {"supply_item"})},
@@ -34,6 +34,11 @@ def source_basis(line):
         "reviewed_by": receipt.reviewed_by_id, "reviewed_at": receipt.reviewed_at,
         "evidence": list(receipt.evidence.order_by("pk").values(
             "kind", "sha256", "size", "original_filename", "note"))})
+    from .receipt_quantity_corrections import correction_extension
+    correction = correction_extension(line)
+    if correction:
+        basis["quantity_correction"] = correction
+    return basis
 
 
 def remaining_quantity(line):
@@ -82,6 +87,8 @@ def validate_followup(receipt, lines):
         return
     source = ReceivingLine.objects.select_related("receipt").get(pk=receipt.followup_source_id)
     original = source.receipt
+    from .receipt_quantity_corrections import require_no_pending
+    require_no_pending(source)
     retained_source(receipt)
     for name in ("supplier", "delivery_reference", "delivery_date", "purchase_order_reference"):
         if getattr(receipt, name) != getattr(original, name):
@@ -122,6 +129,8 @@ def create_followup(*, actor, source_line_id, request_id, expected_basis, inspec
     if owner.pk != root.department_id:
         raise PermissionDenied
     source = ReceivingLine.objects.select_related("receipt").get(pk=source_line_id, receipt=root)
+    from .receipt_quantity_corrections import require_no_pending
+    require_no_pending(source)
     payload = plain({"source_line_id": source.pk, "basis": expected_basis,
                      "inspection": inspection, "quantities": quantities})
     existing = ReceivingReceipt.objects.filter(public_id=request_id).first()

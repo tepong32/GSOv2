@@ -5,6 +5,7 @@ from . import property_movement_views
 from . import property_views
 from . import receiving_views
 from . import receipt_amendment_views
+from . import receipt_quantity_views
 from . import maintenance_views
 from . import employee_custody_views
 from . import custody_review
@@ -40,6 +41,9 @@ urlpatterns = [
     path("receiving/lines/<int:pk>/cost-amendments/", receipt_amendment_views.amendments, name="receipt-amendments"),
     path("receiving/cost-amendments/<int:pk>/", receipt_amendment_views.amendment_detail, name="receipt-amendment-detail"),
     path("receiving/cost-amendments/<int:pk>/evidence/", receipt_amendment_views.amendment_evidence, name="receipt-amendment-evidence"),
+    path("receiving/lines/<int:pk>/quantity-corrections/", receipt_quantity_views.corrections, name="receipt-quantity-corrections"),
+    path("receiving/quantity-corrections/<int:pk>/", receipt_quantity_views.detail, name="receipt-quantity-detail"),
+    path("receiving/quantity-corrections/<int:pk>/evidence/", receipt_quantity_views.evidence, name="receipt-quantity-evidence"),
     path("stock-counts/", stock_count_views.count_list, name="stock-count-list"),
     path("consumables/<int:pk>/count/", stock_count_views.count_start, name="stock-count-start"),
     path("stock-counts/<int:pk>/", stock_count_views.count_detail, name="stock-count-detail"),

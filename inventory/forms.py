@@ -65,7 +65,7 @@ class AssetForm(forms.ModelForm):
                     "Retained from accepted receiving. Documentary cost corrections use receipt amendments."
                 )
         self.fields["status"].choices = [
-            (value, label) for value, label in Asset.STATUS_CHOICES if value != Asset.RETIRED
+            (value, label) for value, label in Asset.STATUS_CHOICES if value not in (Asset.RETIRED, Asset.ENTRY_VOID)
         ]
         model = department_model()
         if model is None:

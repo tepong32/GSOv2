@@ -72,6 +72,8 @@ def _validate(case):
 def open_maintenance(*, actor, asset, data):
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
     _require(actor, asset)
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
     require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
         raise ValidationError("Retired assets cannot enter maintenance.")

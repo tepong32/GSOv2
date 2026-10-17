@@ -175,23 +175,38 @@ def asset_detail(request, pk):
     asset = get_object_or_404(_scoped_assets(request.user), pk=pk)
     pending_transfer = asset.transfers.filter(status=AssetTransfer.PENDING).first()
     open_maintenance = asset.maintenance_cases.filter(status="open").exists()
+    from .receipt_quantity_corrections import require_asset_available
+    correction_hold = ""
+    try:
+        require_asset_available(asset)
+    except ValidationError as exc:
+        correction_hold = " ".join(exc.messages)
+    correction_source = None
+    if correction_hold:
+        from .models import ReceivingLine
+        from .receiving import can_receiving
+        source = ReceivingLine.objects.select_related("receipt").filter(registered_asset=asset).first()
+        if source and can_receiving(request.user, "view", source.receipt):
+            correction_source = source
     open_disposal = asset.disposal_cases.filter(status__in=(
         AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
         AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED)).exists()
     return render(request, "inventory/asset_detail.html", {
         "asset": asset,
+        "correction_hold": correction_hold,
+        "correction_source": correction_source,
         "can_record_return": can_manage_return(request.user, "record", asset) and asset.custodian_user_id
-        and asset.custodian_user_id != request.user.pk and not pending_transfer and not open_disposal and asset.status != Asset.RETIRED,
+        and asset.custodian_user_id != request.user.pk and not pending_transfer and not open_disposal and asset.status != Asset.RETIRED and not correction_hold,
         "events": asset.audit_events.all() if can_view_audit(request.user) else (),
-        "can_change": can(request.user, "change") and not open_maintenance,
+        "can_change": can(request.user, "change") and not open_maintenance and not correction_hold,
         "can_property_records": property_service.can_act(request.user, "view", asset),
         "can_property_movements": movement_service.can_act(request.user, "view", asset),
         "maintenance_history": asset.maintenance_cases.all() if can_view_maintenance(request.user) else (),
         "can_start_maintenance": can_manage_maintenance(request.user, asset) and not open_maintenance
-        and not open_disposal and pending_transfer is None and asset.status != Asset.RETIRED,
+        and not open_disposal and pending_transfer is None and asset.status != Asset.RETIRED and not correction_hold,
         "can_retire": can(request.user, "delete"),
         "can_view_audit": can_view_audit(request.user),
-        "can_transfer": can_transfer_asset(request.user) and pending_transfer is None and asset.status != Asset.RETIRED and not open_maintenance,
+        "can_transfer": can_transfer_asset(request.user) and pending_transfer is None and asset.status != Asset.RETIRED and not open_maintenance and not correction_hold,
         "can_employee_handoff": can_manage_employee_custody(request.user),
         "pending_transfer": pending_transfer,
         "transfer_history": asset.transfers.all() if can_view_audit(request.user) else (),
@@ -201,7 +216,7 @@ def asset_detail(request, pk):
         and not asset.disposal_cases.filter(status__in=(
             AssetDisposalCase.SUBMITTED, AssetDisposalCase.UNDER_REVIEW,
             AssetDisposalCase.NEEDS_INFORMATION, AssetDisposalCase.AUTHORIZED,
-        )).exists() and asset.status != Asset.RETIRED,
+        )).exists() and asset.status != Asset.RETIRED and not correction_hold,
         "disposal_case": asset.disposal_cases.exclude(status=AssetDisposalCase.REJECTED).first(),
     })
 
@@ -223,8 +238,8 @@ def asset_create(request):
 @asset_access_required("change")
 def asset_edit(request, pk):
     asset = get_object_or_404(_scoped_assets(request.user), pk=pk)
-    if asset.status == Asset.RETIRED:
-        raise PermissionDenied("Retired asset records are read-only.")
+    if asset.status in (Asset.RETIRED, Asset.ENTRY_VOID):
+        raise PermissionDenied("Retired and corrected erroneous entries are read-only.")
     if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
         messages.error(request, "This asset has a handoff waiting for acknowledgment. Cancel it before editing the record.")
         return redirect("inventory:asset-detail", pk=asset.pk)

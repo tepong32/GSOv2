@@ -32,6 +32,14 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   governed posting/recovery paths. Never duplicate their authorities here. Numeric
   IDs are installation-local; public UUIDs are portable identities, not permissions.
 - Physical receipt, custody, financial recognition and payment are distinct facts.
+  For accepted-quantity corrections, the user selected clerical overstatement
+  before use. Follow [the selected design](docs/receipt-quantity-corrections.md):
+  retain original acceptance, target the source lot, and never treat a mistaken
+  asset entry as disposal. Existing downstream use/support needs reconciliation,
+  not silent reversal. Reviewers also need the actual stock-adjustment or asset
+  edit grant. Hold operational writes while review is pending; never reverse the
+  receipt-to-item/asset lock order to check a hold. Keep correction packets and
+  protected result snapshots in recovery, and uncorrected snapshot shapes intact.
   Match delivery/claim/journal lines explicitly; do not infer relations from tags,
   free-text references, vendor names, coincident IDs or matching amounts.
 - Accounting owns account/treatment/valuation decisions. Inventory classes and

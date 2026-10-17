@@ -73,6 +73,8 @@ def record_count(*, actor, item, request_id, expected_basis, counted_on, quantit
         return existing
     if not item.is_active or expected_basis != stock_basis(item):
         raise ValidationError("The item or ledger changed. Review the current balance and recount before recording.")
+    from .receipt_quantity_corrections import require_stock_available
+    require_stock_available(item)
     if counted_on != timezone.localdate():
         raise ValidationError("Record today's observed count against today's ledger basis; historical counts need separate reconciliation.")
     if not reference or not note:

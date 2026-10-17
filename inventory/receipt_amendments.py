@@ -65,6 +65,10 @@ def amendment_basis(line):
     if receipt.followup_source_id:
         from .receiving_followups import retained_source
         basis["followup"] = retained_source(receipt)
+    from .receipt_quantity_corrections import correction_extension
+    correction = correction_extension(line)
+    if correction:
+        basis["quantity_correction"] = correction
     return basis
 
 
@@ -103,6 +107,10 @@ def _locked_line(line, actor, action):
     line = ReceivingLine.objects.select_related("receipt").get(pk=line.pk, receipt=receipt)
     if receipt.status != receipt.ACCEPTED or line.is_void or line.accepted_quantity <= 0:
         raise ValidationError("Only accepted, non-void quantities can have a documentary cost amendment.")
+    from .receipt_quantity_corrections import require_no_pending, effective_quantities
+    require_no_pending(line)
+    if effective_quantities(line)["accepted"] <= 0:
+        raise ValidationError("A fully corrected erroneous entry cannot receive new cost amendments.")
     return line
 
 

@@ -11,6 +11,7 @@
   <div class="card"><div class="card-body"><dl>
     {% if row.receipt_snapshot %}<dt>Recorded delivery</dt><dd>{{ row.receipt_snapshot.header.delivery_reference }} · line {{ row.receipt_snapshot.line.sequence }}: {{ row.receipt_snapshot.line.description }}</dd>
     <dt>Recorded accepted quantity and unit cost</dt><dd>{{ row.receipt_snapshot.line.accepted_quantity }} {{ row.receipt_snapshot.line.unit }} · unit cost {{ row.receipt_snapshot.line.unit_cost|default_if_none:'Unknown' }}</dd>
+    {% if row.receipt_snapshot.quantity_correction %}<dt>Retained effective accepted quantity after clerical correction</dt><dd>{{ row.receipt_snapshot.quantity_correction.effective_accepted }} {{ row.receipt_snapshot.line.unit }}</dd>{% endif %}
     {% else %}<dt>Original receipt basis</dt><dd>Not retained by this historical link. Current receipt values are not evidence of its original review.</dd>{% endif %}
     {% if row.receipt_snapshot.documentary_amendment %}<dt>Retained documentary correction</dt><dd>{{ row.receipt_snapshot.documentary_amendment.reference }} · effective unit cost {{ row.receipt_snapshot.documentary_amendment.unit_cost|default_if_none:'Unknown' }} · {{ row.receipt_snapshot.documentary_amendment.uuid }}</dd>{% endif %}
     <dt>Recorded claim line</dt><dd>{{ row.source_snapshot.voucher_number }} · {{ row.source_snapshot.line_description }} · {{ row.source_snapshot.line_amount }}</dd>

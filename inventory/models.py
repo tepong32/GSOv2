@@ -202,6 +202,7 @@ class Asset(models.Model):
     MAINTENANCE = "maintenance"
     TRANSFERRED = "transferred"
     RETIRED = "retired"
+    ENTRY_VOID = "entry_void"
     EQUIPMENT = "equipment"
     VEHICLE = "vehicle"
     KIND_CHOICES = ((EQUIPMENT, "Equipment / furniture"), (VEHICLE, "Transport vehicle"))
@@ -256,6 +257,7 @@ class Asset(models.Model):
         (MAINTENANCE, "Under maintenance"),
         (TRANSFERRED, "Transferred"),
         (RETIRED, "Retired"),
+        (ENTRY_VOID, "Corrected erroneous entry"),
     )
 
     public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
@@ -1692,3 +1694,88 @@ class PropertyMovementEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Retain property movement events.")
+
+
+def receipt_quantity_correction_path(instance, filename):
+    return f"inventory/receipt-quantity-corrections/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class ReceiptQuantityCorrection(models.Model):
+    """Retained clerical overstatement, never a physical return or journal reversal."""
+    PENDING, APPROVED, REJECTED, CANCELLED = "pending", "approved", "rejected", "cancelled"
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    line = models.ForeignKey(ReceivingLine, on_delete=models.PROTECT, related_name="quantity_corrections")
+    predecessor = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True, related_name="successors")
+    quantity = models.DecimalField(max_digits=12, decimal_places=3, validators=[MinValueValidator(Decimal("0.001"))])
+    basis = models.JSONField()
+    reference = models.CharField(max_length=180)
+    reason = models.TextField(max_length=4000)
+    file = models.FileField(storage=disposal_private_storage, upload_to=receipt_quantity_correction_path, max_length=500)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    content_checksum = models.CharField(max_length=64)
+    status = models.CharField(max_length=12, default=PENDING, choices=tuple(
+        (value, value.title()) for value in (PENDING, APPROVED, REJECTED, CANCELLED)))
+    state_version = models.PositiveIntegerField(default=1)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_quantity_corrections_recorded")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_quantity_corrections_decided")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.TextField(blank=True, max_length=4000)
+    adjustment = models.OneToOneField(StockMovement, on_delete=models.PROTECT, null=True, blank=True, related_name="receipt_quantity_correction")
+    asset_event = models.OneToOneField(AssetAuditEvent, on_delete=models.PROTECT, null=True, blank=True, related_name="receipt_quantity_correction")
+    pending_line = models.GeneratedField(expression=models.Case(
+        models.When(status="pending", then=models.F("line_id")), default=None,
+        output_field=models.BigIntegerField()), output_field=models.BigIntegerField(), db_persist=False, null=True)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+        permissions = (("record_receipt_quantity_correction", "Can record clerical receipt quantity corrections"),
+                       ("review_receipt_quantity_correction", "Can independently review clerical receipt quantity corrections"))
+        constraints = [
+            models.UniqueConstraint(fields=("pending_line",), name="gso_one_pending_qty_correction"),
+            models.CheckConstraint(condition=models.Q(quantity__gt=0), name="gso_qty_correction_positive"),
+            models.CheckConstraint(condition=(
+                models.Q(status="approved", decided_by__isnull=False, decided_at__isnull=False)
+                & ~models.Q(decided_by=models.F("recorded_by")) & (
+                    models.Q(adjustment__isnull=False, asset_event__isnull=True)
+                    | models.Q(adjustment__isnull=True, asset_event__isnull=False)))
+                | models.Q(status__in=("pending", "rejected", "cancelled"), adjustment__isnull=True, asset_event__isnull=True),
+                name="gso_qty_correction_result"),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            prior = type(self).objects.get(pk=self.pk)
+            immutable = ("public_id", "line_id", "predecessor_id", "quantity", "basis", "reference", "reason",
+                         "file", "original_filename", "sha256", "size", "content_checksum", "recorded_by_id", "recorded_at")
+            if not getattr(self, "_workflow_write", False) or any(
+                    getattr(prior, field) != getattr(self, field) for field in immutable):
+                raise ValidationError("Retain the correction content; use its reviewed workflow.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain receipt quantity correction history.")
+
+
+class ReceiptQuantityCorrectionEvent(models.Model):
+    correction = models.ForeignKey(ReceiptQuantityCorrection, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    action = models.CharField(max_length=16)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Receipt quantity correction events are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain receipt quantity correction events.")

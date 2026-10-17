@@ -1,5 +1,18 @@
 # GSO and GRAND data design
 
+The [clerical quantity correction](receipt-quantity-corrections.md) extension adds
+inventory0029 in default and adapter0007's dependency only. Its protected source,
+predecessor, stock-result/asset-audit and actor links reuse existing authorities.
+The optional support ceiling uses effective accepted quantity and retained
+conditional correction evidence; untouched receipt snapshots retain their prior
+shape. Any previous support history excludes the initial before-use shortcut.
+Pending corrections serialize with support on the existing receipt lock, with no
+reverse case lock, cross-store FK, journal or valuation write. Event checksums bind
+installation-local references: cross-installation imports still need reviewed
+identity mapping and retained source evidence, not an automatic numeric-ID rewrite.
+The restored-copy checks prove same-installation recovery, not historical import
+acceptance. CONTINUE records actual validation/publication state.
+
 Design checkpoint: 2026-10-16, Asia/Singapore. Recommended approach selected under
 the user's instruction to align the projects and avoid speculative architecture.
 Receiving is published through `7d3547f` with documentation at `9ae80c0`.

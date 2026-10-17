@@ -33,6 +33,11 @@ This repository is a standalone development shell for the GSO asset inventory mo
   still awaiting a decision, with their own evidence and independent acceptance.
   Original receipt facts and Finance approvals remain retained; later deliveries
   and corrections to already accepted quantities are separate workflows.
+- [Clerical quantity corrections](docs/receipt-quantity-corrections.md) retain
+  overstated original receipts and require independent review before a source-lot
+  adjustment or retained erroneous-asset entry. Pending review holds operations;
+  prior use or Finance support requires separate reconciliation. No Accounting
+  reversal is inferred. See CONTINUE for current validation/publication state.
 
 - The department dashboard links to an asset register and shows live counts by status.
 - Employees search and filter records, open an asset detail page, and add or update records according to their granted permissions.

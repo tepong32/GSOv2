@@ -60,6 +60,10 @@ def _accepted_line(pk, *, owner_id=None):
         raise PermissionDenied
     if receipt.status != receipt.ACCEPTED or line.is_void or line.accepted_quantity <= 0:
         raise ValidationError("Only an accepted, non-void receipt line can support a claim.")
+    from inventory.receipt_quantity_corrections import require_no_pending, effective_quantities
+    require_no_pending(line)
+    if effective_quantities(line)["accepted"] <= 0:
+        raise ValidationError("A fully corrected erroneous receipt cannot support a claim.")
     # Refresh after acquiring the receipt lock: a future reviewed amendment may
     # have committed while this operation waited. Never use the pre-lock line.
     return line
@@ -73,7 +77,8 @@ def _receipt_support_limit(line):
     if cost is None or cost <= 0:
         raise ValidationError("This receipt needs a positive documented unit cost before claim support can be recorded.")
     # Documentary ceiling, not an Accounting acquisition-cost determination.
-    return line.accepted_quantity * cost
+    from inventory.receipt_quantity_corrections import effective_quantities
+    return effective_quantities(line)["accepted"] * cost
 
 
 @transaction.atomic(using="default")

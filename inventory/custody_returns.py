@@ -47,6 +47,8 @@ def _record(transfer, actor, action):
 def record_return(*, actor, asset, data, request_id, expected_custody):
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
     _require(actor, "record", asset)
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
     data = _editable_data(data, {"transfer_date", "reference", "reason", "return_condition", "destination_custodian"})
     try:
         request_id = UUID(str(request_id))

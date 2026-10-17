@@ -42,6 +42,10 @@ def receipt_basis(line):
     if receipt.followup_source_id:
         from inventory.receiving_followups import retained_source
         basis["followup"] = retained_source(receipt)
+    from inventory.receipt_quantity_corrections import correction_extension
+    correction = correction_extension(line)
+    if correction:
+        basis["quantity_correction"] = correction
     return basis
 
 

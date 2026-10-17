@@ -234,6 +234,9 @@ def project(*, actor, asset, cutoff):
     opening = current.get("opening")
     issues, rows = [], []
     result = dict(asset=asset, cutoff=cutoff, opening=opening, rows=rows, issues=issues, balance=None)
+    if asset.status == asset.ENTRY_VOID:
+        issues.append("This is a corrected erroneous entry. Its retained receipt is not physical stock history.")
+        return result
     if asset.quantity != 1:
         issues.append("Reconcile the grouped asset quantity before calculating individual stock.")
     if not opening:
@@ -315,6 +318,8 @@ def record(*, actor, asset, determination_id, source_kind, source_id, request_id
     require(actor, "record", asset)
     asset = properties.lock_asset(asset.pk)
     require(actor, "record", asset)
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
     try:
         request_id = UUID(str(request_id))
     except (TypeError, ValueError, AttributeError) as error:
@@ -366,6 +371,9 @@ def decide(*, actor, row, expected_version, action, note):
     require(actor, authority, row.asset)
     asset = properties.lock_asset(row.asset_id)
     require(actor, authority, asset)
+    if action == "verify":
+        from .receipt_quantity_corrections import require_asset_available
+        require_asset_available(asset)
     # Read source identity under the asset lock, then lock source before annotation.
     current = Record.objects.get(pk=row.pk)
     if current.asset_id != asset.pk:

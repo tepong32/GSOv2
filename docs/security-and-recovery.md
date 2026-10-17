@@ -27,6 +27,18 @@ to the internet or an assertion that LGU operational acceptance has passed.
 
 ## Recovery approach aligned with GRAND
 
+Clerical receipt quantity corrections add private packets under
+`inventory/receipt-quantity-corrections/`. Preserve these with the original delivery
+packets, correction/predecessor/events, result stock movements and exact source-lot
+allocations or erroneous-asset audit event. Run
+`python manage.py check_receipt_quantity_correction_evidence` against stopped-write
+or restored storage. It reports file integrity/orphans without repairing anything;
+application verification also checks retained event/result snapshots and chains.
+Reject/cancel may release a pending hold when a file is missing, but cannot approve
+a physical adjustment. A filesystem write surviving database rollback is retained
+for investigation, never automatically deleted. See the
+[workflow and release gates](receipt-quantity-corrections.md).
+
 Use GRAND's `docs/DATABASE_BACKUP.md` at integration. It captures default and
 finance as separate native dumps under one verified same-server MySQL read lock;
 two independently timed snapshots are not an accepted equivalent. GSO tables join

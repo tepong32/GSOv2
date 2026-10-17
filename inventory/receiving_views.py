@@ -136,6 +136,11 @@ def receipt_detail(request, pk):
     lines = list(receipt.lines.all())
     for line in lines:
         line.followup_remaining = remaining_quantity(line) if not receipt.followup_source_id else None
+        from .receipt_quantity_corrections import correction_extension
+        try:
+            line.quantity_correction = correction_extension(line)
+        except ValidationError as exc:
+            line.quantity_correction_error = " ".join(exc.messages)
     return render(request, "inventory/receiving_detail.html", {
         "lines": lines, "can_followup": can_receiving(request.user, "add", receipt)
             and can_receiving(request.user, "change", receipt),

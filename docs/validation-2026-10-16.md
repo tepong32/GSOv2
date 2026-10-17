@@ -1,5 +1,128 @@
 # GSO alignment foundation validation — 2026-10-16
 
+## 2026-10-17: reviewed clerical receipt quantities (feature validation)
+
+GSO `codex/receipt-correction-design`, baseline ad8b348; fresh remote comparison0/0
+with only the prior goal turn's intended source/design edits. That turn was progress,
+not a blocked wait. Actual GRAND test checkout was fetched and remains at candidate
+a533482; remote master is32ab046. The candidate is not represented as production.
+
+Inventory0029/adapter0007 retain correction source, packet, predecessor, independent
+decision and protected result; no Finance DDL/DML. Pending holds and effective
+quantity consumers are wired. Signed record/review screens, original/effective
+display, erroneous-asset history and private downloads are implemented. Current
+publication state is in CONTINUE; these test results alone are not a release.
+
+Commands run in the feature checkout with isolated settings/databases and the
+installed Python runtimes documented below:
+
+- PASS: standalone source/correction/receiving/follow-up45 tests,2.712s.
+- PASS: `manage.py test --verbosity 1`,193 discovered/168 run/25 native skips,
+  72.957s; `.tmp/correction-shell.log`. This earlier full run preceded later UI,
+  result-snapshot and added migration/concurrency tests.
+- PASS: `scripts/run_mysql_tests.py`, full197/197,211.086s;
+  `.tmp/correction-native-shell.log`, terminal77022. This run preceded the final
+  full-result snapshot comparison and asset-label/link changes; focused final
+  checks cover those changes and the later follow-up case.
+- PASS: native focused source/correction/race/populated-migration20/20,4.887s;
+  `.tmp/correction-native-targeted-final.log`. Both simultaneous approvals and an
+  issue racing a proposal serialize correctly. Populated0028-to-0029 preserves
+  original supply/lot/receipt/asset rows and invents no correction.
+- PASS: actual GRAND `scripts/run_grand_source_tests.py --grand-root
+  C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation`,144 discovered,
+  123 run/21 skips,30.468s; `.tmp/correction-grand-sqlite.log`, terminal80940.
+- PASS: same actual GRAND harness with `--mysql`,144/144,61.853s;
+  `.tmp/correction-grand-native.log`, terminal22305. Real native actors/permissions,
+  UAT/foreign/ungranted denial, pending-support block, corrected100-to50 ceiling,
+  independently approved50 support, and withdrawn support exclusion pass with zero
+  Finance queries. The later Finance-versus-correction race is a separate final run.
+- PASS: final local source/correction17/17,1.361s after full result snapshots and
+  refreshing the current asset status during verification.
+- PASS: migration drift (`manage.py makemigrations --check --dry-run`) and
+  `git diff --check` at the schema checkpoint. Recheck before release.
+
+Final affected validation:
+- PASS: `scripts/run_mysql_tests.py inventory.test_receipt_quantity_corrections inventory.test_receipt_correction_sources inventory.test_receipt_quantity_concurrency inventory.test_receipt_quantity_migration`,21/21,5.594s; `.tmp/correction-native-final.log`.
+- PASS: `.tmp/run_quantity_grand_targeted.py --grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql`,3/3,1.692s; `.tmp/correction-grand-native-targeted.log`, terminal98947 exit0. This wrapper selects only the correction module through the actual GRAND harness. Concurrent Finance proposal and correction produce exactly one winner under the receipt lock.
+- Owned MySQL33317 shut down normally after confirming all disposable test schemas were removed. Preview processes are stopped.
+
+Failures investigated and repaired:
+
+- FAIL - CAUSED BY CURRENT WORK: initial service retry tests reused a consumed
+  upload stream. `_packet` now rewinds before validation; exact content/identity
+  checks remain. The45-test rerun passed.
+- FAIL - CAUSED BY CURRENT WORK (test harness): directly calling a streaming test
+  response's close triggered request-finished connection cleanup inside MySQL's
+  test transaction, causing two errors. Consume its streaming iterator through
+  Django's test-client wrapper instead; native20/20 rerun passed. Production
+  file handling and transaction guards were not weakened.
+- FAIL - CAUSED BY CURRENT WORK: a final integrity check read a cached pre-correction
+  asset instance. It now queries the current asset status; final17/17 passed.
+- Browser harness used unavailable global `URL` after creating the pending asset
+  proposal. Resumed that same proposal at its observed URL; no duplicate entry or
+  application repair was needed. Existing copied GRAND public/login media defaults
+  and favicon return404; GSO screens and correction endpoints work.
+
+Populated actual GRAND preview `.tmp/receipt-quantity-preview-rfeep089`:
+all218 existing application tables' original rows retained; only2 new inventory
+content types and2 custom permission definitions added, no existing role grants.
+Finance bytes unchanged. System/migration-drift checks pass. Synthetic grants were
+added only afterward to the copied preview actors. Desktop/mobile browser:
+delivered10/accepted6 -> approved subtraction2 -> effective8/4, unresolved2;
+independent review; original-lot adjustment; original acceptance retained. A second
+one-unit asset case retains the asset as `entry_void`, with actions disabled and
+explicit original-quantity/cost labels and authorized correction-history link.
+Screenshots `output/playwright/quantity-correction-{form-mobile,approved-desktop,original-mobile,asset-mobile}.png`
+were inspected. Browser receipt-quantity and both preview processes62913/91841
+are stopped; no operator server was used.
+
+Stopped paired restore PASS: `.tmp/rehearse_receipt_quantity_recovery.py`, log
+`.tmp/correction-recovery.log`, backup
+`C:/Users/Administrator/.codex/backups/gsov2-receipt-quantity-recovery-20261017-9xv4hpz1`.
+All221 default/83 Finance tables and24 private files match retained manifests.
+Older FIFO lot untouched, corrected source allocation2, combined stock10, effective
+source accepted4, erroneous asset quantity0 and original history survive. Missing/
+tampered correction packets and altered adjustment result fail verification; file
+checkers pass after restoration. Source hashes remain unchanged. This is synthetic
+stopped SQLite recovery, not operator/offsite/online MySQL RPO/RTO acceptance.
+
+## 2026-10-17: clerical-correction source prerequisite (unreleased)
+
+Branch `codex/receipt-correction-design`, baseline ad8b348. Fetched GSO HEAD and
+origin/master0/0, clean before edits. Canonical master also clean0/0; operator DB
+SHA256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Finance fetched candidate a533482/master32ab046, only its existing untracked
+coordination note. User selected clerical overstatement before use.
+
+New internal `lock_unused_source` requires the caller's default transaction and
+locks receipt then item/asset. It checks exact original acceptance/packet metadata,
+file integrity, owner and materialization, prior usage/reconciliation and dependent
+history. No production mutation calls it yet; no pending hold, correction write,
+migration or endpoint is claimed. The design and Finance coordination are recorded.
+
+Runtime: `C:/xxx/_INSTALLS/_HERE/_xxx/gsov2-development/Scripts/python.exe`.
+Set `GSO_DATABASE_PATH` to feature `.tmp/correction-source-tests.sqlite3`; Django
+created/destroyed the isolated test database, not the operator database.
+
+- PASS: `manage.py test inventory.test_receipt_correction_sources --verbosity 1`,
+  initial10 tests,0.507s. Read-only inspection, stale/missing source, scope, prior
+  non-FIFO issue/return, target versus older FIFO lot, adjustments, dependent draft
+  follow-up and asset audit history.
+- PASS: `manage.py test inventory.test_receipt_correction_sources inventory.test_receiving inventory.test_receiving_followups --verbosity 1`,
+  final40 tests,2.106s after adding malformed-history validation and original asset
+  snapshot comparison. This includes11 new tests and29 dependent receiving tests.
+- PASS: `git diff --check`.
+- NOT RUN - OUT OF SCOPE: full/native/actual-GRAND/browser/migration/recovery gates
+  for the complete correction feature, which does not exist yet. The optional
+  Finance history predicate has not been tested in actual GRAND at this checkpoint.
+  Native write races and hold enforcement are mandatory when those writes are added.
+
+No runtime server was started. No VM release/integration/push for this incomplete
+feature. The original receiving-followup release ad8b348 remains published; its
+earlier evidence is historical and is not a test of this new source prerequisite.
+
+## Original alignment foundation scope
+
 Scope: UUID migration/export prerequisite, dependency update, stock-owner fix,
 service input restrictions and deployment settings. Full shell suite selected
 because these affect shared models, permissions, migrations and dependencies.
@@ -1993,7 +2116,7 @@ makemigrations --check --dry-run pass. Original218 tables' old rows/columns rema
 with the same explicitly checked native7/42 metadata additions; Finance bytes
 unchanged. This empty dependency migration was added after the first broad run
 started and is included in the final native rerun. VM inspect/preview selects
-minor0.24.0 and generates only VERSION/CHANGELOG.
+the receiving-follow-up minor release published at ad8b348 and generates only VERSION/CHANGELOG.
 
 
 Final native GRAND: PASS142/142 in59.470s,exit0,terminal24710,

@@ -1,6 +1,7 @@
 {% extends "inventory/base.html" %}
 {% block title %}{{ asset.asset_name }}{% endblock %}
 {% block content %}
+{% if correction_hold %}<section class="panel"><p role="status">{{ correction_hold }}</p>{% if correction_source %}<a href="{% url 'inventory:receipt-quantity-corrections' correction_source.pk %}">Receipt quantity correction and retained evidence</a>{% endif %}</section>{% endif %}
 {% if can_property_movements %}<nav class="quick-links"><a href="{% url 'inventory:property-movements' asset.pk %}">Documented movements and opening balance</a></nav>{% endif %}
 {% if can_property_records %}<nav class="quick-links"><a href="{% url 'inventory:property-records' asset.pk %}">Property documents and useful life</a></nav>{% endif %}
 <header class="hero"><div><p class="eyebrow">GSO workspace · Asset record</p><h1>{{ asset.asset_name }}</h1><p>{{ asset.get_status_display }}{% if asset.obr_reference %} · OBR {{ asset.obr_reference }}{% endif %}</p></div></header>
@@ -18,7 +19,7 @@
   <div><dt>Purchase order / contract</dt><dd>{{ asset.purchase_order_reference|default:"Not recorded" }}</dd></div><div><dt>Voucher / journal</dt><dd>{{ asset.voucher_reference|default:"—" }}{% if asset.journal_reference %} / {{ asset.journal_reference }}{% endif %}</dd></div>
   <div><dt>Fund</dt><dd>{{ asset.fund_code|default:"Not recorded" }}</dd></div><div><dt>COA account</dt><dd>{% if asset.coa_account_code %}{{ asset.coa_account_code }} · {{ asset.coa_account_title }}{% else %}Not mapped{% endif %}</dd></div><div><dt>Mapping reference</dt><dd>{{ asset.coa_basis|default:"Awaiting Accounting review" }}</dd></div>
   <div><dt>Purchase date</dt><dd>{{ asset.purchase_date|date:"F j, Y"|default:"Not recorded" }}</dd></div><div><dt>Supplier</dt><dd>{{ asset.supplier|default:"Not recorded" }}</dd></div>
-  <div><dt>Unit cost</dt><dd>{% if asset.unit_cost is not None %}₱{{ asset.unit_cost|floatformat:2 }}{% else %}Not recorded{% endif %}</dd></div><div><dt>Quantity</dt><dd>{{ asset.quantity }}</dd></div>
+  <div><dt>{% if asset.status == 'entry_void' %}Original recorded unit cost{% else %}Unit cost{% endif %}</dt><dd>{% if asset.unit_cost is not None %}₱{{ asset.unit_cost|floatformat:2 }}{% else %}Not recorded{% endif %}</dd></div><div><dt>{% if asset.status == 'entry_void' %}Original recorded quantity{% else %}Quantity{% endif %}</dt><dd>{{ asset.quantity }}</dd></div>
   <div><dt>Assigned department</dt><dd>{{ asset.assigned_department_label|default:"Unassigned" }}</dd></div><div><dt>Assigned office / custodian</dt><dd>{{ asset.assigned_office|default:"Not recorded" }}</dd></div>
   <div><dt>Return / transfer / retirement date</dt><dd>{{ asset.returned_date|date:"F j, Y"|default:"—" }}</dd></div>
   <div class="field full"><dt>Notes</dt><dd>{{ asset.notes|linebreaksbr|default:"No notes" }}</dd></div>

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.25.0] - 2026-10-17
+### Added
+- Add reviewed clerical receipt quantity corrections
+
 ## [0.24.0] - 2026-10-17
 ### Added
 - Add independently reviewed receipt follow-up acceptance

@@ -94,6 +94,8 @@ def create_asset(*, actor, data):
     if department is None:
         raise PermissionDenied
     data = _editable_data(data, ASSET_INPUT_FIELDS)
+    if data.get("status") == Asset.ENTRY_VOID:
+        raise ValidationError("Only a reviewed receipt correction can mark an erroneous entry.")
     validate_asset_identifiers(department.pk, data)
     assigned_department_pk = data.pop("assigned_department", None)
     assigned_department = _resolve_assigned_department(assigned_department_pk)
@@ -115,6 +117,10 @@ def create_asset(*, actor, data):
 def update_asset(*, actor, asset, data):
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
     _require(actor, "change", asset)
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
+    if data.get("status") == Asset.ENTRY_VOID:
+        raise ValidationError("Only a reviewed receipt correction can mark an erroneous entry.")
     from .maintenance import require_no_open_maintenance
     require_no_open_maintenance(asset)
     if asset.transfers.filter(status=AssetTransfer.PENDING).exists():
@@ -202,6 +208,8 @@ def create_asset_transfer(*, actor, asset, data, request_id=None, expected_custo
             return existing
     if expected_custody is not None and expected_custody != custody_source(asset):
         raise ValidationError("The asset custody changed after this preview. Review the handoff again.")
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
     from .maintenance import require_no_open_maintenance
     require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
@@ -337,7 +345,11 @@ def start_asset_verification_round(*, actor, title, as_of_date):
         title=title, as_of_date=as_of_date,
         department_id=department.pk, department_label=department.name, created_by=actor,
     )
-    assets = Asset.objects.filter(department_id=department.pk).exclude(status=Asset.RETIRED).order_by("pk")
+    assets = list(Asset.objects.select_for_update().filter(department_id=department.pk)
+                  .exclude(status__in=(Asset.RETIRED, Asset.ENTRY_VOID)).order_by("pk"))
+    from .receipt_quantity_corrections import require_asset_available
+    for asset in assets:
+        require_asset_available(asset)
     AssetVerificationRecord.objects.bulk_create([
         AssetVerificationRecord(
             verification_round=verification_round, asset=asset,
@@ -477,6 +489,10 @@ def review_unregistered_verification_finding(*, actor, finding, data):
     related_asset = data.get("related_asset")
     if status in (AssetVerificationFinding.REGISTERED, AssetVerificationFinding.DUPLICATE) and related_asset is None:
         raise ValidationError("Link the finding to the relevant asset record.")
+    if related_asset:
+        related_asset = Asset.objects.select_for_update().get(pk=related_asset.pk)
+        from .receipt_quantity_corrections import require_asset_available
+        require_asset_available(related_asset)
     if related_asset and related_asset.department_id != finding.verification_round.department_id:
         raise PermissionDenied
     finding.status = status
@@ -643,6 +659,8 @@ def submit_asset_disposal_request(*, actor, asset, data):
     asset = Asset.objects.select_for_update().get(pk=asset.pk)
     if not can_request_asset_disposal(actor, asset):
         raise PermissionDenied
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
     from .maintenance import require_no_open_maintenance
     require_no_open_maintenance(asset)
     if asset.status == Asset.RETIRED:
@@ -819,6 +837,8 @@ def update_consumable(*, actor, item, data):
     data = _editable_data(data, CONSUMABLE_INPUT_FIELDS)
     item = ConsumableItem.objects.select_for_update().get(pk=item.pk)
     _stock_permission(actor, "change", item)
+    from .receipt_quantity_corrections import require_stock_available
+    require_stock_available(item)
     if item.use_fifo != data.get("use_fifo", item.use_fifo) and item.movements.exists():
         raise ValidationError("FIFO tracking cannot be changed after stock movements exist.")
     for field, value in data.items():
@@ -904,6 +924,8 @@ def record_stock_movement(*, actor, item, kind, quantity, reference="", reason="
             return existing
     if not item.is_active:
         raise ValidationError("Inactive supply items cannot receive new movements.")
+    from .receipt_quantity_corrections import require_stock_available
+    require_stock_available(item)
     inbound = kind in (StockMovement.RECEIPT, StockMovement.RETURN, StockMovement.ADJUSTMENT_IN)
     if not inbound and _stock_signed_total(item) < quantity:
         raise ValidationError(f"Only {_stock_signed_total(item):g} {item.unit} are available.")

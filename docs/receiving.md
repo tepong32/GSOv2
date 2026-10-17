@@ -43,6 +43,14 @@ text are not automatically deduplicated; reviewers must check the source packet.
 
 ## Recovery and migration
 
+The user-selected [clerical overstatement before use](receipt-quantity-corrections.md)
+workflow preserves original delivered/accepted columns and records an independently
+reviewed subtraction from both. The receipt screen shows effective quantities beside
+the original facts; it does not reopen resolved remainder capacity. Original-lot
+adjustments and erroneous-asset entries are distinct from physical returns and disposal.
+Any previous Finance support history requires separate reconciliation. Publication
+and validation state are maintained in CONTINUE.
+
 Run `python manage.py check_receiving_evidence` during stopped-write maintenance or
 against an isolated restore. It reports missing/changed/unsafe/unreferenced files
 and changes nothing. Preserve unreferenced files after failed uploads for investigation.

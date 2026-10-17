@@ -35,8 +35,12 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 The [completion audit](completion-audit.md) separates remaining engineering work
 from local policy, data and operational acceptance. Linked follow-up acceptance
 of delivered unresolved quantities is implemented; see [its design](receiving-followups.md)
-and CONTINUE for validation/publication. Accepted-quantity reversal still needs
-eligibility tracing through custody, stock/FIFO and Finance support before design.
+and CONTINUE for validation/publication. The user selected clerical overstatement
+before use as the first accepted-quantity correction case. The
+[selected workflow](receipt-quantity-corrections.md) traces custody, stock/FIFO and
+Finance support. Implementation is on the feature branch; CONTINUE records its
+validation/publication state. Changed inspection decisions, returns after use and
+Accounting reversals remain distinct cases, not automatic extensions of this one.
 Do not expand conditional vehicle/general-office scope without a concrete use case.
 
 The [property-record workflow](property-record-design.md) now retains supplied

@@ -154,6 +154,8 @@ def record(*, actor, asset, request_id, expected_source, expected_predecessor, d
     require(actor, "record", asset)
     asset = lock_asset(asset.pk)
     require(actor, "record", asset)
+    from .receipt_quantity_corrections import require_asset_available
+    require_asset_available(asset)
     try:
         request_id = UUID(str(request_id))
     except (TypeError, ValueError, AttributeError) as error:
@@ -205,6 +207,9 @@ def decide(*, actor, row, expected_version, action, note):
     authority = "record" if action == "cancel" else "review"
     require(actor, authority, row.asset)
     asset = lock_asset(row.asset_id)
+    if action == "verify":
+        from .receipt_quantity_corrections import require_asset_available
+        require_asset_available(asset)
     row = Record.objects.select_for_update().get(pk=row.pk)
     require(actor, authority, asset)
     if isinstance(expected_version, bool) or not isinstance(expected_version, int) or expected_version != row.state_version or row.status != "pending":
