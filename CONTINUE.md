@@ -5,12 +5,15 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Property movement milestone — local release gates passed
+## Published property movement milestone
 
 Branch `codex/property-movement-records`, based on published dbd47c0. Local/remote
 baseline was checked before work; Finance candidate a533482/master32ab046 remains
-unchanged except append-only GSO coordination. VM publication is the next step;
-this note does not claim an unperformed push or hosted check.
+unchanged except append-only GSO coordination. Actual VM v0.23.0 was integrated
+and pushed as ce845fc65744f6072dc378f0ab560c91666b8532; feature CI38987081260 and
+master CI38987256429 PASS. Remote master/tag matched; canonical clean0/0.
+Previous goal turn: progress (implemented and published the movement workflow).
+This turn fresh sync reverified ce845fc0/0 and the completed master CI.
 
 [Movement design](docs/property-movements.md): reviewed source annotations and
 explicit end-of-day openings, protected source/property/predecessor links, private
@@ -42,8 +45,13 @@ migration, grant or deployment. Full goal remains active and incomplete.
 
 ## Next work and boundaries
 
-1. Publish this completed movement milestone through actual VM, exact feature CI,
-   primary integration/push and primary CI verification. Recheck sync first.
+1. The `codex/gso-office-records-entry` milestone passed local validation. GSO
+   navigation now reuses native Records authorization and actual assigned-office
+   scope. No duplicate registry, tables or invented operational associations.
+   See [office records](docs/office-records.md). Standalone1, actual GRAND SQLite17
+   (3.934s) and MySQL17 (4.743s) PASS, including existing native Records regressions.
+   Browser desktop/mobile GSO→Records→native draft creation PASS. Actual VM/hosted
+   publication receipts must be checked against Git; this is the pre-release note.
 2. Continue the roadmap after publication. Official SPC, complete
    historical balances, accepted forms and physical cost allocation remain unfinished.
 3. GRAND default/finance ownership and explicit permissions remain authoritative.
@@ -57,7 +65,7 @@ migration, grant or deployment. Full goal remains active and incomplete.
 ## Working locations and continuity
 
 - GSO feature checkout: `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`.
-  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, masterdbd47c0 at last fetch.
+  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, masterce845fc at last fetch.
 - Finance active checkout: `C:/Users/Administrator/.codex/worktrees/finance-form1-treatments/grand`;
   candidate a533482, remote master32ab046. Re-read its CONTINUE and fetch before
   adapter changes. Append-only coordination is docs/GSO_INTEGRATION_REVIEW.md;
@@ -73,7 +81,12 @@ migration, grant or deployment. Full goal remains active and incomplete.
   [AGENTS](AGENTS.md) holds durable constraints; the roadmap owns scope, feature
   design files own behavior, and validation owns actual commands/results.
 
-No active browser, preview or test run remains. Owned MySQL33317 was stopped
+Current Records browser/preview and test runs are finished. Owned MySQL33317 was
+stopped after verifying cleanup. Final logs: `.tmp/office-records-grand-final.log`
+and `.tmp/office-records-grand-native-final.log`; preview copy
+`.tmp/office-records-preview-bzhdnbrg`. Original runs failed only the native test
+relative-template-path assumption; corrected runner uses the GRAND source cwd.
+Previous movement milestone: owned MySQL33317 was stopped
 normally after verifying no disposable test schemas remain. Preview copy:
 `.tmp/property-movement-preview-ea05rtn5`. Logs: `.tmp/property-movement-ui-shell.log`,
 `.tmp/property-movement-native-full.log`, `.tmp/property-movement-grand-native.log`,

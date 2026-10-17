@@ -105,6 +105,11 @@ may offer the photo library instead.
 
 ## GRAND integration target
 
+General office filing reuses GRAND's existing Records workspace. Authorized GSO
+staff can open it from the GSO dashboard when the native app and routes are
+installed. The standalone shell does not duplicate that registry. See
+[office records and permissions](docs/office-records.md).
+
 The module uses `settings.AUTH_USER_MODEL` for actors. `inventory.access.department_for_user()` reads GRAND's `employeeprofile.assigned_department`; the fallback to the local `user.User.department` exists only for this standalone shell. The inventory stores a numeric `department_id` and a label snapshot rather than a foreign key, following GRAND's finance-domain pattern and keeping the module portable across database boundaries. In GRAND, both the asset table and its user foreign keys should use the default database; do not route GSO assets to the separate Finance database.
 
 Integration should:

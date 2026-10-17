@@ -82,6 +82,7 @@ def main():
                  "gso_integration_tests.grand_supply_returns",
                  "gso_integration_tests.grand_property",
                  "gso_integration_tests.grand_property_movements",
+                 "gso_integration_tests.grand_office_records",
                  "gso_integration_tests.grand_property_links",
                  "gso_integration_tests.grand_property_link_races",
                  "gso_integration_tests.grand_property_link_migration",

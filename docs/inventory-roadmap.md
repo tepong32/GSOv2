@@ -46,8 +46,8 @@ history and unknown values. This is an SPC source prerequisite; numbered movemen
 documents, opening reconciliation, historical balances and accepted output remain.
 Source tracing found disposal lock-order/fresh-authority gaps; these are now fixed
 before card movement integration. Disposal0026 evidence integrity and service-level
-upload validation are implemented with local validation complete. Next develop reviewed
-movement annotations/openings, preserving historical evidence unknowns.
+upload validation are implemented with local validation complete. Reviewed movement annotations/openings are now published atce845fc, preserving
+historical evidence unknowns; see the movement design for reconstruction limits.
 See property-record-design for the actual receipt/handoff/return/disposal mapping.
 
 Supplies follow-up: [request and issue design](stock-request-design.md) records
@@ -166,3 +166,10 @@ Foundation0027, reviewed records, source-checked projection and entry/review/his
 screens passed native GRAND, browser and recovery gates. See CONTINUE for actual
 publication state. Official SPC layout, complete imported history/local numbering
 and accepted office procedures remain separate work.
+
+
+General office filing entry: `codex/gso-office-records-entry` reuses GRAND Records
+from the GSO dashboard with native permission and actual assigned-office checks.
+See [scope and existing native authority](office-records.md). No duplicate registry
+or unsupported inventory association is introduced; official outputs and governed
+operational source integration remain distinct gaps.

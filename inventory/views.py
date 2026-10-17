@@ -68,6 +68,7 @@ def _scoped_assets(user):
 @login_required
 def dashboard(request):
     from .custody_review import can_view_custody_review
+    from .office_records import workspace_url
     from .maintenance_views import can_view_maintenance
     if not can(request.user, "view"):
         from .receiving import require_receiving
@@ -76,6 +77,7 @@ def dashboard(request):
     assets = _scoped_assets(request.user)
     return render(request, "inventory/dashboard.html", {
         "department": department_for_user(request.user) or gso_department_for_user(request.user),
+        "office_records_url": workspace_url(request.user),
         "is_gso": request.user.is_superuser or _is_gso_department(department_for_user(request.user)),
         "total_assets": assets.count(),
         "in_service_count": assets.filter(status=Asset.ACTIVE).count(),

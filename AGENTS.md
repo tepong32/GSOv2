@@ -97,7 +97,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   clearance. Lock sorted assets before the employee, then the case; recheck the
   asset set and reject changes instead of locking new assets after the employee.
   Named handoffs must keep their target-user lock. Reuse GRAND Records for future
-  general filing; do not duplicate its registry. See [case design](docs/hr-custody-review.md).
+  general filing; do not duplicate its registry. The [office Records entry](docs/office-records.md)
+  uses native authorization and the actual assigned office, not inventory superuser
+  fallback scope. Do not invent inventory RecordAssociation types. See
+  [case design](docs/hr-custody-review.md).
 - Witnessed returns reuse custody movements with independent GSO confirmation and
   private evidence. Retain original employee identity; change physical custody only,
   not maintenance, acquisition value or Finance. Distinguish known GSO returns from

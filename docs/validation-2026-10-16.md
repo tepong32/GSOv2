@@ -1814,3 +1814,65 @@ No operator migration/grants/deployment. Operator SQLite SHA256 still
 5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
 Browsers/previews stopped; owned MySQL55828/PID90792 normal shutdown after no remaining
 schemas. Remote rulesets[] and master protected=false rechecked before release.
+
+
+## GSO office Records entry — 2026-10-17
+
+Previous turn: progress, actual VM movement releasece845fc integrated/pushed with
+featureCI38987081260 and masterCI38987256429 PASS. Fresh sync on this turn: GSO0/0,
+Finance a533482/master32ab046 unchanged except GSO notes. Separate feature branch
+`codex/gso-office-records-entry`; no GRAND source/schema/operator edits.
+
+Inspected actual native Records models, authorization, forms, source allowlist,
+services/views/routes and tests. Reuse its general departmental filing through a
+GSO dashboard link; no inventory association invented. The helper resolves only
+installed/routed native Records for an active actually GSO-assigned user authorized
+by native Records. Superuser inventory fallback does not select a registry office.
+
+PASS standalone `manage.py test inventory.test_office_records --verbosity 1`,1/1;
+system checks/migration drift/diff whitespace PASS. No migration or new storage.
+Actual-GRAND focused runner `.tmp/test_office_records_grand.py` reuses the committed
+isolated settings/router harness, discovering `gso_integration_tests.grand_office_records`
+and `records.tests`. First SQLite17-test run:16 PASS/1 ERROR in3.861s. FAIL - CAUSED
+BY CURRENT WORK (harness): existing native footer source test assumes GRAND cwd;
+FileNotFoundError for templates/components/footer_links.html when launched in GSO.
+Corrected focused runner to chdir to the explicit GRAND source, preserving absolute
+isolated database paths. Final SQLite/native results pending; original logs retained.
+
+PASS browser through actual GRAND: GSO dashboard card at desktop/mobile, click into
+native /records/, register a synthetic general-office draft and see its created
+event, native department record number and unassigned retention. No official output
+or supplied signature is inferred. Preview `.tmp/office-records-preview-bzhdnbrg`
+was copied from stopped synthetic data; operator files untouched. Screenshot review
+confirms the new card fits mobile. Existing copied default logo/avatar/favicon files
+are missing on native pages (404); no new dashboard-link error. Browser and preview
+73243 are stopped. The native registry's full production/security/recovery acceptance
+is not claimed by this entry or inherited test suite.
+
+NOT RUN - OUT OF SCOPE: new migration/populated import, custody/stock races and new
+paired-evidence restore; this change has no models, mutation service, file writes or
+storage namespace. Existing Records regression plus real native filing/scope tests
+cover the destination; the normal hosted release suite still applies.
+
+
+Final office Records entry results: PASS actual GRAND SQLite17/17 in3.934s, exit0,
+terminal64665 (`.tmp/office-records-grand-final.log`); PASS MySQL17/17 in4.743s, exit0,
+terminal58452 (`.tmp/office-records-grand-native-final.log`). Both execute3 new GSO
+integration cases plus14 existing Records cases. Original MySQL58810 ended1 with
+the same cwd-relative footer test error (16 pass/1 error in6.964s), matching the
+original SQLite harness issue; no production code changed for this correction.
+Focused runner command: GRAND Python `.tmp/test_office_records_grand.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation [--mysql]`.
+It is the normal isolated runner with discovery narrowed to the two named modules
+and working directory set to that GRAND source for its existing file-source test.
+The committed default runner includes the3 new GSO cases in future broad runs.
+No locks/schema were changed; targeted native tests plus the normal hosted full
+shell release suite are appropriate for this optional navigation addition.
+
+PASS browser native draft creation and readable GSO mobile card; screenshot files
+`output/playwright/office-records-*` inspected. Preview73243/browser stopped;
+owned MySQL92116/PID81160 shut down normally after checking all test schemas gone.
+Operator database hash unchanged. No Finance code/operator grants/deployment.
+VM README reviewed, inspect/preview selected patch0.23.1; only VERSION/CHANGELOG
+are generated. Hosted feature/master receipts are checked after the actual release;
+this paragraph does not claim those unperformed results.

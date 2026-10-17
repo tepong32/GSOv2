@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.23.1] - 2026-10-17
+### Added
+- Connect GSO workspace to GRAND office records
+
 ## [0.23.0] - 2026-10-17
 ### Added
 - Add reviewed property movement records and working balances
