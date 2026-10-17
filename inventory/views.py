@@ -166,6 +166,7 @@ def asset_export(request):
 
 @asset_access_required("view")
 def asset_detail(request, pk):
+    from . import property_movements as movement_service
     from .custody_returns import can_manage_return
     from .maintenance import can_manage_maintenance
     from .maintenance_views import can_view_maintenance
@@ -182,6 +183,7 @@ def asset_detail(request, pk):
         "events": asset.audit_events.all() if can_view_audit(request.user) else (),
         "can_change": can(request.user, "change") and not open_maintenance,
         "can_property_records": property_service.can_act(request.user, "view", asset),
+        "can_property_movements": movement_service.can_act(request.user, "view", asset),
         "maintenance_history": asset.maintenance_cases.all() if can_view_maintenance(request.user) else (),
         "can_start_maintenance": can_manage_maintenance(request.user, asset) and not open_maintenance
         and not open_disposal and pending_transfer is None and asset.status != Asset.RETIRED,

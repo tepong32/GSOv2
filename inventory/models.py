@@ -708,6 +708,7 @@ class AssetDisposalCase(models.Model):
         ("destruction", "Condemnation / destruction"),
     )
 
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="disposal_cases")
     status = models.CharField(max_length=24, choices=STATUS_CHOICES, default=SUBMITTED, db_index=True)
     reason = models.CharField(max_length=240)
@@ -1588,3 +1589,103 @@ class SupplyReturnEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Supply return history is retained.")
+
+
+
+def property_movement_path(instance, filename):
+    return f"inventory/property-movements/{instance.public_id}/{uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class PropertyMovementRecord(models.Model):
+    """Reviewed source annotation; never itself a custody or Finance movement."""
+    public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="property_movements")
+    determination = models.ForeignKey(PropertyDetermination, on_delete=models.PROTECT, related_name="movement_records")
+    predecessor = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True, related_name="successors")
+    source_kind = models.CharField(max_length=12, choices=tuple((v, v.title()) for v in ("opening", "receipt", "handoff", "return", "disposal")))
+    source_key = models.CharField(max_length=100)
+    receipt_line = models.ForeignKey(ReceivingLine, on_delete=models.PROTECT, null=True, blank=True, related_name="property_movements")
+    transfer = models.ForeignKey(AssetTransfer, on_delete=models.PROTECT, null=True, blank=True, related_name="property_movements")
+    disposal = models.ForeignKey(AssetDisposalCase, on_delete=models.PROTECT, null=True, blank=True, related_name="property_movements")
+    movement_date = models.DateField()
+    within_day_order = models.PositiveSmallIntegerField(default=1)
+    reference = models.CharField(max_length=180)
+    item_number = models.CharField(max_length=100, blank=True)
+    office_officer_label = models.CharField(max_length=240, blank=True)
+    stock_delta = models.SmallIntegerField(default=0)
+    opening_quantity = models.PositiveSmallIntegerField(null=True, blank=True)
+    unit_cost = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0"))])
+    remarks = models.CharField(max_length=500)
+    source_snapshot = models.JSONField()
+    file = models.FileField(upload_to=property_movement_path, storage=disposal_private_storage, max_length=500)
+    original_filename = models.CharField(max_length=255)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    status = models.CharField(max_length=12, default="pending", choices=tuple((v, v.title()) for v in ("pending", "verified", "rejected", "cancelled")))
+    state_version = models.PositiveIntegerField(default=1)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_property_movements_recorded")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="gso_property_movements_decided")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.CharField(max_length=500, blank=True)
+    pending_asset = models.GeneratedField(expression=models.Case(models.When(status="pending", then=models.F("asset_id")), default=models.Value(None)), output_field=models.BigIntegerField(null=True), db_persist=False)
+
+    class Meta:
+        ordering = ("movement_date", "within_day_order", "pk")
+        default_permissions = ()
+        permissions = (("view_property_movement", "Can view documented property movements"),
+            ("record_property_movement", "Can record property movement sources and openings"),
+            ("review_property_movement", "Can independently verify property movement documents"))
+        constraints = [
+            models.UniqueConstraint(fields=("pending_asset",), name="gso_one_pending_property_move"),
+            models.CheckConstraint(condition=(
+                models.Q(source_kind="opening", receipt_line__isnull=True, transfer__isnull=True, disposal__isnull=True)
+                | models.Q(source_kind="receipt", receipt_line__isnull=False, transfer__isnull=True, disposal__isnull=True)
+                | models.Q(source_kind__in=("handoff", "return"), receipt_line__isnull=True, transfer__isnull=False, disposal__isnull=True)
+                | models.Q(source_kind="disposal", receipt_line__isnull=True, transfer__isnull=True, disposal__isnull=False)),
+                name="gso_property_move_source"),
+            models.CheckConstraint(condition=(
+                models.Q(source_kind="opening", stock_delta=0, opening_quantity__in=(0, 1), opening_quantity__isnull=False, within_day_order=0)
+                | (~models.Q(source_kind="opening") & models.Q(opening_quantity__isnull=True, within_day_order__gt=0) & (
+                    models.Q(source_kind="receipt", stock_delta=1)
+                    | models.Q(source_kind__in=("handoff", "disposal"), stock_delta__in=(-1, 0))
+                    | models.Q(source_kind="return", stock_delta__in=(0, 1))))), name="gso_property_move_effect"),
+            models.CheckConstraint(condition=models.Q(unit_cost__isnull=True) | models.Q(unit_cost__gte=0), name="gso_property_move_cost"),
+            models.CheckConstraint(condition=~models.Q(status__in=("verified", "rejected")) | (
+                models.Q(decided_by__isnull=False, decided_at__isnull=False) & ~models.Q(decided_by=models.F("recorded_by"))), name="gso_property_move_independent"),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            prior = type(self).objects.get(pk=self.pk)
+            mutable = {"status", "state_version", "decided_by_id", "decided_at", "decision_note"}
+            if not getattr(self, "_workflow_write", False) or any(
+                getattr(prior, field.attname) != getattr(self, field.attname)
+                for field in self._meta.concrete_fields if not field.generated and field.attname not in mutable
+            ):
+                raise ValidationError("Retain property movement sources; use a reviewed successor.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain property movement sources and their history.")
+
+
+class PropertyMovementEvent(models.Model):
+    movement = models.ForeignKey(PropertyMovementRecord, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="gso_property_movement_events")
+    action = models.CharField(max_length=16)
+    snapshot = models.JSONField()
+    checksum = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("pk",)
+        default_permissions = ()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Property movement events are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retain property movement events.")

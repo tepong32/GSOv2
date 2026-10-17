@@ -158,3 +158,11 @@ Disposal source integrity prerequisite has passed local validation on
 `codex/disposal-evidence-integrity`:0026 preserves legacy unknown hashes, validates
 new uploads in services and adds read-only reconciliation. This does not supply
 movement numbering/openings, official SPC output or Accounting valuation.
+
+
+The documented movement/opening workflow is implemented on
+`codex/property-movement-records`; see [its design](property-movements.md).
+Foundation0027, reviewed records, source-checked projection and entry/review/history
+screens passed native GRAND, browser and recovery gates. See CONTINUE for actual
+publication state. Official SPC layout, complete imported history/local numbering
+and accepted office procedures remain separate work.

@@ -829,3 +829,35 @@ parallel work; fetch and inspect its current source before adapter work.
 4. Continue maintenance corrections, stock counts, custody/clearance, general-office records,
    accepted outputs, GRAND import/router and coordinated recovery work per roadmap.
 
+
+## Disposal evidence integrity — local validation complete
+
+Previous turn: progress. Actual VM published577c549/v0.21.1; branchCI38983516424
+and masterCI38983686513 PASS. Remote master/tag verified, canonical clean0/0,
+operator database unchanged. Fresh sync this turn: clean0/0 at577c549; Finance
+candidate a533482 unchanged except coordination note, master32ab046.
+New branch `codex/disposal-evidence-integrity`.
+
+Inventory0026 adds a blank-by-default attachment SHA-256; old records and events
+are preserved without fabricated historical hashes. Shared save service validates
+all upload groups before file writes, captures actual byte counts/hashes. Downloads
+check and rewind the same open file; missing/changed files return409. Authorization
+and completion check retained files, allowing legacy unknown hashes explicitly
+but still rejecting missing/size-changed files. Strict source verification rejects
+legacy unknowns; do not treat operational completion as verified SPC evidence.
+Read-only `check_disposal_evidence` reports unknown, missing, changed, unsafe and
+unreferenced files without modifying them. UI distinguishes retained baselines.
+
+Shell142 (121 run/21 native skips) PASS44.109s. Focused6 PASS0.351s after recovery
+caught and fixed a reopened-missing-file ValueError. Full native standalone142 finished with one new test-fixture error: manually
+closing an already-consumed streaming response fired request_finished twice and
+closed MySQL's test transaction. Redundant close removed in standalone and GRAND
+tests. Final standalone native143/143 PASS124.530s; corrected full actual GRAND
+135/135 PASS55.812s, exit0. Affected native12/12 PASS1.955s after both fixes.
+All disposable schemas removed; owned MySQL normal shutdown confirmed.
+Populated actual GRAND copy preserved216 prior non-migration tables and Finance
+bytes. Desktop/mobile inspected, table scroll remains contained; browser/preview
+stopped. Recovery217/83 tables/9 files PASS at
+`C:/Users/Administrator/.codex/backups/gsov2-disposal-evidence-recovery-20261017-wm6udr7g`.
+See validation record for limitations and remaining release gates. Overall goal active.
+

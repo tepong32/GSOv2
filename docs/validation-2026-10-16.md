@@ -1680,7 +1680,7 @@ reflect the subsequently edited file, not a fresh import. Retained log
 full actual GRAND run uses final corrected tests (`.tmp/disposal-evidence-grand-final.log`).
 Full standalone native final rerun also active (`.tmp/disposal-evidence-native-final.log`).
 No release while these outcomes remain unresolved. VM inspect/preview selects
-minor0.22.0 and changes only VERSION/CHANGELOG. Remote rulesets empty/master
+the dbd47c0 release and changes only VERSION/CHANGELOG. Remote rulesets empty/master
 unprotected; normal hosted branch/master checks still required.
 
 Final full standalone native PASS143/143 in124.530s, exit0; terminal66565 and
@@ -1702,3 +1702,115 @@ including scoped downloads, changed-evidence denial and zero Finance queries.
 All disposable schemas removed; owned MySQL33317 normal shutdown confirmed.
 Local validation complete. No live previews/browser/test processes remain.
 Actual VM publication and hosted branch/master gates follow.
+
+
+## Property movement schema foundation — 2026-10-17
+Previous disposal milestone actually VM-publisheddbd47c0, branchCI38984917166 and
+masterCI38985045378 PASS; remote master/tag verified and canonical clean0/0.
+Fresh fetch for this feature: dbd47c0 clean0/0; Finance candidate a533482 unchanged
+except preserved coordination notes. New branch codex/property-movement-records.
+Reopened ONAR2024-006 index and visually re-read retained AnnexA.2 pages7–8;
+no new applicability/effectivity claim. Selected source-linked annotation/opening
+design documented in property-movements.md; no automatic custody/Finance writes.
+
+PASS: `manage.py test inventory.test_property_movement_schema --verbosity 1`,4/4
+in1.148s,exit0. Tests database pending uniqueness, source/effect/opening constraints,
+independent decision constraint and immutable source writes; populated0026→0027
+retains two historical disposal cases/events and assigns distinct nonempty UUIDs.
+No old movement annotations are invented. PASS system checks/migration drift.
+NOT RUN - OUT OF SCOPE for this unfinished foundation checkpoint: full/native,
+HTTP/concurrency/browser/recovery acceptance. These are mandatory before feature
+publication; schema-only tests are not workflow or integration evidence. No release,
+operator migration, role grant or deployment performed. No live test processes.
+
+
+## Property movement service checkpoint — 2026-10-17
+Fresh fetch: feature base dbd47c0 matches remote master; intended local work preserved.
+Finance a533482 unchanged except GSO note. Previous turn made schema/design progress.
+Added reviewed-source services and working projection; no custody/stock/Finance write.
+
+PASS: focused `manage.py test inventory.test_property_movements
+inventory.test_property_movement_schema --verbosity 1`,14/14 in2.142s,exit0.
+Covers model/migration invariants, independent review, replay, predecessor correction,
+source/file drift, fresh owner denial, pending and missing source entries, negative
+stock, duplicate chronology, pinned property basis drift and undated legacy retirement.
+Known handoff/reassignment fixtures are accepted source rows; they do not replace
+real end-to-end receipt/return/disposal or native race/HTTP tests. Full shell regression
+is running (`.tmp/property-movement-services-shell.log`, terminal67240).
+NOT RUN - OUT OF SCOPE for this incomplete checkpoint: native/race/actual GRAND,
+UI/browser and paired recovery; mandatory before release, not waived. Feature remains
+unpublished. No operator migration/grants/deployment or official-output claim.
+
+Full standalone shell PASS157 discovered/136 run/21 native-only skips in55.870s,
+exit0, terminal67240; `.tmp/property-movement-services-shell.log`. Includes all
+existing workflows and migration tests after the new models/services. Broad scope
+selected because0027 extends existing disposal identity and adds schema. PASS
+migration drift and diff whitespace checks. No active test/preview remains.
+Native/GRAND, real source-chain, UI and recovery gates remain open; no release.
+
+
+## Property movement UI/integration checkpoint — 2026-10-17
+
+Fresh fetch: feature HEAD and origin/master dbd47c0 have0/0 divergence; intended
+unpublished changes preserved. Finance candidate a533482/master32ab046 unchanged,
+only append-only GSO coordination file untracked. UI routes/forms/history/private
+downloads and correction prefill now exist. No operator database change or release.
+
+PASS: `manage.py test inventory.test_property_movement_http
+inventory.test_property_movements inventory.test_property_movement_schema
+--verbosity 1`,19/19 in2.780s. Later correction scenario: HTTP6/6 in0.771s.
+PASS: migration drift, diff whitespace. HTTP uses enforced CSRF; covers signed actor,
+source/expiry binding, independent review, replay, owner/read-only scope, fixed source
+date, zero/unknown cost and retained correction predecessor.
+FAIL - CAUSED BY CURRENT WORK: first20-test run, chain fixture attempted GRAND-only
+employee lookup in standalone (ValidationError); moved the real-chain test into
+`gso_integration_tests/grand_property_movements.py` using actual GRAND profiles.
+No production authorization change made to accommodate the fixture.
+
+PASS: `scripts/run_mysql_tests.py inventory.test_property_movement_concurrency
+inventory.test_property_movement_http inventory.test_property_movements
+inventory.test_property_movement_schema`,22/22 in6.292s, exit0, terminal77280;
+`.tmp/property-movement-native-focused.log`. Includes competing records/decisions
+and asset-before-annotation lock ordering. This run discovered5 HTTP tests before
+the sixth correction test was added. Native broad regression remains required.
+Actual GRAND SQLite/native and full shell runs are pending in CONTINUE; no pass
+claimed yet. Browser, paired restore and populated actual-GRAND preservation gates
+remain required before publishing this workflow.
+
+
+Final local movement milestone gates:
+- PASS full shell166 (142 executed/24 native skips),66.284s,exit0,terminal96868;
+  `.tmp/property-movement-ui-shell.log`.
+- PASS full MySQL166/166,169.779s,exit0,terminal72318;
+  `.tmp/property-movement-native-full.log`.
+- PASS actual GRAND MySQL137/137,62.934s,exit0,terminal58511;
+  `.tmp/property-movement-grand-native.log`. Actual GRAND SQLite136 with21 native
+  skips PASS31.050s,exit0,terminal10553; discovered before the added native authority
+  test. Both include real receipt→named issue→witnessed return→disposal. Native also
+  checks UAT/ungranted superuser/foreign office and zero Finance queries.
+- PASS final HTTP6/6,0.725s after applying existing44px button classes to the new
+  templates. Broad suites above plus this focused retest cover the final change.
+- PASS populated actual-GRAND copied default migration0027:216 existing tables'
+  rows preserved, Finance byte hash unchanged, historical disposal fields/events
+  retained, distinct nonempty UUIDs. Expected additions2 content types/3 permissions;
+  no grants automatically assigned. Initial preview assertion failed because it
+  incorrectly prohibited those post-migrate additions; corrected the harness to
+  require those exact counts while preserving all old rows. No app migration fix.
+- PASS browser CLI: actual employee login, opening0 with unknown cost, independent
+  verify, mobile correction1, pending-balance suppression, independent successor
+  verify and two retained verified history rows. Desktop/mobile screenshots visually
+  checked; mobile table scroll stays within its panel. Existing missing copied
+  media/defaults/grand-mark.svg causes login/home404s; no movement-page errors.
+  Initial browser helper used unavailable Buffer; rerun with a local synthetic PDF
+  through the same file input. Button styling fixed using existing theme classes.
+- PASS stopped synthetic paired recovery at
+  `C:/Users/Administrator/.codex/backups/gsov2-property-movement-recovery-20261017-2q0dm5pv`:
+  219 default/83 Finance tables and12 private files, exact row/file manifests, old
+  legacy disposal unknowns, movement predecessor/event history and working balance1
+  preserved. Missing/tampered movement packet rejects integrity and suppresses
+  balance. Source copy unchanged. This is not live operator/MySQL restore acceptance.
+
+No operator migration/grants/deployment. Operator SQLite SHA256 still
+5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+Browsers/previews stopped; owned MySQL55828/PID90792 normal shutdown after no remaining
+schemas. Remote rulesets[] and master protected=false rechecked before release.

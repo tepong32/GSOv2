@@ -197,3 +197,13 @@ This distinction must survive restore and later property-card integration.
 New upload hashes establish byte consistency, not document authenticity or malware
 safety. File writes are not transactional with the database; interrupted operations
 can leave unreferenced files, which require investigation rather than automatic deletion.
+
+
+Property movements add `inventory/property-movements` private packets. Restore
+records/events, predecessor links, pinned property/source snapshots and disposal
+UUIDs with the same coordinated stores/files. Run `check_property_movement_evidence`
+on restored copies. Missing or changed packets invalidate the current working
+balance; preserve historical records for investigation. Never reconstruct openings,
+chronology or source UUIDs from today's custody. The stopped synthetic rehearsal
+preserved both stores and verified corrections; it does not replace operational
+online MySQL backup/restore acceptance.

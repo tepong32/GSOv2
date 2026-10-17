@@ -58,6 +58,11 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   Keep association writes in default, committing under Finance dimension locks;
   a GSO reader sees retained history without an implied live ledger check. Keep
   withdrawal possible when a supporting Finance source is missing or stale.
+- Property movement work follows [the selected design](docs/property-movements.md).
+  Source annotations/openings never independently move custody or post Finance.
+  Preserve historical source/property versions; missing history is not zero stock.
+  Keep current reconstructed stock distinct from historical knowledge and official
+  SPC acceptance; include movement packets and correction history in recovery.
 - Enforce department and action permissions in views and services. Preserve audit
   and correction history, private evidence, and independent review where required.
   Do not grant roles, change the operator database, or deploy as part of a code release.

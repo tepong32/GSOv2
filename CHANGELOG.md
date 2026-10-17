@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.23.0] - 2026-10-17
+### Added
+- Add reviewed property movement records and working balances
+
 ## [0.22.0] - 2026-10-17
 ### Added
 - Verify disposal evidence while preserving legacy unknowns

@@ -5,46 +5,46 @@ Read [roadmap](docs/inventory-roadmap.md), [data design](docs/grand-integration-
 [claim support](docs/claim-attribution.md), [COA sources](docs/coa-requirements.md),
 [receiving](docs/receiving.md) and [validation](docs/validation-2026-10-16.md).
 
-## Disposal evidence integrity — local validation complete
+## Property movement milestone — local release gates passed
 
-Previous turn: progress. Actual VM published577c549/v0.21.1; branchCI38983516424
-and masterCI38983686513 PASS. Remote master/tag verified, canonical clean0/0,
-operator database unchanged. Fresh sync this turn: clean0/0 at577c549; Finance
-candidate a533482 unchanged except coordination note, master32ab046.
-New branch `codex/disposal-evidence-integrity`.
+Branch `codex/property-movement-records`, based on published dbd47c0. Local/remote
+baseline was checked before work; Finance candidate a533482/master32ab046 remains
+unchanged except append-only GSO coordination. VM publication is the next step;
+this note does not claim an unperformed push or hosted check.
 
-Inventory0026 adds a blank-by-default attachment SHA-256; old records and events
-are preserved without fabricated historical hashes. Shared save service validates
-all upload groups before file writes, captures actual byte counts/hashes. Downloads
-check and rewind the same open file; missing/changed files return409. Authorization
-and completion check retained files, allowing legacy unknown hashes explicitly
-but still rejecting missing/size-changed files. Strict source verification rejects
-legacy unknowns; do not treat operational completion as verified SPC evidence.
-Read-only `check_disposal_evidence` reports unknown, missing, changed, unsafe and
-unreferenced files without modifying them. UI distinguishes retained baselines.
+[Movement design](docs/property-movements.md): reviewed source annotations and
+explicit end-of-day openings, protected source/property/predecessor links, private
+packets, independent decisions and retained corrections.0027 gives disposal cases
+portable UUIDs without rewriting their old facts/events. Screens select confirmed
+sources, bind expiring signed requests, preserve zero/unknown values and show a
+working stock reconstruction. They never move custody, stock ledgers or Finance.
+Missing/ambiguous/stale history produces no calculated balance. This is not official
+SPC formatting, financial valuation or certification of complete external history.
 
-Shell142 (121 run/21 native skips) PASS44.109s. Focused6 PASS0.351s after recovery
-caught and fixed a reopened-missing-file ValueError. Full native standalone142 finished with one new test-fixture error: manually
-closing an already-consumed streaming response fired request_finished twice and
-closed MySQL's test transaction. Redundant close removed in standalone and GRAND
-tests. Final standalone native143/143 PASS124.530s; corrected full actual GRAND
-135/135 PASS55.812s, exit0. Affected native12/12 PASS1.955s after both fixes.
-All disposable schemas removed; owned MySQL normal shutdown confirmed.
-Populated actual GRAND copy preserved216 prior non-migration tables and Finance
-bytes. Desktop/mobile inspected, table scroll remains contained; browser/preview
-stopped. Recovery217/83 tables/9 files PASS at
-`C:/Users/Administrator/.codex/backups/gsov2-disposal-evidence-recovery-20261017-wm6udr7g`.
-See validation record for limitations and remaining release gates. Overall goal active.
+PASS local release gates:
+- Full standalone166 discovered/142 run/24 native skips,66.284s,exit0.
+- Full native MySQL166/166,169.779s,exit0.
+- Actual GRAND native137/137,62.934s,exit0; SQLite136 with21 native skips,31.050s.
+  Includes real receipt→named issue→witnessed return→disposal and explicit native
+  grants/UAT/owner/zero-Finance-query tests. SQLite discovered before the last native
+  authority test was added; native includes it.
+- Native focused22/22 including3 concurrency tests; final styled HTTP6/6,0.725s.
+- Populated actual GRAND copy:216 existing tables' rows retained, Finance file
+  unchanged, expected2 content types/3 permissions added, disposal UUIDs unique.
+- Browser desktop/mobile opening0→independent verification→correction1→independent
+  verification; pending correction suppresses balance, both verified entries remain.
+- Stopped paired restore:219 default/83 Finance tables,12 private files; exact
+  manifests/history/balance preserved, missing/tampered movement files rejected.
+  Backup: `C:/Users/Administrator/.codex/backups/gsov2-property-movement-recovery-20261017-2q0dm5pv`.
+
+Test logs and known harness corrections are recorded in validation. No operator
+migration, grant or deployment. Full goal remains active and incomplete.
 
 ## Next work and boundaries
 
-1. Local validation is complete. Run actual Version Manager release, hosted
-   feature checks, fast-forward/push master, hosted master checks and remote verification.
-   Keep initial failure evidence alongside the final passes.
-2. After release and fresh sync, use a new feature branch for reviewed property
-   movement annotations/openings. Reuse receipt, acknowledged handoff, witnessed
-   return and completed disposal facts; never derive stock effects from custody alone.
-   Follow [property design](docs/property-record-design.md). Official SPC, complete
+1. Publish this completed movement milestone through actual VM, exact feature CI,
+   primary integration/push and primary CI verification. Recheck sync first.
+2. Continue the roadmap after publication. Official SPC, complete
    historical balances, accepted forms and physical cost allocation remain unfinished.
 3. GRAND default/finance ownership and explicit permissions remain authoritative.
    No Finance code changes, operator migration/grants or deployment are authorized
@@ -57,7 +57,7 @@ See validation record for limitations and remaining release gates. Overall goal 
 ## Working locations and continuity
 
 - GSO feature checkout: `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`.
-  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, master577c549 at last fetch.
+  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, masterdbd47c0 at last fetch.
 - Finance active checkout: `C:/Users/Administrator/.codex/worktrees/finance-form1-treatments/grand`;
   candidate a533482, remote master32ab046. Re-read its CONTINUE and fetch before
   adapter changes. Append-only coordination is docs/GSO_INTEGRATION_REVIEW.md;
@@ -73,7 +73,10 @@ See validation record for limitations and remaining release gates. Overall goal 
   [AGENTS](AGENTS.md) holds durable constraints; the roadmap owns scope, feature
   design files own behavior, and validation owns actual commands/results.
 
-No live local test or preview processes remain. Full GRAND27511 and standalone
-66565 ended0; MySQL66795 shut down normally after schema cleanup. Logs:
-`.tmp/disposal-evidence-grand-final.log`, `.tmp/disposal-evidence-native-final.log`.
-Actual VM publication and hosted gates follow; no operator migration or deployment.
+No active browser, preview or test run remains. Owned MySQL33317 was stopped
+normally after verifying no disposable test schemas remain. Preview copy:
+`.tmp/property-movement-preview-ea05rtn5`. Logs: `.tmp/property-movement-ui-shell.log`,
+`.tmp/property-movement-native-full.log`, `.tmp/property-movement-grand-native.log`,
+`.tmp/property-movement-grand-sqlite.log`. Recovery helper is
+`.tmp/rehearse_property_movement_recovery.py`. Synthetic screenshots are under
+`output/playwright/property-movement-*`.

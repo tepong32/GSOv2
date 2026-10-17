@@ -1,6 +1,7 @@
 {% extends "inventory/base.html" %}
 {% block title %}{{ asset.asset_name }}{% endblock %}
 {% block content %}
+{% if can_property_movements %}<nav class="quick-links"><a href="{% url 'inventory:property-movements' asset.pk %}">Documented movements and opening balance</a></nav>{% endif %}
 {% if can_property_records %}<nav class="quick-links"><a href="{% url 'inventory:property-records' asset.pk %}">Property documents and useful life</a></nav>{% endif %}
 <header class="hero"><div><p class="eyebrow">GSO workspace · Asset record</p><h1>{{ asset.asset_name }}</h1><p>{{ asset.get_status_display }}{% if asset.obr_reference %} · OBR {{ asset.obr_reference }}{% endif %}</p></div></header>
 <nav class="quick-links" aria-label="Asset actions"><a href="{% url 'inventory:asset-list' %}">Back to register</a>{% if can_change %}<a class="button primary" href="{% url 'inventory:asset-edit' asset.pk %}">Edit record</a>{% endif %}{% if can_transfer %}{% if can_employee_handoff %}<a class="button primary" href="{% url 'inventory:employee-handoff' asset.pk %}">Hand over to employee</a>{% endif %}<a class="button primary" href="{% url 'inventory:asset-transfer-create' asset.pk %}">Transfer / hand over</a>{% endif %}{% if can_record_return %}<a class="button" href="{% url 'inventory:custody-return-start' asset.pk %}">Record witnessed return</a>{% endif %}{% if can_request_disposal %}<a class="button danger" href="{% url 'inventory:asset-disposal-request' asset.pk %}">Request disposal review</a>{% endif %}</nav>
