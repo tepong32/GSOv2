@@ -32,6 +32,12 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 
 ## Planned features, in order
 
+The [completion audit](completion-audit.md) separates remaining engineering work
+from local policy, data and operational acceptance. After the published office
+Records entry, the next design pass is governed follow-up acceptance of delivered
+unresolved quantities, tracing downstream Finance and physical-source links first.
+Do not expand conditional vehicle/general-office scope without a concrete use case.
+
 The [property-record workflow](property-record-design.md) now retains supplied
 treatment/useful-life evidence and independent documentary verification through
 migration0024. Native Finance association now has an explicit GSO request and

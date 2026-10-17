@@ -51,9 +51,14 @@ migration, grant or deployment. Full goal remains active and incomplete.
    See [office records](docs/office-records.md). Standalone1, actual GRAND SQLite17
    (3.934s) and MySQL17 (4.743s) PASS, including existing native Records regressions.
    Browser desktop/mobile GSO→Records→native draft creation PASS. Actual VM/hosted
-   publication receipts must be checked against Git; this is the pre-release note.
-2. Continue the roadmap after publication. Official SPC, complete
-   historical balances, accepted forms and physical cost allocation remain unfinished.
+   publication completed at a7cfb2df928d22575d21a45d12c19c20e908b6ca. Feature
+   CI38988203821 and master CI38988402908 PASS; fetched master/tag and clean0/0
+   were verified. The scope-audit turn rechecked the master CI and source baseline.
+2. Follow the [completion audit](docs/completion-audit.md): next inspect and design
+   governed follow-up acceptance of already delivered unresolved quantities, tracing
+   existing Finance support and source links before selecting schema. Official SPC,
+   complete historical balances, accepted forms and physical cost allocation remain
+   unfinished. Do not create official rules or optional fleet scope by inference.
 3. GRAND default/finance ownership and explicit permissions remain authoritative.
    No Finance code changes, operator migration/grants or deployment are authorized
    by this code-release workflow. General office filing should reuse GRAND records
@@ -65,7 +70,7 @@ migration, grant or deployment. Full goal remains active and incomplete.
 ## Working locations and continuity
 
 - GSO feature checkout: `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`.
-  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, masterce845fc at last fetch.
+  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, mastera7cfb2d at audit fetch.
 - Finance active checkout: `C:/Users/Administrator/.codex/worktrees/finance-form1-treatments/grand`;
   candidate a533482, remote master32ab046. Re-read its CONTINUE and fetch before
   adapter changes. Append-only coordination is docs/GSO_INTEGRATION_REVIEW.md;

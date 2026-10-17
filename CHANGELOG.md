@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.23.2] - 2026-10-17
+### Documentation
+- Document remaining GSO scope and receiving follow-up design
+
 ## [0.23.1] - 2026-10-17
 ### Added
 - Connect GSO workspace to GRAND office records
