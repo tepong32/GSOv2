@@ -33,9 +33,10 @@ GRAND's records/custody/HR capabilities where available instead of duplicating t
 ## Planned features, in order
 
 The [completion audit](completion-audit.md) separates remaining engineering work
-from local policy, data and operational acceptance. After the published office
-Records entry, the next design pass is governed follow-up acceptance of delivered
-unresolved quantities, tracing downstream Finance and physical-source links first.
+from local policy, data and operational acceptance. Linked follow-up acceptance
+of delivered unresolved quantities is implemented; see [its design](receiving-followups.md)
+and CONTINUE for validation/publication. Accepted-quantity reversal still needs
+eligibility tracing through custody, stock/FIFO and Finance support before design.
 Do not expand conditional vehicle/general-office scope without a concrete use case.
 
 The [property-record workflow](property-record-design.md) now retains supplied
@@ -76,7 +77,8 @@ COA's published guidance describes an annual PPE physical count presented on RPC
 
 Draft/returned corrections, protected evidence, independent acceptance, stock/asset
 materialization and native duplicate protection are implemented. Official forms,
-accepted-receipt reversals and incremental remainder acceptance remain future work.
+accepted-receipt reversals remain future work. [Linked follow-up inspection](receiving-followups.md)
+implements unresolved-remainder acceptance; see CONTINUE for validation/publication.
 [Reviewed documentary cost amendments](receipt-cost-corrections.md) now retain
 correcting evidence and independent decisions without rewriting accepted inventory
 or Finance values. Original/effective cost and stale support remain visible.

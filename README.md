@@ -29,6 +29,10 @@ This repository is a standalone development shell for the GSO asset inventory mo
   review, and receives only accepted quantities into inventory. Corrections and review
   history are retained. Stale acceptance cannot create stock twice. No Finance posting
   or approval is inferred.
+- [Follow-up inspections](docs/receiving-followups.md) resolve delivered quantities
+  still awaiting a decision, with their own evidence and independent acceptance.
+  Original receipt facts and Finance approvals remain retained; later deliveries
+  and corrections to already accepted quantities are separate workflows.
 
 - The department dashboard links to an asset register and shows live counts by status.
 - Employees search and filter records, open an asset detail page, and add or update records according to their granted permissions.

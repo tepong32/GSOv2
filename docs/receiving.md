@@ -30,8 +30,11 @@ do not grant roles or migrate operator data.
    after intake; no acquisition date, account or custodian is invented.
 
 Unaccepted quantities never enter stock. Accepted receipts are read-only. Later
-deliveries need their own records and source evidence. Incremental acceptance of
-pending remainders and accepted quantity correction/reversal are not yet implemented.
+deliveries need their own records and source evidence. [Follow-up inspections](receiving-followups.md)
+resolve documented portions of an original unresolved remainder through separate
+linked receipts and independent review. Original accepted/rejected quantities stay
+fixed. See CONTINUE for validation and publication state.
+Accepted quantity correction/reversal is not implemented.
 [Reviewed documentary cost amendments](receipt-cost-corrections.md) preserve the
 original accepted facts and separately record a corrected source cost.
 Investigate mistaken acceptance before using existing adjustment routes; never

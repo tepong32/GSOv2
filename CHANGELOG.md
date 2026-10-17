@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.24.0] - 2026-10-17
+### Added
+- Add independently reviewed receipt follow-up acceptance
+
 ## [0.23.2] - 2026-10-17
 ### Documentation
 - Document remaining GSO scope and receiving follow-up design

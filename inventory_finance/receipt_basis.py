@@ -39,6 +39,9 @@ def receipt_basis(line):
             "content_checksum": amendment.content_checksum, "unit_cost": value(amendment.unit_cost),
             "reference": amendment.reference, "reviewed_by_local_id": amendment.reviewed_by_id,
             "reviewed_at": value(amendment.reviewed_at)}
+    if receipt.followup_source_id:
+        from inventory.receiving_followups import retained_source
+        basis["followup"] = retained_source(receipt)
     return basis
 
 

@@ -1012,6 +1012,9 @@ class ReceivingReceipt(models.Model):
     STATUS_CHOICES = ((DRAFT, "Draft"), (SUBMITTED, "For review"),
                       (ACCEPTED, "Accepted into inventory"), (RETURNED, "Returned for correction"))
     public_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+    followup_source = models.ForeignKey("ReceivingLine", on_delete=models.PROTECT,
+        null=True, blank=True, related_name="followup_receipts")
+    followup_basis = models.JSONField(default=dict, blank=True)
     department_id = models.PositiveBigIntegerField(db_index=True)
     department_label = models.CharField(max_length=160)
     supplier = models.CharField(max_length=160)

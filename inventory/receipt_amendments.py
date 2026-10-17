@@ -53,7 +53,7 @@ def effective_cost(line):
 def amendment_basis(line):
     receipt = line.receipt
     row = latest_amendment(line)
-    return {"receipt_uuid": str(receipt.public_id), "receipt_version": receipt.state_version,
+    basis = {"receipt_uuid": str(receipt.public_id), "receipt_version": receipt.state_version,
         "owner_local_id": receipt.department_id, "status": receipt.status,
         "header": {key: _value(getattr(receipt, key)) for key in sorted(HEADER_FIELDS)},
         "line_local_id": line.pk, "sequence": line.sequence,
@@ -62,6 +62,10 @@ def amendment_basis(line):
         "effective_unit_cost": _value(row.unit_cost if row else line.unit_cost),
         "predecessor_uuid": str(row.public_id) if row else None,
         "predecessor_checksum": row.content_checksum if row else None}
+    if receipt.followup_source_id:
+        from .receiving_followups import retained_source
+        basis["followup"] = retained_source(receipt)
+    return basis
 
 
 def verify_amendment_evidence(row):

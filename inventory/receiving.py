@@ -49,22 +49,29 @@ def _data(data, fields):
     return dict(data)
 
 
-def _event(receipt, actor, action, note=""):
+def _event(receipt, actor, action, note="", followup_request=None):
     def value(v):
         return v.isoformat() if hasattr(v, "isoformat") else str(v) if v is not None else None
     header = {field: value(getattr(receipt, field)) for field in HEADER_FIELDS}
     lines = list(receipt.lines.values())
-    ReceivingEvent.objects.create(receipt=receipt, actor=actor, action=action, snapshot={
+    snapshot = {
         "public_id": str(receipt.public_id), "version": receipt.state_version,
         "status": receipt.status, "header": header, "note": note,
         "review_note": receipt.review_note, "reviewed_by_id": receipt.reviewed_by_id,
         "evidence": list(receipt.evidence.values("id", "kind", "sha256", "size", "note", "original_filename")),
         "lines": [{key: value(val) for key, val in line.items()} for line in lines],
-    })
+    }
+    if receipt.followup_source_id:
+        snapshot["followup"] = {"source_line_id": receipt.followup_source_id,
+                                "basis": receipt.followup_basis}
+    if followup_request is not None:
+        snapshot["followup_request"] = followup_request
+    ReceivingEvent.objects.create(receipt=receipt, actor=actor, action=action, snapshot=snapshot)
 
 
 def _locked(receipt, actor, action, expected_version):
-    receipt = ReceivingReceipt.objects.select_for_update().get(pk=receipt.pk)
+    from .receiving_followups import lock_receipt
+    receipt = lock_receipt(receipt.pk)
     require_receiving(actor, action, receipt)
     if receipt.state_version != expected_version:
         raise ValidationError("This receipt changed. Reload it before continuing.")
@@ -80,9 +87,17 @@ def _require_editable(receipt):
 def update_receipt(*, actor, receipt, data, expected_version):
     receipt = _locked(receipt, actor, "change", expected_version)
     _require_editable(receipt)
-    for key, value in _data(data, HEADER_FIELDS).items():
+    data = _data(data, HEADER_FIELDS)
+    if receipt.followup_source_id:
+        original = receipt.followup_source.receipt
+        for key in ("supplier", "delivery_reference", "delivery_date", "purchase_order_reference"):
+            if key in data and data[key] != getattr(original, key):
+                raise ValidationError("A follow-up retains the original delivery facts.")
+    for key, value in data.items():
         setattr(receipt, key, value)
     receipt.full_clean()
+    if receipt.followup_source_id and receipt.inspection_date < original.inspection_date:
+        raise ValidationError("Follow-up inspection cannot precede the original inspection.")
     receipt.state_version += 1
     receipt.save()
     _event(receipt, actor, "header_saved")
@@ -93,6 +108,8 @@ def update_receipt(*, actor, receipt, data, expected_version):
 def void_receipt_line(*, actor, receipt, line_id, reason, expected_version):
     receipt = _locked(receipt, actor, "change", expected_version)
     _require_editable(receipt)
+    if receipt.followup_source_id:
+        raise ValidationError("Correct the follow-up line instead of voiding its source link.")
     if not reason.strip():
         raise ValidationError("Explain why this line is being removed from the receipt.")
     try:
@@ -147,6 +164,8 @@ def save_receipt_line(*, actor, receipt, data, expected_version, line_id=None):
     if receipt.status not in (receipt.DRAFT, receipt.RETURNED):
         raise ValidationError("Only draft or returned receipts can be edited.")
     if line_id is None:
+        if receipt.followup_source_id:
+            raise ValidationError("Edit the existing follow-up line; a follow-up cannot add another item.")
         if receipt.lines.count() >= 50:
             raise ValidationError("A receipt supports at most 50 lines.")
         last = receipt.lines.order_by("-sequence").first()
@@ -159,6 +178,9 @@ def save_receipt_line(*, actor, receipt, data, expected_version, line_id=None):
     for key, val in _data(data, LINE_FIELDS).items():
         setattr(line, key, val)
     line.full_clean()
+    if receipt.followup_source_id:
+        from .receiving_followups import validate_followup
+        validate_followup(receipt, [line])
     line.save()
     receipt.state_version += 1
     receipt.save(update_fields=("state_version",))
@@ -177,6 +199,8 @@ def submit_receipt(*, actor, receipt, expected_version):
         raise ValidationError("Record at least one delivery line.")
     for line in lines:
         line.full_clean()
+    from .receiving_followups import validate_followup
+    validate_followup(receipt, lines)
     verify_receipt_evidence(receipt)
     receipt.status = receipt.SUBMITTED
     receipt.state_version += 1
@@ -252,6 +276,8 @@ def accept_receipt(*, actor, receipt, expected_version, note):
     lines = list(receipt.lines.filter(is_void=False).order_by("sequence"))
     if not lines:
         raise ValidationError("An empty receipt cannot be accepted.")
+    from .receiving_followups import validate_followup
+    validate_followup(receipt, lines)
     for line in lines:
         line.full_clean()
         if line.registered_asset_id or line.stock_movement_id:

@@ -1898,3 +1898,110 @@ PASS: git diff --check and local Markdown link validation for changed documents.
 NOT RUN - OUT OF SCOPE: local runtime, migration, browser and recovery reruns for
 this documentation-only audit. Existing milestone evidence is retained without
 claiming a new runtime pass. Normal hosted full shell gates apply to publication.
+
+
+## Receiving follow-up acceptance — 2026-10-17
+
+Fresh baseline78c19e8 clean0/0. Previous audit release was progress; its exact
+featureCI38988773596 and masterCI38988917720 passed. Finance remains candidate
+a533482/master32ab046 with only append-only GSO notes. Separate branch
+`codex/receipt-followup-acceptance`; no operator/Finance source changes.
+
+Implemented linked follow-up receiving header/source basis, exactly one line,
+original-before-follow-up locks, cumulative capacity, signed request replay,
+independent existing receiving review/materialization, staff entry/correction and
+retained original history. Snapshot extensions are conditional on new follow-ups;
+ordinary Finance/property bases retain their shape. Working property source uses
+follow-up inspection date rather than earlier delivery. No accounting rule/posting.
+Migration0028 adds optional relation/basis; adapter0006 declares its dependency
+without schema/data operations. See receiving-followups.md.
+
+PASS affected initial service/receiving/amendment/property suite41 in2.765s.
+PASS focused8 follow-up service/HTTP cases in0.818s. The earliest focused invocation
+discovered26 tests because a fixture TestCase was imported as a class; changed to
+module import so the8 new cases are counted separately, without weakening tests.
+PASS full native shell176/176 in165.538s, exit0, terminal77253,
+`.tmp/followup-native-shell.log`. Includes actual competing follow-up acceptances.
+PASS full standalone176 discovered,151 run/25 native skips,66.987s,exit0,terminal26625,
+`.tmp/followup-shell-final.log`. These full runs preceded the added populated
+migration test and final header-edit guard; targeted results below cover those.
+PASS native focused10/10 in2.888s,exit0,terminal68553,
+`.tmp/followup-native-final.log`:8 service/HTTP,1 real-connection race and1 populated
+0027-to-0028 receipt/event-preservation test. The final header-only guard was added
+while that run was already in progress. PASS final SQLite30/30 in2.108s,exit0,
+`.tmp/followup-shell-guard-final.log`: receiving,follow-ups,populated migration;
+includes rejecting replacement of original supplier through the service.
+Commands: standalone Python `manage.py test <labels> --verbosity 1`; native
+`scripts/run_mysql_tests.py [inventory.test_receiving_followups
+inventory.test_receiving_followup_concurrency inventory.test_receiving_followup_migration]`
+with isolated loopback credentials. System checks/migration drift/diff whitespace PASS.
+
+PASS actual GRAND SQLite141 discovered/120 run/21 native skips in31.864s,exit0,
+terminal96128,`.tmp/followup-grand-sqlite.log`. This included native identity/grant/
+UAT/owner/zero-Finance-query follow-up integration; the additional approved-claim
+retention case was added afterward for the native run. Native broad result pending.
+Command GRAND Python `scripts/run_grand_source_tests.py --grand-root
+C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation [--mysql]`.
+
+PASS populated actual GRAND copy migration: all prior rows/columns in218 nonmigration
+tables retained; Finance file hash unchanged. post_migrate populated7 existing
+Budget Form1 content types and42 associated permissions, with no role assignment.
+Initial harness wrongly expected no metadata additions (FAIL - CAUSED BY CURRENT
+WORK, harness). Inspection identified all7 native Budget models and42 permissions;
+a second harness check used the wrong permission tuple column index, corrected
+after PRAGMA inspection. Final explicit comparison passed. Source copy stayed
+unchanged; preview `.tmp/receiving-followup-preview-z7_ru0hv`.
+
+PASS browser actual GRAND desktop/mobile: original remaining2 -> signed follow-up
+draft1 -> correction1.5 -> retain delivery/inspection packets -> submit -> distinct
+reviewer accepts -> original remaining0.5 with original accepted6 and original
+events unchanged. Screens `output/playwright/receiving-followup-*`; form/original
+mobile screenshots visually inspected. Initial navigation used the shell URL and
+returned404; used harness /gso/inventory/ routes thereafter. Existing native logo/
+favicon404s on login/public pages were from copied media; no new receiving error.
+Browser receiving-followup and preview52001 stopped before recovery.
+
+PASS stopped paired restore219 default/83 Finance tables and16 private files,
+exact manifests/source hashes preserved. Original/follow-up lineage,6-event child
+history,stock7.5,remainder0.5 retained. Missing/tampered original and follow-up
+packets rejected; receiving evidence checker passed. Prior property/disposal
+history/unknown evidence controls also retained. Backup:
+`C:/Users/Administrator/.codex/backups/gsov2-receiving-followup-recovery-20261017-f7bss3tn`.
+Helper `.tmp/rehearse_receiving_followup_recovery.py`,log`.tmp/followup-recovery.log`.
+This is stopped synthetic SQLite recovery, not online/operator/RPO/RTO acceptance.
+Operator database SHA256 remains5c6c3c66e46d8a6f4a95799806ec96f4ef3fda923027adba29d63e9f337a2039.
+
+NOT RUN - OUT OF SCOPE: official-form acceptance, operator migration/grants,
+production deployment and accepted-quantity reversal; none is claimed here.
+VM README reread; actual repository rulesets[] and master protected=false.
+Publication awaits final native/adapter checks and the ordinary hosted gates.
+
+
+Native GRAND first run: FAIL - CAUSED BY CURRENT WORK (test fixture),141 pass/1
+error among142,57.915s,exit1,terminal16344,`.tmp/followup-grand-native.log`. The new
+approved-support test discarded finish(child)'s accepted return value, so its
+related line retained a cached draft header and submitted a stale Finance basis.
+The production stale-basis guard correctly rejected it. Corrected the fixture to
+use the returned accepted receipt; no guard was weakened. Full native rerun on
+final source is pending at terminal24710,`.tmp/followup-grand-native-final.log`.
+
+PASS final actual-GRAND adapter dependency check on another populated copy:
+`.tmp/check_followup_adapter.py --grand-root .../gsov2-grand-v173-validation`,
+exit0,`.tmp/followup-adapter-check.log`. Adapter0006 plan includes inventory0028
+before itself, the adapter migration is recorded after migrate, system checks and
+makemigrations --check --dry-run pass. Original218 tables' old rows/columns remain
+with the same explicitly checked native7/42 metadata additions; Finance bytes
+unchanged. This empty dependency migration was added after the first broad run
+started and is included in the final native rerun. VM inspect/preview selects
+minor0.24.0 and generates only VERSION/CHANGELOG.
+
+
+Final native GRAND: PASS142/142 in59.470s,exit0,terminal24710,
+`.tmp/followup-grand-native-final.log`. Corrected fixture uses the accepted returned
+child; both original approved60 and child approved40 remain valid against the same
+100 claim, original receipt snapshot unchanged, with zero Finance queries. Full
+native rerun includes final code and adapter0006. Owned MySQL33317 was shut down
+normally after no disposable test schemas remained. No live owned test/preview.
+Changed Python syntax, Markdown local links and whitespace checks PASS.
+Feature/master hosted receipts will be checked after the actual VM transaction;
+this pre-release note does not claim those unperformed outcomes.

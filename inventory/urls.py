@@ -56,6 +56,7 @@ urlpatterns = [
     path("maintenance/evidence/<int:pk>/", maintenance_views.maintenance_evidence, name="maintenance-evidence"),
     path("receiving/", receiving_views.receipt_list, name="receiving-list"),
     path("receiving/new/", receiving_views.receipt_create, name="receiving-create"),
+    path("receiving/line/<int:pk>/follow-up/", receiving_views.receipt_followup, name="receiving-followup"),
     path("receiving/<int:pk>/", receiving_views.receipt_detail, name="receiving-detail"),
     path("receiving/evidence/<int:pk>/", receiving_views.evidence_download, name="receiving-evidence"),
     path("dashboard/", views.dashboard, name="dashboard"),

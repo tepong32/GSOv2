@@ -207,3 +207,14 @@ balance; preserve historical records for investigation. Never reconstruct openin
 chronology or source UUIDs from today's custody. The stopped synthetic rehearsal
 preserved both stores and verified corrections; it does not replace operational
 online MySQL backup/restore acceptance.
+
+
+## Receiving follow-up lineage
+
+Follow-up inspection reuses the receiving private namespace. Preserve the original
+receipt/line and packet, child source relation/basis, child packet/materialization
+and both event histories together. The stopped synthetic paired restore retained
+219 default/83 Finance tables and16 files, stock7.5 and unresolved remainder0.5;
+missing/changed original or child packets were detected. See validation for the
+backup receipt and limits. Adapter0006 only declares the inventory0028 dependency.
+No operator migration or online recovery acceptance is established by that drill.

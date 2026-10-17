@@ -139,6 +139,13 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   Finance UAT viewers may only read scoped receipts/private evidence. Enforce the
   same policy in services, POST entry points and rendered controls; never cache
   receiving pages or private downloads. Standalone permissions remain supported.
+- Delivered-remainder follow-ups reuse receiving headers with protected original
+  line/basis and one independently reviewed line. Lock original receipt before
+  follow-up; cap cumulative accepted/rejected quantities without rewriting the
+  original acceptance or Finance snapshots. Retain original delivery facts and
+  use follow-up inspection date for its working stock entry. See
+  [follow-up design](docs/receiving-followups.md); never treat rejected goods or a
+  later delivery as an unresolved remainder. Include both packets in recovery.
 - Claim support pins both claim and receipt facts. Preserve NULL historical receipt
   bases; never backfill approval evidence from today's values. Re-read lines after
   taking receipt locks, keep case → receipt → attribution order, and retain original

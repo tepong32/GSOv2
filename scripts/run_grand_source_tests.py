@@ -88,6 +88,7 @@ def main():
                  "gso_integration_tests.grand_property_link_migration",
                  "gso_integration_tests.grand_receipt_basis",
                  "gso_integration_tests.grand_receiving_authority",
+                 "gso_integration_tests.grand_receiving_followups",
                  "gso_integration_tests.grand_asset_authority",
                  "gso_integration_tests.grand_receipt_amendments",
                  "gso_integration_tests.grand_journal_sources",

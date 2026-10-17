@@ -210,7 +210,7 @@ def source_id(row):
 
 def physical_date(kind, basis):
     physical = basis["physical"]
-    raw = (physical["receipt"]["header"]["delivery_date"] if kind == "receipt"
+    raw = (physical["receipt"]["header"]["inspection_date" if physical["receipt"].get("followup") else "delivery_date"] if kind == "receipt"
            else physical["record"]["disposal_date" if kind == "disposal" else "transfer_date"])
     return date.fromisoformat(raw)
 
@@ -249,9 +249,10 @@ def project(*, actor, asset, cutoff):
     selected = sorted((row for key, row in current.items() if key != "opening"
         and opening.movement_date < row.movement_date <= cutoff), key=lambda r: (r.movement_date, r.within_day_order))
     expected = set()
-    for line in ReceivingLine.objects.filter(registered_asset=asset, receipt__status="accepted", is_void=False,
-            receipt__delivery_date__gt=opening.movement_date, receipt__delivery_date__lte=cutoff).select_related("receipt"):
-        expected.add(f"receipt:{line.receipt.public_id}:{line.sequence}")
+    for line in ReceivingLine.objects.filter(registered_asset=asset, receipt__status="accepted", is_void=False).select_related("receipt"):
+        event_date = line.receipt.inspection_date if line.receipt.followup_source_id else line.receipt.delivery_date
+        if opening.movement_date < event_date <= cutoff:
+            expected.add(f"receipt:{line.receipt.public_id}:{line.sequence}")
     for transfer in asset.transfers.filter(status="accepted", transfer_date__gt=opening.movement_date, transfer_date__lte=cutoff):
         expected.add(f"transfer:{transfer.public_id}")
     for case in asset.disposal_cases.filter(status="disposed", disposal_date__gt=opening.movement_date, disposal_date__lte=cutoff):
