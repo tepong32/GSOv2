@@ -322,3 +322,13 @@ Finance remains read-only to GSO services. Preserve request/predecessor/event UU
 property and dimension snapshots, source packet and explicit Department/user key
 remappings in any future installation import. This code does not implement that
 import or deploy the module into the operator GRAND instance.
+
+## Historical authentication exclusion
+
+The [historical-data audit](security-and-recovery.md) confirms authentication and
+session records in old prototype database blobs. Future imports must exclude
+credentials, sessions, tokens and privileges; source business actors need reviewed
+mapping to native GRAND identities, with original evidence retained. This is an
+acceptance requirement for the still-unimplemented importer, not a claimed filter
+or completed remediation. Existing same-installation recovery tests do not prove
+safe cross-installation import.

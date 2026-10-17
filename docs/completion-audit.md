@@ -1,7 +1,7 @@
 # GSO completion audit
 
-Checkpoint: 2026-10-17. Code baseline a7cfb2d, fetched master and working tree
-clean and equal. This is a finite scope audit, not a new feature list or compliance
+Checkpoint: 2026-10-17. Rechecked published baseline89890e1, fetched master and
+working tree clean and equal before this documentation audit. This is a finite scope audit, not a new feature list or compliance
 certificate. The overall goal is incomplete. [CONTINUE](../CONTINUE.md) owns the
 current checkpoint; the [roadmap](inventory-roadmap.md) and
 [COA matrix](coa-requirements.md) retain the full requirements and source limits.
@@ -28,11 +28,11 @@ still states production NO-GO; GSO release checks cannot satisfy that gate.
 | Mistaken accepted quantity / physical reversal | The user-selected [clerical overstatement before use](receipt-quantity-corrections.md) has a reviewed workflow published at33cd899: source-lot adjustment or retained erroneous asset, original facts unchanged. See CONTINUE for release state. | Native races, source/hold checks, populated migration, real GRAND, browser and restore evidence are recorded in validation. Cases after use, changed inspection decisions and actual returns remain explicit reconciliation, not automatic repair. |
 | Physical cost allocation and valuation | Keep documentary amounts separate from Accounting's approved treatment. Reuse native Finance dimensions and journal lineage, not another ledger. | Accountant-confirmed allocation basis and representative delivery/claim/component cases; prevent duplicate capacity and preserve unknown costs. |
 | Official PAR/ICS/SPC/RPCPPE/RPCI/RSMI outputs | Use reviewed sources and accepted local templates/signatories. Existing working registers and CSVs remain working records. | Applicable issuance text, effectivity/amendment review, actual municipal template and numbering/sign-off process. No generated signature or implied approval. |
-| Imported history and openings | Use explicit source-to-target identity maps and reviewed openings; preserve unreconciled records. | Representative export and source ownership, department/user/Finance identity mapping, duplicate decisions and repeatable restored-copy import validation. Never match numeric IDs or names automatically. |
+| Imported history and openings | Use explicit source-to-target identity maps and reviewed openings; preserve unreconciled records. | Representative export and source ownership, exclusion of prototype authentication/session data, department/user/Finance identity mapping, duplicate decisions and repeatable restored-copy import validation. Never match numeric IDs or names automatically. |
 | Loss and relief from accountability | Distinguish missing-item findings, investigation, authorized relief and disposal. Do not retire or derecognize from a missing finding. | Verified applicable process and authority, evidence requirements and real office scenarios. A new incident form alone would not complete relief processing. |
 | General office filing | Reuse native GRAND Records, already linked. Add operational associations only through its explicit supported-source policy. | A concrete filing use case and native ownership/confidentiality/retention/recovery review before adding inventory associations. |
 | Vehicle use/fuel or additional office records | Do not expand into a fleet/procurement ERP by inference. Existing vehicle register and maintenance remain usable. | Confirmed record type and office process before adding more schema. This is conditional scope, not a fabricated blocker to existing workflows. |
-| Production and recovery | Follow GRAND's two-store recovery and deployment procedure, including all private evidence/media. | Target environment, operator roles, historical exposure review, protected storage, actual restore/RPO/RTO and operational acceptance. Synthetic drills and CI do not establish production readiness. |
+| Production and recovery | Follow GRAND's two-store recovery and deployment procedure, including all private evidence/media. | Target environment, operator roles, disposition of the verified historical authentication exposure, protected storage, actual restore/RPO/RTO and operational acceptance. Synthetic drills and CI do not establish production readiness. |
 
 ## Why the next engineering item is concrete
 

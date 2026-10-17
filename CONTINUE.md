@@ -5,6 +5,34 @@ Read [roadmap](docs/inventory-roadmap.md), [completion audit](docs/completion-au
 [data design](docs/grand-integration-design.md), [COA sources](docs/coa-requirements.md)
 and [validation](docs/validation-2026-10-16.md) before substantial work.
 
+## Current historical-data audit
+
+Prior goal turn was progress: actual VM verification repair89890e1 /v0.25.1 was
+integrated/pushed master; exact feature CI38993852886 and masterCI38994043849 PASS.
+This turn fetched clean0/0; Finance still candidate a533482/master32ab046 with
+only the existing untracked coordination note. No live test/preview process.
+
+Branch `codex/historical-data-audit` contains documentation only. Read-only,
+in-memory inspection of origin/master's nine historical database blobs confirmed
+account/password-hash/session records in all nine, including one superuser in each.
+Only aggregate metadata was retained in `.tmp/historical-database-audit.json`;
+no credentials, identifiers or session contents were printed. See security/recovery
+for scope, unknown reuse and the required authentication exclusion in future imports.
+No operator data, credentials or Git history changed. This does not complete the
+separate broader historical-secret/media review or production remediation.
+
+The remaining completion inputs are actual local forms/signatory/numbering rules,
+representative historical data and identity maps, Accountant-confirmed allocation
+cases, and the intended deployment/operational recovery evidence. A text question
+is pending for municipality and first form details (PAR recommended). Do not invent
+those inputs or create another schema to stand in for them. Native Records already
+covers general filing. Continue source research only where it can resolve a specific
+requirement; do not repeatedly restate a completed release as unfinished work.
+
+Next: publish this documentation checkpoint with the actual VM workflow and
+exact-commit hosted checks. No runtime tests needed for prose-only changes; prior
+code evidence remains scoped to89890e1. The goal remains incomplete.
+
 ## Current verification follow-up repair
 
 2026-10-17: prior goal turn was progress: actual VM correction release33cd899
@@ -26,11 +54,8 @@ binding failed one test because consecutive checks can share a timestamp; replac
 with exact observed-field comparison plus the history-event identity. Full SQLite
 regression PASS202 discovered/175 run/27 skips,76.790s in terminal44515; final
 focused native MySQL5/5 PASS1.761s. Actual GRAND authority8/8 PASS1.053s, terminal98644, zero Finance queries.
-Next: actual VM patch release and exact feature/master hosted gates. Local checks
-pass; inspect/preview changes only VERSION/CHANGELOG. All temporary databases were
-cleaned and owned MySQL33317 stopped normally. No browser server is live. This is
-a pre-publication checkpoint; verify remote commits/tags/CI before repeating release.
-Do not repeat the completed correction release.
+Published at89890e1 as recorded above; do not repeat that release. Temporary
+databases were cleaned and owned MySQL33317 stopped normally.
 The broader finite completion audit and real local/operational prerequisites remain.
 
 ## Selected correction checkpoint

@@ -25,6 +25,31 @@ to the internet or an assertion that LGU operational acceptance has passed.
   is claimed. Before production use, inspect historical exposure privately and
   replace any real credentials/accounts that were distributed in a prototype DB.
 
+## Verified historical database exposure — 2026-10-17
+
+Read-only inspection at master89890e1 found nine distinct `db.sqlite3` blobs
+reachable through origin/master history. Each contains two account rows, one
+superuser row, at least one usable password-hash record and session rows. All nine
+passed SQLite integrity_check. Inspection used in-memory, query-only SQLite and
+exported aggregate metadata only; no account identifiers, password hashes or
+session contents were printed or copied into documentation. Current tracked files
+contain neither `.env` nor SQLite databases. This confirms historical exposure;
+it does not establish real credential reuse, current session validity or compromise.
+The bounded check is not a comprehensive historical secret/media scan.
+
+Integration decision: never import prototype users' authentication credentials,
+sessions, tokens or privileges into GRAND. Use native GRAND accounts with explicit
+reviewed identity mappings for business history. Do not substitute invented users
+or silently rewrite historical actor snapshots/checksums. No data importer exists
+yet, so this is a required import acceptance condition, not an implemented filter.
+
+Before an operational installation, the operator must identify whether these
+prototype credentials or signing secrets were reused, replace any affected live
+credentials and invalidate affected sessions through the owning system's supported
+process. Record disposition without including secrets. No live credential rotation,
+session revocation, history rewrite or removal from existing clones is claimed.
+Historical release evidence and operator databases remain untouched.
+
 ## Recovery approach aligned with GRAND
 
 Clerical receipt quantity corrections add private packets under

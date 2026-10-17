@@ -1,5 +1,27 @@
 # GSO alignment foundation validation — 2026-10-16
 
+## 2026-10-17: historical-data exposure audit (documentation only)
+
+PASS: fresh GSO fetch/status and history comparison at89890e1, clean0/0. Finance
+fetch unchanged a533482/master32ab046, existing coordination note only. Exact
+prior release master CI38994043849 confirmed success at89890e1.
+
+PASS: `.tmp/audit_historical_database.py` enumerated `git rev-list origin/master
+-- db.sqlite3`, deduplicated existing blobs, deserialized them into query-only
+in-memory SQLite, and inspected aggregate counts plus integrity_check. Nine
+snapshots, all with account/usable-password/session rows; two accounts and one
+superuser per snapshot. No private field values exported. Aggregate receipt:
+`.tmp/historical-database-audit.json` outside tracked files. `git ls-files
+'*.sqlite3' '.env'` returned none. This is a bounded exposure finding, not proof
+of current credential reuse, live-session validity, compromise or remediation.
+
+NOT RUN - OUT OF SCOPE: new application/native/browser/restore tests; only durable
+prose/import-acceptance requirements changed. No production configuration or data
+changed. Run diff/link review and actual VM inspect/preview before publication;
+hosted exact-commit checks remain the integration gate.
+Initial VM inspect found a Windows-encoded inserted dash; normalized that file
+to UTF-8 and corrected newline duplication. Final diff check and preview pass.
+
 ## 2026-10-17: verification follow-up integrity (unreleased)
 
 Sync PASS: fetched GSO master33cd899, clean0/0; Finance candidate a533482,

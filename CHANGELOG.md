@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.25.2] - 2026-10-17
+### Documentation
+- Document historical authentication exposure and import boundaries
+
 ## [0.25.1] - 2026-10-17
 ### Fixed
 - Keep verification follow-up decisions tied to observed facts

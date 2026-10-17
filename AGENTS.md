@@ -78,6 +78,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
 - Enforce department and action permissions in views and services. Preserve audit
   and correction history, private evidence, and independent review where required.
   Do not grant roles, change the operator database, or deploy as part of a code release.
+- Historical prototype databases contain authentication/session data. Never import
+  their credentials, sessions or privileges into GRAND; map business-history actors
+  explicitly to native identities. See the verified historical-data finding in
+  [security and recovery](docs/security-and-recovery.md).
 - Back up data and evidence outside Git. GRAND's coordinated two-store recovery
   procedure is the integration target; a CSV or Git tag is not a data backup.
 - Prefer the smallest vertical workflow using established services. No generic
