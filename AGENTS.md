@@ -71,6 +71,10 @@ Its tests use the isolated actual-GRAND harness; see the handoff for development
   Preserve historical source/property versions; missing history is not zero stock.
   Keep current reconstructed stock distinct from historical knowledge and official
   SPC acceptance; include movement packets and correction history in recovery.
+- New physical observations invalidate current discrepancy resolutions while
+  preserving their events. Follow-up review binds the displayed observation and
+  history event, checked under the record lock; a resolution is never relief from
+  accountability or authority to change custody, dispose or write Finance.
 - Enforce department and action permissions in views and services. Preserve audit
   and correction history, private evidence, and independent review where required.
   Do not grant roles, change the operator database, or deploy as part of a code release.

@@ -1,5 +1,45 @@
 # GSO alignment foundation validation — 2026-10-16
 
+## 2026-10-17: verification follow-up integrity (unreleased)
+
+Sync PASS: fetched GSO master33cd899, clean0/0; Finance candidate a533482,
+master32ab046 unchanged, existing coordination note only. Previous milestone
+published with exact feature/master CI38992943732/38993133478 PASS.
+
+Observed source defect: record_asset_verification replaced the physical observation
+but retained resolution fields, so a newly changed missing/discrepant observation
+could appear already resolved. Reset current resolution on new checks; preserve
+prior event rows. Signed forms bind actor, record, latest history event and exact
+observed fields; compare under the record lock. No asset or Finance state changes.
+
+PASS: isolated `.tmp/run_verification_tests.py inventory.test_verification_followups`,
+5 tests,1.668s. Covers reopened discrepancies, matched observations, retained
+history, stale/duplicate decisions, missing/stale HTTP tokens and the interleaving
+between reading a record and its latest event. FAIL - CAUSED BY CURRENT WORK:
+intermediate timestamp-only binding did not reject same-timestamp changed facts;
+replaced by exact field comparison and rerun passed. Full regression PASS202 discovered/175 run/27 native skips,76.790s, terminal44515,
+`.tmp/verification-full.log`; this began before the final observed-field binding,
+covered by the final focused run. Native MySQL5/5 PASS1.761s, terminal2068,
+`.tmp/verification-native.log`, using `scripts/run_mysql_tests.py
+inventory.test_verification_followups`. Fresh disposable schema only.
+
+PASS: actual GRAND native authority8/8,1.053s, terminal98644 exit0 through
+`.tmp/run_verification_grand.py --grand-root C:/Users/Administrator/.codex/worktrees/gsov2-grand-v173-validation --mysql`;
+`.tmp/verification-grand-native.log`. Wrapper selects the existing authority module,
+now extended with a native scoped signed review/reset/Finance-no-query case.
+Owned MySQL33317 shut down normally after confirming all test schemas removed.
+VM inspect/preview selects a patch and changes only VERSION/CHANGELOG.
+NOT RUN - OUT OF SCOPE: new populated migration/restore drill (no schema, file or
+storage change); prior evidence is retained, and regression tests explicitly check
+that existing events survive new observations. Broader concurrency/deployment
+acceptance is not claimed. No migration changed; operator database hash unchanged.
+
+Research follow-up: COA's indexed relief FAQs distinguish notice/application,
+but their notice-period summaries differ. Direct 2024 Citizen Charter PDF returned
+403; do not infer a new deadline or adjudication workflow from these snippets.
+No legal rule or loss/relief schema was added. The substantive engineering repair
+above follows observed data lineage, not an unverified legal interpretation.
+
 ## 2026-10-17: reviewed clerical receipt quantities (feature validation)
 
 GSO `codex/receipt-correction-design`, baseline ad8b348; fresh remote comparison0/0

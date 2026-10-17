@@ -5,6 +5,34 @@ Read [roadmap](docs/inventory-roadmap.md), [completion audit](docs/completion-au
 [data design](docs/grand-integration-design.md), [COA sources](docs/coa-requirements.md)
 and [validation](docs/validation-2026-10-16.md) before substantial work.
 
+## Current verification follow-up repair
+
+2026-10-17: prior goal turn was progress: actual VM correction release33cd899
+was integrated/pushed to master, tag v0.25.0. Feature CI38992943732 and master
+CI38993133478 PASS on that exact commit. Canonical and feature clean0/0 at this
+turn's start; Finance fetched unchanged candidate a533482/master32ab046, with
+only its existing untracked GSO coordination note. Operator data untouched.
+
+New branch `codex/verification-followup-integrity` in the existing feature worktree.
+Source audit found that recording a later physical observation retained the old
+follow-up decision, incorrectly hiding fresh discrepancies from pending follow-ups.
+The repair clears only current resolution fields, retains original history, and
+binds review submissions to the observed fields and latest history event. Stale,
+duplicate and missing-token submissions are rejected. History now displays the
+retained decision notes. No migration, authority changes or Finance writes.
+
+Five focused SQLite service/HTTP regressions PASS1.668s. An intermediate timestamp
+binding failed one test because consecutive checks can share a timestamp; replaced
+with exact observed-field comparison plus the history-event identity. Full SQLite
+regression PASS202 discovered/175 run/27 skips,76.790s in terminal44515; final
+focused native MySQL5/5 PASS1.761s. Actual GRAND authority8/8 PASS1.053s, terminal98644, zero Finance queries.
+Next: actual VM patch release and exact feature/master hosted gates. Local checks
+pass; inspect/preview changes only VERSION/CHANGELOG. All temporary databases were
+cleaned and owned MySQL33317 stopped normally. No browser server is live. This is
+a pre-publication checkpoint; verify remote commits/tags/CI before repeating release.
+Do not repeat the completed correction release.
+The broader finite completion audit and real local/operational prerequisites remain.
+
 ## Selected correction checkpoint
 
 The user answered the office-case question: **clerical overstatement before use**.
@@ -20,13 +48,10 @@ wired. Finance ceilings use effective accepted quantities; uncorrected snapshots
 retain their shape, while any existing support history excludes the first shortcut.
 There is no Finance DML, new authority registry, operator migration/grant or deployment.
 
-Current feature branch: `codex/receipt-correction-design`, based on ad8b348.
-Fresh fetch: baseline HEAD and origin/master equal (0/0), with only the previous
-goal turn's intended source/design edits. Finance remains candidate a533482, master32ab046,
-with only the existing untracked coordination note. Its production NO-GO remains.
-The preceding receiving follow-up release is complete: actual VM commit ad8b348,
-tag v0.24.0, feature CI38990465812 and master CI38990605051 PASS. Do not release
-or integrate that milestone again. Canonical master is also ad8b348.
+Published correction branch `codex/receipt-correction-design`: actual VM commit
+33cd899, tag v0.25.0, integrated/pushed master. Feature CI38992943732 and master
+CI38993133478 PASS. Published receiving follow-up ad8b348 remains its predecessor.
+Finance candidate a533482/master32ab046 and production NO-GO remain unchanged.
 
 Validation (exact commands and chronology in validation):
 - Full standalone SQLite193 discovered/168 run/25 skips PASS,72.957s, earlier state.
@@ -46,14 +71,10 @@ Validation (exact commands and chronology in validation):
   `C:/Users/Administrator/.codex/backups/gsov2-receipt-quantity-recovery-20261017-9xv4hpz1`.
   Source-lot/history preserved; missing/tampered packets and altered result rejected.
 
-Next: perform the actual external VM minor release and exact-commit hosted gates
-before integrating master. README/inspect/preview were read/run; configured remote
-rulesets are empty and master is unprotected. All local gates above passed.
-This is the pre-publication checkpoint: consult Git/tag/hosted receipts before
-deciding whether release remains. Do not repeat a completed VM release based only
-on this note. Owned MySQL33317 was shut down normally after test schema cleanup.
-No browser/preview server is live. After publication, continue the finite completion
-audit; broader official-form, import and operational acceptance remain incomplete.
+Correction publication is complete; do not release that milestone again.
+Owned MySQL33317 and correction previews were stopped after validation; the current
+repair's test processes are tracked in the checkpoint above. Broader official-form,
+import and operational acceptance remain incomplete.
 
 ## Published receiving follow-up evidence
 
@@ -113,7 +134,7 @@ association types. GRAND's own production NO-GO remains authoritative.
 ## Locations and preserved state
 
 - Feature checkout: `C:/Users/Administrator/.codex/worktrees/gsov2-receiving-safety`.
-  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`, masterad8b348.
+  Canonical: `C:/Users/Administrator/Desktop/GH/GSOv2`; baseline master33cd899.
 - Finance active: `C:/Users/Administrator/.codex/worktrees/finance-form1-treatments/grand`;
   candidate a533482, remote master32ab046. Fetch/read its own CONTINUE before work.
   Only append to docs/GSO_INTEGRATION_REVIEW.md for coordination; no Finance publish.

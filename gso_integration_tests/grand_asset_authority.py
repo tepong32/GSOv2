@@ -162,3 +162,31 @@ class GrandAssetAuthorityTests(TestCase):
                 Path(row.file.path).write_bytes(b"%PDF-changed evidence")
                 self.assertEqual(self.client.get(url).status_code, 409)
             self.assertEqual(len(finance), 0)
+    def test_changed_count_requires_new_scoped_review_without_finance_writes(self):
+        with CaptureQueriesContext(connections['finance']) as finance:
+            count = services.start_asset_verification_round(actor=self.clerk, title='Recheck', as_of_date=timezone.localdate())
+            record = count.records.get(asset=self.asset)
+            record = services.record_asset_verification(actor=self.clerk, record=record,
+                data={'result':'not_found', 'notes':'Initial search'})
+            event_id = record.events.last().pk
+            observation = services.verification_observation(record)
+            services.resolve_asset_verification_followup(actor=self.clerk, record=record,
+                status='resolved', note='Initial review', expected_event_id=event_id, expected_observation=observation)
+            record = services.record_asset_verification(actor=self.clerk, record=record,
+                data={'result':'not_found', 'notes':'Further search'})
+            self.assertTrue(record.needs_followup)
+            for actor in (self.viewer, self.super_no_grant, self.outsider):
+                with self.assertRaises(PermissionDenied):
+                    services.resolve_asset_verification_followup(actor=actor, record=record,
+                        status='resolved', note='Denied', expected_event_id=record.events.last().pk,
+                        expected_observation=services.verification_observation(record))
+            self.client.force_login(self.clerk)
+            url = reverse('inventory:asset-verification-followup', args=[record.pk])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(url, {'status':'resolved','note':'Fresh native review',
+                'review_token':response.context['review_token']})
+            self.assertEqual(response.status_code, 302)
+            record.refresh_from_db()
+            self.assertFalse(record.needs_followup)
+        self.assertEqual(len(finance), 0)

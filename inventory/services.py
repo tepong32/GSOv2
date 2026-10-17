@@ -388,9 +388,14 @@ def record_asset_verification(*, actor, record, data):
     record.observed_office = data.get("observed_office", "").strip()
     record.condition = data.get("condition", "")
     record.notes = data.get("notes", "").strip()
+    # A decision applies to its observed facts, never to a later physical check.
+    record.follow_up_status = AssetVerificationRecord.FOLLOW_UP_OPEN
+    record.resolution_note = ""
+    record.resolved_by = None
+    record.resolved_at = None
     record.verified_by = actor
     record.verified_at = timezone.now()
-    record.save(update_fields=("result", "observed_department", "observed_office", "condition", "notes", "verified_by", "verified_at"))
+    record.save(update_fields=("result", "observed_department", "observed_office", "condition", "notes", "verified_by", "verified_at", "follow_up_status", "resolution_note", "resolved_by", "resolved_at"))
     AssetVerificationEvent.objects.create(
         record=record, actor=actor,
         snapshot={
@@ -413,8 +418,13 @@ def record_asset_verification(*, actor, record, data):
     return record
 
 
+def verification_observation(record):
+    return {field: getattr(record, field) for field in (
+        "result", "observed_department", "observed_office", "condition", "notes")}
+
+
 @transaction.atomic
-def resolve_asset_verification_followup(*, actor, record, status, note):
+def resolve_asset_verification_followup(*, actor, record, status, note, expected_event_id, expected_observation):
     if not can_manage_asset_verification(actor, "record"):
         raise PermissionDenied
     record = AssetVerificationRecord.objects.select_for_update().select_related("verification_round").get(pk=record.pk)
@@ -422,6 +432,10 @@ def resolve_asset_verification_followup(*, actor, record, status, note):
         department = gso_department_for_user(actor)
         if not department or record.verification_round.department_id != department.pk:
             raise PermissionDenied
+    latest_event_id = record.events.order_by("-pk").values_list("pk", flat=True).first()
+    if (type(expected_event_id) is not int or latest_event_id != expected_event_id
+            or expected_observation != verification_observation(record)):
+        raise ValidationError("The physical check or follow-up changed. Reload and review it again.")
     if record.result not in (AssetVerificationRecord.DISCREPANCY, AssetVerificationRecord.NOT_FOUND):
         raise ValidationError("Only a discrepancy or missing asset needs a follow-up decision.")
     if status not in (AssetVerificationRecord.FOLLOW_UP_RESOLVED, AssetVerificationRecord.FOLLOW_UP_ACCEPTED):
@@ -438,6 +452,7 @@ def resolve_asset_verification_followup(*, actor, record, status, note):
         record=record, actor=actor,
         snapshot={
             "action": "follow_up_resolved", "result": record.result,
+            "reviewed_event_id": latest_event_id,
             "follow_up_status": record.follow_up_status,
             "resolution_note": record.resolution_note,
             "resolved_at": record.resolved_at.isoformat(),

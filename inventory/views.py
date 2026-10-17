@@ -43,7 +43,7 @@ from .services import (
     respond_to_disposal_case, review_asset_disposal_case,
     submit_asset_disposal_request, update_asset, update_consumable,
     start_asset_verification_round, record_asset_verification, close_asset_verification_round,
-    resolve_asset_verification_followup, record_unregistered_verification_finding,
+    resolve_asset_verification_followup, verification_observation, record_unregistered_verification_finding,
     review_unregistered_verification_finding, import_accounting_asset_snapshot,
 )
 
@@ -458,10 +458,22 @@ def asset_verification_followup(request, pk):
         AssetVerificationRecord.objects.select_related("verification_round"),
         pk=pk, verification_round__in=_verification_round_queryset(request.user),
     )
+    review_token = signing.dumps({"actor": request.user.pk, "record": record.pk,
+        "observation": verification_observation(record),
+        "event": record.events.order_by("-pk").values_list("pk", flat=True).first()},
+        salt="inventory.verification-followup")
     form = AssetVerificationFollowUpForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         try:
+            try:
+                basis = signing.loads(request.POST.get("review_token", ""),
+                    salt="inventory.verification-followup", max_age=1800)
+            except signing.BadSignature:
+                raise ValidationError("This review form expired or is invalid. Reload and review again.")
+            if basis.get("actor") != request.user.pk or basis.get("record") != record.pk:
+                raise PermissionDenied
             resolve_asset_verification_followup(
+                expected_event_id=basis.get("event"), expected_observation=basis.get("observation"),
                 actor=request.user, record=record, status=form.cleaned_data["status"],
                 note=form.cleaned_data["note"],
             )
@@ -470,7 +482,7 @@ def asset_verification_followup(request, pk):
         else:
             messages.success(request, "Follow-up decision recorded in the verification history.")
             return redirect("inventory:asset-verification-detail", pk=record.verification_round_id)
-    return render(request, "inventory/asset_verification_followup.html", {"record": record, "form": form})
+    return render(request, "inventory/asset_verification_followup.html", {"record": record, "form": form, "review_token": review_token})
 
 
 @asset_access_required("view")

@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.25.1] - 2026-10-17
+### Fixed
+- Keep verification follow-up decisions tied to observed facts
+
 ## [0.25.0] - 2026-10-17
 ### Added
 - Add reviewed clerical receipt quantity corrections

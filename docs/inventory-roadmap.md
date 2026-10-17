@@ -38,8 +38,7 @@ of delivered unresolved quantities is implemented; see [its design](receiving-fo
 and CONTINUE for validation/publication. The user selected clerical overstatement
 before use as the first accepted-quantity correction case. The
 [selected workflow](receipt-quantity-corrections.md) traces custody, stock/FIFO and
-Finance support. Implementation is on the feature branch; CONTINUE records its
-validation/publication state. Changed inspection decisions, returns after use and
+Finance support. The correction workflow is published at33cd899; CONTINUE records validation. Changed inspection decisions, returns after use and
 Accounting reversals remain distinct cases, not automatic extensions of this one.
 Do not expand conditional vehicle/general-office scope without a concrete use case.
 
@@ -72,6 +71,10 @@ or reservation is inferred. Stock form retry protection remains in place.
 ### 1. Annual physical count reporting and reconciliation — implemented
 
 Extend verification rounds with an explicit count/as-of date, a way to record items found during the count that are not in the register, and a discrepancy follow-up process. Produce a reviewable comparison between the GSO register, physical findings, and Accounting's asset records. Begin with controlled import/export and manual review; do not update Finance records automatically.
+
+Physical-check follow-up now requires fresh review after each new observation;
+previous decisions remain in history, and signed stale reviews are rejected.
+This does not adjudicate losses or change asset custody. See CONTINUE for validation.
 
 The working comparison distinguishes found and matched, differences in serial/department/account/cost/date, not found, register-only, Accounting-only, ambiguous tags, and items found outside the register. It keeps the original private Accounting CSV and normalized snapshot, records review history, and exports a working reconciliation CSV. It does not generate the official RPCPPE form; validate its fields and sign-off process with the LGU Accountant before creating that output.
 
