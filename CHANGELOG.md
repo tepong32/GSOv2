@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.26.4] - 2026-11-10
+### Security
+- Bump Pillow to 13.0.0 to resolve pip-audit security advisories
+
 ## [0.26.3] - 2026-10-17
 ### Documentation
 - Record paused standalone and GRAND-first development decision
